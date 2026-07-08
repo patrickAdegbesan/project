@@ -1,6 +1,12 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HealthContext = createContext(null);
+
+// All state is persisted on-device under this key, so the app works fully
+// offline and data survives restarts. Demo data is seeded once on first
+// launch only.
+const STORAGE_KEY = '@health_monitor/state/v1';
 
 // ── Seed data generator ──────────────────────────────────────────────────────
 function generateRecords() {
@@ -102,17 +108,56 @@ export function getOverallStatus(record) {
 }
 
 // ── Provider ──────────────────────────────────────────────────────────────────
+const INITIAL_REMINDERS = [
+  { id: 'r1', label: 'Morning Weigh-in',    time: '7:00 AM', enabled: true },
+  { id: 'r2', label: 'Medication Reminder', time: '9:00 PM', enabled: true },
+  { id: 'r3', label: 'Hydration Check',     time: '2:00 PM', enabled: false },
+];
+
 export function HealthProvider({ children }) {
   const [records, setRecords]           = useState(INITIAL_RECORDS);
   const [goals, setGoals]               = useState(INITIAL_GOALS);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [user]    = useState({ name: 'Henry Ejikeme', email: 'h.ejikeme@email.com', age: 32, height: '1.78 m' });
   const [streak]  = useState(21);
-  const [reminders, setReminders] = useState([
-    { id: 'r1', label: 'Morning Weigh-in',    time: '7:00 AM', enabled: true },
-    { id: 'r2', label: 'Medication Reminder', time: '9:00 PM', enabled: true },
-    { id: 'r3', label: 'Hydration Check',     time: '2:00 PM', enabled: false },
-  ]);
+  const [reminders, setReminders] = useState(INITIAL_REMINDERS);
+  const [hydrated, setHydrated] = useState(false);
+  const saveTimer = useRef(null);
+
+  // Load persisted state once on mount; fall back to the seed data on
+  // first launch (or if storage is unreadable).
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const saved = JSON.parse(raw);
+          if (Array.isArray(saved.records))       setRecords(saved.records);
+          if (Array.isArray(saved.goals))         setGoals(saved.goals);
+          if (Array.isArray(saved.notifications)) setNotifications(saved.notifications);
+          if (Array.isArray(saved.reminders))     setReminders(saved.reminders);
+        }
+      } catch (e) {
+        // Corrupt or unreadable storage: keep in-memory defaults.
+      } finally {
+        setHydrated(true);
+      }
+    })();
+  }, []);
+
+  // Persist on every change (debounced), but never before hydration —
+  // otherwise the seed data would overwrite the user's saved state.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ records, goals, notifications, reminders }),
+      ).catch(() => {});
+    }, 250);
+    return () => clearTimeout(saveTimer.current);
+  }, [hydrated, records, goals, notifications, reminders]);
 
   const addRecord = (entry) => {
     setRecords((prev) => [{

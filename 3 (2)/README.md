@@ -108,6 +108,28 @@ App.js
 
 ---
 
+## Data Persistence & Offline Use
+
+All state (records, goals, reminders, notifications) is persisted
+on-device with AsyncStorage under the key `@health_monitor/state/v1`,
+so your data survives app restarts. Demo data is seeded once on first
+launch only; everything you log afterwards is kept. The app makes no
+network requests — it works fully offline.
+
+## Terminal Client
+
+Every feature of the app is also available from the terminal:
+
+```
+node cli.js             # interactive menu
+node cli.js dashboard   # print the dashboard and exit
+```
+
+The CLI covers the dashboard, logging vitals (with the same BP/HR/SpO₂
+status logic and health notifications), history, ASCII trend charts,
+goals, reminders and profile. Data is stored in `health-data.json`
+next to the script. No dependencies and no network needed.
+
 ## End-to-End Data Flow
 
 ```

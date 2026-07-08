@@ -390,6 +390,26 @@ When `brand_typosquat = 1`, a **hard rule** overrides the model output and force
 
 All endpoints are prefixed with `/api`. The server also serves the frontend at `/`.
 
+The frontend is fully self-contained (Chart.js and Lucide are bundled in
+`frontend/vendor/`), so the dashboard works without internet access.
+
+### Terminal client
+
+Every dashboard function is also available from the terminal. From the
+`backend/` directory:
+
+```
+python cli.py analyze https://suspicious-site.example
+python cli.py history --limit 20
+python cli.py feedback 12 incorrect --comment "false positive"
+python cli.py stats
+python cli.py model
+python cli.py interactive     # menu-driven session
+```
+
+The CLI runs the same FastAPI application in-process against the same
+database — no server or network connection required.
+
 ### `POST /api/analyze`
 
 Analyse a URL and return the classification.

@@ -122,6 +122,26 @@ chown -R apache:apache assets/uploads   # or www-data:www-data on Debian/Ubuntu
 
 ## 4. Running the Server
 
+The app is fully self-contained: Bootstrap, Bootstrap Icons and
+Chart.js are bundled in `assets/vendor/`, so no internet connection is
+needed — only the local MySQL/MariaDB database.
+
+### Terminal client
+
+The application's functionality is also available from the terminal:
+
+```
+php cli.php
+```
+
+Menu-driven: login (same accounts and password rules as the website),
+students (list/search/profile/add), courses, grade entry and viewing
+with the same GPA/CGPA calculation, attendance marking and reports,
+fee statements and payments (auto-generated receipt numbers), summary
+reports, user list and the audit log. It loads the same
+`includes/functions.php` business logic against the same database as
+the web app.
+
 ### Option A — Bundled stack (XAMPP/WAMP/MAMP)
 
 Start Apache and MySQL from the control panel, then visit:

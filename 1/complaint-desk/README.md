@@ -109,6 +109,23 @@ http://127.0.0.1:5000
 
 > **Important:** Always access the app via `http://127.0.0.1:5000`, not by opening HTML files directly with `file://`. Direct file opening breaks all API calls since there is no server to handle them.
 
+The app is fully self-contained: all styles and scripts are local, so it
+works without any internet connection.
+
+### 4. Terminal client (optional)
+
+Every feature of the website is also available from the terminal:
+
+```
+cd backend
+python cli.py
+```
+
+This starts a menu-driven client (login/register, submit and track
+complaints, respond, and the full admin panel: statuses, users,
+announcements, reports, settings). It runs the same application code
+against the same database as the website — no server or network needed.
+
 ---
 
 ## Default Accounts

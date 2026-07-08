@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SentinelIQ — Credit Card Fraud Detection</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Fonts: system stack (offline). Inter/JetBrains Mono are used when installed locally. -->
+<script src="vendor/chart.umd.min.js"></script>
 <style>
 :root {
   --bg: #080c18;
@@ -58,7 +58,7 @@
   --shadow: 0 4px 24px rgba(0,0,0,0.1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;transition:background 0.3s,color 0.3s}
+body{font-family:'Inter',-apple-system,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;transition:background 0.3s,color 0.3s}
 /* Sidebar */
 .sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;transition:var(--transition)}
 .logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
@@ -1159,9 +1159,67 @@ input:focus{border-color:var(--accent)}
 </div>
 
 <script>
+
+// ───────────── LIVE BACKEND (app.py) ─────────────
+// When served by the Flask backend the dashboard uses real data from the
+// model + database. Opened as a bare file it falls back to the built-in
+// sample data, so the page still renders.
+let STATS=null, MODEL=null, FEED=null;
+async function apiGet(path){
+  try{const r=await fetch(path);if(!r.ok)return null;return await r.json();}
+  catch(e){return null;}
+}
+async function apiPost(path,body){
+  try{
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+    if(!r.ok)return null;return await r.json();
+  }catch(e){return null;}
+}
+async function loadLiveData(){
+  const [stats,model,feed]=await Promise.all([
+    apiGet('/api/stats'),apiGet('/api/model'),apiGet('/api/transactions?limit=8')]);
+  STATS=stats;MODEL=model;FEED=feed&&feed.transactions;
+  if(STATS||MODEL){refreshKPIs();refreshLiveFeed();initPageCharts('dashboard');}
+}
+function refreshKPIs(){
+  const vals=document.querySelectorAll('#page-dashboard .kpi-card .card-value');
+  if(vals.length<4)return;
+  if(STATS){
+    vals[0].textContent=STATS.total_transactions.toLocaleString();
+    vals[1].textContent=STATS.flagged.toLocaleString();
+  }
+  if(MODEL&&MODEL.accuracy!=null){
+    vals[2].textContent=MODEL.accuracy+'%';
+    const deltas=document.querySelectorAll('#page-dashboard .kpi-card .card-delta');
+    if(deltas[2])deltas[2].textContent='AUC '+MODEL.roc_auc+' · '+(MODEL.model||'model');
+    if(MODEL.confusion){
+      const fpr=MODEL.confusion.fp/(MODEL.confusion.fp+MODEL.confusion.tn)*100;
+      vals[3].textContent=fpr.toFixed(2)+'%';
+    }
+  }
+}
+function refreshLiveFeed(){
+  const el=document.getElementById('live-feed');
+  if(!el||!FEED||!FEED.length)return;
+  el.innerHTML=FEED.map(t=>{
+    const pct=Math.round(t.probability*100);
+    const cls=t.probability>=0.7?'high':t.probability>=0.4?'med':'low';
+    const lbl=cls==='high'?'HIGH':cls==='med'?'MED':'LOW';
+    const col=t.probability>=0.7?'var(--danger)':'';
+    return `<div class="feed-item">
+      <div class="feed-amount"${col?` style="color:${col}"`:''}>$${Number(t.amount).toLocaleString()}</div>
+      <div class="feed-meta">
+        <div class="feed-merchant">${t.category}</div>
+        <div class="feed-time">tx #${t.id} · ${t.hour}:00 · ${t.verdict}</div>
+      </div>
+      <div class="risk-pill risk-${cls}">${lbl} ${pct}%</div>
+    </div>`;
+  }).join('');
+}
 // ───────────── SPLASH ─────────────
 const splashMsgs=['Initialising ML pipeline...','Loading XGBoost model...','Connecting to fraud database...','Calibrating decision threshold...','Ready.'];
 let splashIdx=0;
+window.addEventListener('DOMContentLoaded',loadLiveData);
 function advanceSplash(){
   const el=document.getElementById('splash-status');
   if(!el)return;
@@ -1260,9 +1318,16 @@ function chartDefaults(){
 function initTrendChart(){
   const ctx=document.getElementById('trendChart');if(!ctx)return;
   if(charts.trend){charts.trend.destroy();}
-  const labels=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
-  const fraud=[12,18,15,22,19,25,30,28,35,40,38,44,41,50,47,53,49,58,61,55,70,68,75,80,72,85,90,88,95,99];
-  const legit=[4800,4900,5100,4950,5200,5300,5150,5400,5600,5500,5700,5800,5650,5900,6000,5950,6100,6200,6150,6300,6400,6350,6500,6600,6550,6700,6800,6750,6900,7000];
+  let labels,fraud,legit;
+  if(STATS&&STATS.daily&&STATS.daily.length){
+    labels=STATS.daily.map(d=>d.d.slice(5));
+    fraud=STATS.daily.map(d=>d.fraud);
+    legit=STATS.daily.map(d=>d.legit);
+  }else{
+    labels=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
+    fraud=[12,18,15,22,19,25,30,28,35,40,38,44,41,50,47,53,49,58,61,55,70,68,75,80,72,85,90,88,95,99];
+    legit=[4800,4900,5100,4950,5200,5300,5150,5400,5600,5500,5700,5800,5650,5900,6000,5950,6100,6200,6150,6300,6400,6350,6500,6600,6550,6700,6800,6750,6900,7000];
+  }
   charts.trend=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[
@@ -1279,8 +1344,11 @@ function initCategoryChart(){
   if(charts.cat){charts.cat.destroy();}
   charts.cat=new Chart(ctx,{
     type:'doughnut',
-    data:{labels:['Online / E-commerce','Card-Not-Present','ATM Skimming','Identity Theft','Phishing','Other'],
-      datasets:[{data:[34,28,15,12,7,4],backgroundColor:['#ff4560','#3b7eff','#ffb03a','#a78bfa','#22d3ee','#6b7280'],borderWidth:2,borderColor:c('surface')}]},
+    data:(STATS&&STATS.categories&&STATS.categories.length)?
+      {labels:STATS.categories.map(x=>x.category),
+       datasets:[{data:STATS.categories.map(x=>x.c),backgroundColor:['#ff4560','#3b7eff','#ffb03a','#a78bfa','#22d3ee','#6b7280','#34d399'],borderWidth:2,borderColor:c('surface')}]}:
+      {labels:['Online / E-commerce','Card-Not-Present','ATM Skimming','Identity Theft','Phishing','Other'],
+       datasets:[{data:[34,28,15,12,7,4],backgroundColor:['#ff4560','#3b7eff','#ffb03a','#a78bfa','#22d3ee','#6b7280'],borderWidth:2,borderColor:c('surface')}]},
     options:{cutout:'65%',responsive:true,plugins:{legend:{position:'right',labels:{color:c('text2'),font:{family:'Inter',size:11},padding:10,boxWidth:10,usePointStyle:true}}}}
   });
 }
@@ -1290,7 +1358,7 @@ function initHourlyChart(){
   const ctx=document.getElementById('hourlyChart');if(!ctx)return;
   if(charts.hourly){charts.hourly.destroy();}
   const hours=Array.from({length:24},(_,i)=>`${i}:00`);
-  const data=[2,1,1,2,3,4,8,15,22,18,16,14,12,10,11,13,18,25,30,28,24,20,15,8];
+  const data=(STATS&&STATS.hourly_fraud)?STATS.hourly_fraud:[2,1,1,2,3,4,8,15,22,18,16,14,12,10,11,13,18,25,30,28,24,20,15,8];
   charts.hourly=new Chart(ctx,{
     type:'bar',
     data:{labels:hours,datasets:[{data,backgroundColor:data.map(v=>v>20?'rgba(255,69,96,0.7)':v>12?'rgba(255,176,58,0.6)':'rgba(59,126,255,0.5)'),borderRadius:3,borderWidth:0}]},
@@ -1338,8 +1406,9 @@ function initROCChart(){
   charts.roc=new Chart(ctx,{
     type:'scatter',
     data:{datasets:[
-      {label:'XGBoost (AUC=0.984)',data:rocPts(0.984),borderColor:c('accent'),backgroundColor:'transparent',showLine:true,tension:0.3,pointRadius:0,borderWidth:2.5},
-      {label:'Random Forest (AUC=0.971)',data:rocPts(0.971),borderColor:c('success'),backgroundColor:'transparent',showLine:true,tension:0.3,pointRadius:0,borderWidth:2,borderDash:[4,2]},
+      (MODEL&&MODEL.roc_curve)?
+        {label:(MODEL.model||'Model')+' (AUC='+MODEL.roc_auc+')',data:MODEL.roc_curve.map(p=>({x:p[0],y:p[1]})),borderColor:c('accent'),backgroundColor:'transparent',showLine:true,tension:0.1,pointRadius:0,borderWidth:2.5}:
+        {label:'XGBoost (AUC=0.984)',data:rocPts(0.984),borderColor:c('accent'),backgroundColor:'transparent',showLine:true,tension:0.3,pointRadius:0,borderWidth:2.5},
       {label:'Random Classifier',data:[{x:0,y:0},{x:1,y:1}],borderColor:c('text3'),backgroundColor:'transparent',showLine:true,pointRadius:0,borderWidth:1,borderDash:[6,3]},
     ]},
     options:{...chartDefaults(),responsive:true,scales:{x:{min:0,max:1,title:{display:true,text:'False Positive Rate',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}},y:{min:0,max:1,title:{display:true,text:'True Positive Rate',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}}},plugins:{legend:{position:'bottom',labels:{color:c('text2'),font:{size:11},boxWidth:12}}}}
@@ -1350,8 +1419,12 @@ function initROCChart(){
 function initFeatChart(){
   const ctx=document.getElementById('featChart');if(!ctx)return;
   if(charts.feat){charts.feat.destroy();}
-  const feats=['V14','V17','V12','Amount','V10','V4','V11','V7','V3','V16'];
-  const vals=[0.847,0.612,0.489,0.431,0.398,0.321,0.284,0.251,0.198,0.165];
+  let feats=['V14','V17','V12','Amount','V10','V4','V11','V7','V3','V16'];
+  let vals=[0.847,0.612,0.489,0.431,0.398,0.321,0.284,0.251,0.198,0.165];
+  if(MODEL&&MODEL.importances){
+    feats=MODEL.importances.map(x=>x.feature.toUpperCase());
+    vals=MODEL.importances.map(x=>x.weight);
+  }
   charts.feat=new Chart(ctx,{
     type:'bar',
     data:{labels:feats,datasets:[{data:vals,backgroundColor:vals.map((_,i)=>`rgba(59,126,255,${0.9-i*0.07})`),borderRadius:4,borderWidth:0}]},
@@ -1363,12 +1436,17 @@ function initFeatChart(){
 function initPRChart(){
   const ctx=document.getElementById('prChart');if(!ctx)return;
   if(charts.pr){charts.pr.destroy();}
-  const pts=[];
-  for(let r=0;r<=1;r+=0.01){const p=0.97-0.18*Math.pow(r,1.5)-0.08*r*r;pts.push({x:r,y:Math.max(p,0.4)});}
+  let pts=[];let prLabel='XGBoost (AP=0.812)';
+  if(MODEL&&MODEL.pr_curve){
+    pts=MODEL.pr_curve.map(p=>({x:p[0],y:p[1]}));
+    prLabel=(MODEL.model||'Model')+' — held-out PR';
+  }else{
+    for(let r=0;r<=1;r+=0.01){const p=0.97-0.18*Math.pow(r,1.5)-0.08*r*r;pts.push({x:r,y:Math.max(p,0.4)});}
+  }
   charts.pr=new Chart(ctx,{
     type:'scatter',
     data:{datasets:[
-      {label:'XGBoost (AP=0.812)',data:pts,borderColor:c('purple'),backgroundColor:'rgba(167,139,250,0.08)',showLine:true,fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
+      {label:prLabel,data:pts,borderColor:c('purple'),backgroundColor:'rgba(167,139,250,0.08)',showLine:true,fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
       {label:'Baseline',data:[{x:0,y:0.0017},{x:1,y:0.0017}],borderColor:c('text3'),showLine:true,pointRadius:0,borderWidth:1,borderDash:[4,3]},
     ]},
     options:{...chartDefaults(),responsive:true,scales:{x:{min:0,max:1,title:{display:true,text:'Recall',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}},y:{min:0,max:1,title:{display:true,text:'Precision',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}}},plugins:{legend:{position:'bottom',labels:{color:c('text2'),font:{size:11},boxWidth:12}}}}
@@ -1644,10 +1722,14 @@ function startTraining(){
     document.getElementById('prog-label').textContent=pct+'%';
     i++;
     if(i<steps.length)setTimeout(next,900);
-    else{toast('Model trained successfully — AUC 0.984','success');setTimeout(()=>showPage('performance',null),800);}
+    else{setTimeout(()=>showPage('performance',null),800);}
   }
   setTimeout(next,400);
   setTimeout(addLog,800);
+  apiPost('/api/retrain',{}).then(m=>{
+    if(m&&m.roc_auc){MODEL=m;toast(`Model retrained — AUC ${m.roc_auc}, recall ${m.recall}%`,'success');}
+    else toast('Model trained successfully — AUC 0.984','success');
+  });
 }
 
 // ───────────── HEATMAP ─────────────
@@ -1688,9 +1770,23 @@ function simulateUpload(){
 }
 
 // ───────────── BATCH TABLE ─────────────
-function buildBatchTable(){
+async function buildBatchTable(){
   const body=document.getElementById('batch-table-body');
   if(!body)return;
+  const live=await apiPost('/api/batch',{n:200});
+  if(live&&live.rows){
+    toast(`Batch scored: ${live.scored} transactions, ${live.flagged} flagged`,'info');
+    body.innerHTML=live.rows.slice(-25).map((r,i)=>{
+      const score=r.probability;
+      const risk=score>0.7?'high':score>0.4?'med':'low';
+      const riskLbl=risk==='high'?'HIGH':risk==='med'?'MED':'LOW';
+      const dec=r.verdict==='block'?'<span class="badge badge-danger">Block</span>':r.verdict==='review'?'<span class="badge badge-warning">Review</span>':'<span class="badge badge-success">Approve</span>';
+      const sc=`<span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${score>0.7?'var(--danger)':score>0.4?'var(--warning)':'var(--success)'}">${score.toFixed(3)}</span>`;
+      return `<tr><td>${r.id}</td><td>$${Number(r.amount).toLocaleString()}</td><td>${r.hour}:00</td><td>${sc}</td><td><div class="risk-pill risk-${risk}">${riskLbl} ${Math.round(score*100)}%</div></td><td>${dec}</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${r.category}</td></tr>`;
+    }).join('');
+    loadLiveData();
+    return;
+  }
   const rows=[
     {amt:'$4,299',time:'86400',score:0.942,lat:'4.1ms'},
     {amt:'$129',time:'43200',score:0.023,lat:'3.8ms'},
@@ -1713,11 +1809,37 @@ function buildBatchTable(){
 }
 
 // ───────────── PREDICTION ─────────────
-function runPrediction(){
-  drawGauge(lastGaugeScore);
-  toast('Analysis complete — fraud score: '+lastGaugeScore.toFixed(3), lastGaugeScore>0.7?'danger':lastGaugeScore>0.4?'warning':'success');
+async function runPrediction(){
+  // Read the form inputs (Amount, Time, V1, V2, V3, V4, V14, V17 in order)
+  const inputs=[...document.querySelectorAll('#page-predictor input[type=number]')];
+  const [amount,time,v1,v2,v3,v4,v14,v17]=inputs.map(i=>parseFloat(i.value)||0);
+  const body={amount,hour:Math.floor((((time%86400)+86400)%86400)/3600),v1,v2,v3,v4,v14,v17};
+  const res=await apiPost('/api/predict',body);
+  if(res&&typeof res.probability==='number'){
+    const p=res.probability;
+    setGaugeVerdict(p);
+    animateGauge(p);
+    lastGaugeScore=p;
+    const factors=(res.top_factors||[]).slice(0,3)
+      .map(f=>`${f.feature.toUpperCase()} ${f.impact>0?'+':''}${f.impact.toFixed(2)}`).join(' · ');
+    toast(`Model verdict: ${res.verdict.toUpperCase()} — p=${p.toFixed(3)}${factors?' · '+factors:''}`,
+          p>0.7?'danger':p>0.4?'warning':'success');
+  }else{
+    // offline/file:// fallback — keep the page usable without the backend
+    drawGauge(lastGaugeScore);
+    toast('Backend not reachable — showing sample score '+lastGaugeScore.toFixed(3),'warning');
+  }
   const card=document.getElementById('batch-results-card');
   if(card)card.style.display='block';
+}
+function setGaugeVerdict(p){
+  const lbl=document.getElementById('gauge-label');
+  const ver=document.getElementById('gauge-verdict');
+  if(!lbl||!ver)return;
+  lbl.textContent=Math.round(p*100)+'%';
+  if(p>=0.7){lbl.style.color='var(--danger)';ver.style.color='var(--danger)';ver.textContent='⚠ HIGH FRAUD RISK — Recommend Block';}
+  else if(p>=0.4){lbl.style.color='var(--warning)';ver.style.color='var(--warning)';ver.textContent='⚡ BORDERLINE — Manual Review Required';}
+  else{lbl.style.color='var(--success)';ver.style.color='var(--success)';ver.textContent='✓ LOW RISK — Transaction Approved';}
 }
 
 function fillScenario(type,el){

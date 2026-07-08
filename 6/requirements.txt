@@ -1,5 +1,7 @@
 # Web framework
-fastapi>=0.104.1
+# fastapi is pinned below 0.116: the app uses the TemplateResponse(name,
+# context) call style, which Starlette 1.x removed.
+fastapi>=0.104.1,<0.116
 uvicorn[standard]>=0.24.0
 python-multipart>=0.0.6
 aiofiles>=23.2.1

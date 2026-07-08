@@ -3,7 +3,8 @@
    Design System: Modern, Bootstrap-5-inspired, Inter font
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Fonts: system stack only, so the app works fully offline. 'Inter' is used
+   when installed locally; otherwise the OS UI font is a close match. */
 
 :root {
   --primary:       #1a73e8;

@@ -224,6 +224,26 @@ http://localhost:5500
 
 > **Why a server instead of opening the file directly?** Browsers block `fetch()` calls when HTML is opened via `file://`. Serving via `python -m http.server` avoids this restriction.
 
+The app runs fully offline: Font Awesome and Chart.js are bundled in
+`frontend/vendor/`, and the optional semantic-search dependencies
+(sentence-transformers/chromadb) fall back to built-in keyword search
+when not installed.
+
+### 3. Terminal client (optional)
+
+Every feature of the website also works from the terminal:
+
+```bash
+cd backend
+python cli.py
+```
+
+Menu-driven: login/register, tasks (add/search/update/delete), study
+schedule, progress logging, goals, the analytics dashboard, AI
+recommendations, and the admin panel. It runs the same application
+code against the same database as the website — no server or network
+needed.
+
 ---
 
 ## Demo Account and Seed Data

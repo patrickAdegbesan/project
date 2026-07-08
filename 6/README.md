@@ -54,6 +54,31 @@ The database is created automatically on first run and seeded with:
 - 3 job roles (ASM, RSM, Dispatch Rider)
 - 3 sample candidates with pre-computed scores
 
+The app works fully offline: all styles and scripts (Bootstrap,
+Bootstrap Icons, jQuery, DataTables) are bundled in
+`app/static/vendor/`, the spaCy model is optional (regex fallback),
+and geocoding uses the built-in Lagos location dictionary first —
+the OpenStreetMap fallback is only attempted when internet is
+available.
+
+### 5. Terminal client (optional)
+
+Every function of the web app also works from the terminal:
+
+```bash
+python cli.py roles
+python cli.py upload 1 path/to/resume.pdf
+python cli.py results 3
+python cli.py candidate 6
+python cli.py shortlist 4 6          # score ids; add --off to remove
+python cli.py export 3 -o out.xlsx
+python cli.py stats
+python cli.py interactive            # menu-driven session
+```
+
+The CLI runs the same FastAPI application in-process against the same
+database and scoring pipeline — no server or network needed.
+
 ---
 
 ## Project Structure

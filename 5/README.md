@@ -127,6 +127,25 @@ The server starts at **http://localhost:5000**. Open it in your browser.
 
 The SQLite database (`instance/taskmind.db`) is created automatically on first run. No database setup is required.
 
+All styles and scripts (Bootstrap, Font Awesome, Chart.js) are bundled
+in `static/vendor/`, so the app runs without any internet connection.
+The spaCy language model is optional — without it, parsing falls back
+to the built-in regex engine automatically.
+
+### Terminal client
+
+Every feature of the website also works from the terminal:
+
+```bash
+python cli.py
+```
+
+Menu-driven: login/register, add tasks in plain English (same AI
+parsing and priority scoring), list/complete/reschedule/delete tasks,
+"what should I do next?" recommendations, stats and password change.
+It runs the same application code against the same database as the
+website — no server or network needed.
+
 ---
 
 ## How to Use

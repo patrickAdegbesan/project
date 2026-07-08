@@ -7,3 +7,6 @@ numpy>=1.26.0
 requests>=2.32.0
 python-multipart>=0.0.9
 joblib>=1.4.0
+
+# Terminal client (cli.py) drives the API in-process via TestClient
+httpx>=0.27.0

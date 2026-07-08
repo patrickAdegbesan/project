@@ -6,3 +6,7 @@ __pycache__/
 .venv/
 venv/
 *.log
+
+# generated at runtime
+4/sentineliq.db
+3 (2)/health-data.json

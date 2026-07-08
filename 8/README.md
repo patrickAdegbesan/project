@@ -111,6 +111,12 @@ project/
 
 ## Command-Line Options
 
+`main.py` is the terminal equivalent of the web application: it runs
+the same simulation engine with the same parameters and writes the
+same tables and figures to `outputs/`. The web UI (with Bootstrap
+bundled locally in `static/vendor/`) and the CLI both work fully
+offline.
+
 ```
 python main.py                    # Full pipeline (validation + experiments)
 python main.py --validate-only    # M/M/1 validation only
