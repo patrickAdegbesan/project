@@ -246,10 +246,10 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- Default admin user: password = Admin@1234
 INSERT INTO `users` (`username`, `email`, `password_hash`, `role`, `full_name`, `phone`, `status`) VALUES
-('admin', 'admin@srms.edu.ng', '$2y$12$6pBEVAnQF5s7L4Yv9qJVueTW/EkSoGiXcmJJRXQFUoAi0Gxl4aTeq', 'admin', 'System Administrator', '08000000000', 'active'),
-('registrar1', 'registrar@srms.edu.ng', '$2y$12$6pBEVAnQF5s7L4Yv9qJVueTW/EkSoGiXcmJJRXQFUoAi0Gxl4aTeq', 'registrar', 'Mrs. Grace Okonkwo', '08011111111', 'active'),
-('dr_eze', 'eze@srms.edu.ng', '$2y$12$6pBEVAnQF5s7L4Yv9qJVueTW/EkSoGiXcmJJRXQFUoAi0Gxl4aTeq', 'teacher', 'Dr. Chukwuemeka Eze', '08022222222', 'active'),
-('mr_adeyemi', 'adeyemi@srms.edu.ng', '$2y$12$6pBEVAnQF5s7L4Yv9qJVueTW/EkSoGiXcmJJRXQFUoAi0Gxl4aTeq', 'teacher', 'Mr. Babatunde Adeyemi', '08033333333', 'active');
+('admin', 'admin@srms.edu.ng', '$2y$12$pcN9VoFeh/K.dz2oxXd7Y.69lIo0Z3ercHSUcG2Vgz1W8/Hp5kqXK', 'admin', 'System Administrator', '08000000000', 'active'),
+('registrar1', 'registrar@srms.edu.ng', '$2y$12$pcN9VoFeh/K.dz2oxXd7Y.69lIo0Z3ercHSUcG2Vgz1W8/Hp5kqXK', 'registrar', 'Mrs. Grace Okonkwo', '08011111111', 'active'),
+('dr_eze', 'eze@srms.edu.ng', '$2y$12$pcN9VoFeh/K.dz2oxXd7Y.69lIo0Z3ercHSUcG2Vgz1W8/Hp5kqXK', 'teacher', 'Dr. Chukwuemeka Eze', '08022222222', 'active'),
+('mr_adeyemi', 'adeyemi@srms.edu.ng', '$2y$12$pcN9VoFeh/K.dz2oxXd7Y.69lIo0Z3ercHSUcG2Vgz1W8/Hp5kqXK', 'teacher', 'Mr. Babatunde Adeyemi', '08033333333', 'active');
 
 -- Departments
 INSERT INTO `departments` (`name`, `code`, `faculty`, `head_of_dept`) VALUES

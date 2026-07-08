@@ -6,6 +6,6 @@
   "train_size": 24000,
   "test_size": 6000,
   "features": 32,
-  "trained_at": "2026-06-28T02:50:43.886393",
+  "trained_at": "2026-07-08T07:55:59.718119",
   "model": "GradientBoostingClassifier"
 }
