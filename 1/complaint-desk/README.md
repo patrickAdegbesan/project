@@ -77,7 +77,8 @@ complaint-desk/
 ### 1. Install dependencies
 
 ```bash
-pip install flask flask-cors werkzeug
+pip install -r backend/requirements.txt
+# (equivalent to: pip install flask flask-cors werkzeug)
 ```
 
 ### 2. Start the server
