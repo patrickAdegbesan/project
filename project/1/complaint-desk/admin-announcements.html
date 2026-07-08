@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Announcements — Admin Panel</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .sidebar { background: #1a1f2e; }
+  .sidebar-logo { border-color: rgba(255,255,255,0.05); }
+  .sidebar-nav a.active { background: rgba(234,67,53,0.2); color: #f87171; }
+
+  .ann-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 24px; box-shadow:var(--shadow-sm); margin-bottom:16px; }
+  .ann-card:hover { box-shadow:var(--shadow-md); }
+  .ann-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:12px; }
+  .ann-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ann-meta { flex:1; }
+  .ann-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .ann-sub { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .ann-body { font-size:13.5px; color:var(--text-secondary); line-height:1.7; margin-bottom:14px; }
+  .ann-tags { display:flex; gap:6px; flex-wrap:wrap; }
+  .ann-footer { display:flex; align-items:center; justify-content:space-between; padding-top:12px; border-top:1px solid var(--border-light); }
+  .ann-stats { display:flex; align-items:center; gap:16px; }
+  .ann-stat { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:4px; }
+  .target-badge { font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .target-all { background:#e8f0fe; color:#1a73e8; }
+  .target-student { background:#e6f4ea; color:#188038; }
+  .target-staff { background:#fce8e6; color:#c5221f; }
+  .draft-banner { background:#fff8e1; border:1px solid #f9ab00; border-radius:8px; padding:8px 14px; font-size:12.5px; color:#7a5200; display:flex; align-items:center; gap:6px; }
+
+  .compose-panel { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow-sm); }
+  .compose-panel h4 { font-size:15px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+  .target-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .target-chip { padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid var(--border); color:var(--text-secondary); background:transparent; transition:var(--transition); }
+  .target-chip.active { border-color:var(--primary); color:var(--primary); background:#e8f0fe; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <div>
+        <span class="logo-text">Complaint<span style="color:#ea4335;">Desk</span></span>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:500;margin-top:-2px;letter-spacing:0.05em;">ADMIN PANEL</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Administration</div>
+      <nav class="sidebar-nav">
+        <a href="07-admin-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="08-admin-all-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>All Complaints<span class="badge-count">23</span></a>
+        <a href="11-admin-users.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Users</a>
+        <a href="12-admin-reports.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Reports &amp; Analytics</a>
+        <a href="admin-announcements.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>Announcements</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">System</div>
+      <nav class="sidebar-nav">
+        <a href="admin-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+        <a href="admin-help.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; Documentation</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div>
+        <div class="sidebar-user-info"><div class="user-name">Super Admin</div><div class="user-role">administrator@caleb.edu.ng</div></div>
+      </div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('active');">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="topnav-search">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Search announcements...">
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn notification-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-dot"></span></button>
+        <div class="topbar-user"><div class="avatar avatar-sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div><span>Super Admin</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="breadcrumb"><a href="07-admin-dashboard.html">Dashboard</a><span>›</span><span>Announcements</span></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 class="page-title" style="margin-bottom:2px;">Announcements</h2>
+          <p style="font-size:13.5px;color:var(--text-muted);">Broadcast messages to students, staff, or all users</p>
+        </div>
+        <button class="btn btn-danger" onclick="document.getElementById('composeModal').style.display='flex'" style="gap:8px;display:flex;align-items:center;">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          New Announcement
+        </button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:28px;">
+        <div class="stat-card"><div class="stat-icon" style="background:#e8f0fe;color:#1a73e8;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg></div><div><div class="stat-num">14</div><div class="stat-label">Total Published</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fce8e6;color:#ea4335;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div><div><div class="stat-num">2</div><div class="stat-label">Pinned / Urgent</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fff8e1;color:#f9ab00;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></div><div><div class="stat-num">3</div><div class="stat-label">Drafts</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#e6f4ea;color:#34a853;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div><div><div class="stat-num">2,847</div><div class="stat-label">Total Reach</div></div></div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        <button onclick="filterAnn(this,'all')" class="btn btn-primary" style="padding:6px 16px;font-size:13px;">All (14)</button>
+        <button onclick="filterAnn(this,'pinned')" class="btn btn-ghost" style="padding:6px 16px;font-size:13px;">Pinned</button>
+        <button onclick="filterAnn(this,'students')" class="btn btn-ghost" style="padding:6px 16px;font-size:13px;">Students</button>
+        <button onclick="filterAnn(this,'staff')" class="btn btn-ghost" style="padding:6px 16px;font-size:13px;">Staff</button>
+        <button onclick="filterAnn(this,'drafts')" class="btn btn-ghost" style="padding:6px 16px;font-size:13px;">Drafts</button>
+      </div>
+
+      <!-- Announcement cards -->
+      <div id="annList">
+
+        <!-- Pinned / Urgent -->
+        <div class="ann-card" style="border-left:4px solid #ea4335;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="background:#fce8e6;color:#ea4335;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+              PINNED
+            </span>
+            <span style="background:#fce8e6;color:#c5221f;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">URGENT</span>
+          </div>
+          <div class="ann-header">
+            <div class="ann-icon" style="background:#fce8e6;color:#ea4335;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div class="ann-meta">
+              <div class="ann-title">Portal Maintenance — Saturday 22 June, 12:00 AM – 4:00 AM</div>
+              <div class="ann-sub">
+                <span>Posted by Super Admin</span><span>·</span><span>Jun 18, 2024</span>
+                <span class="target-badge target-all">All Users</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm">Edit</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">Delete</button>
+            </div>
+          </div>
+          <div class="ann-body">The ComplaintDesk portal will undergo scheduled maintenance on Saturday, 22 June 2024 from 12:00 AM to 4:00 AM. During this period the system will be unavailable. Please submit any pending complaints before this window. We apologise for the inconvenience.</div>
+          <div class="ann-footer">
+            <div class="ann-stats">
+              <span class="ann-stat"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>1,204 views</span>
+              <span class="ann-stat"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>Push sent</span>
+            </div>
+            <span style="font-size:12px;color:var(--text-muted);">Expires: Jun 22, 2024</span>
+          </div>
+        </div>
+
+        <!-- Pinned 2 -->
+        <div class="ann-card" style="border-left:4px solid #1a73e8;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="background:#e8f0fe;color:#1a73e8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+              PINNED
+            </span>
+          </div>
+          <div class="ann-header">
+            <div class="ann-icon" style="background:#e8f0fe;color:#1a73e8;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            </div>
+            <div class="ann-meta">
+              <div class="ann-title">New Complaint Category Added: "Health &amp; Wellness"</div>
+              <div class="ann-sub">
+                <span>Posted by Super Admin</span><span>·</span><span>Jun 12, 2024</span>
+                <span class="target-badge target-all">All Users</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm">Edit</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">Delete</button>
+            </div>
+          </div>
+          <div class="ann-body">We have introduced a new complaint category — <strong>Health &amp; Wellness</strong> — to better route complaints related to the clinic, mental health services, and sports facilities. All existing complaints in the "General" category that relate to health matters have been migrated accordingly.</div>
+          <div class="ann-footer">
+            <div class="ann-stats">
+              <span class="ann-stat"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>876 views</span>
+            </div>
+            <span style="font-size:12px;color:var(--text-muted);">No expiry set</span>
+          </div>
+        </div>
+
+        <!-- Regular announcements -->
+        <div class="ann-card">
+          <div class="ann-header">
+            <div class="ann-icon" style="background:#e6f4ea;color:#34a853;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="ann-meta">
+              <div class="ann-title">Response Time Improvement — Average now 48 hours</div>
+              <div class="ann-sub"><span>Posted by Super Admin</span><span>·</span><span>Jun 5, 2024</span><span class="target-badge target-all">All Users</span></div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm">Edit</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">Delete</button>
+            </div>
+          </div>
+          <div class="ann-body">We are pleased to announce that average complaint response time has improved from 72 hours to 48 hours this quarter. Thank you to all department handlers for their dedication. We continue to target a 24-hour response SLA by end of semester.</div>
+          <div class="ann-footer">
+            <div class="ann-stats"><span class="ann-stat"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>432 views</span></div>
+            <span style="font-size:12px;color:var(--text-muted);">No expiry set</span>
+          </div>
+        </div>
+
+        <div class="ann-card">
+          <div class="ann-header">
+            <div class="ann-icon" style="background:#f3e8ff;color:#7c3aed;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+            <div class="ann-meta">
+              <div class="ann-title">End-of-Semester Complaint Submission Deadline — June 28</div>
+              <div class="ann-sub"><span>Posted by Super Admin</span><span>·</span><span>May 28, 2024</span><span class="target-badge target-student">Students</span></div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm">Edit</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">Delete</button>
+            </div>
+          </div>
+          <div class="ann-body">All complaints relating to the current semester (2023/2024 Second Semester) must be submitted by <strong>Friday, 28 June 2024</strong>. Complaints submitted after this date will be processed in the next academic session. Academic complaints (grade disputes, exam irregularities) must be submitted through the relevant department first.</div>
+          <div class="ann-footer">
+            <div class="ann-stats"><span class="ann-stat"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>689 views</span></div>
+            <span style="font-size:12px;color:var(--text-muted);">Expires: Jun 28, 2024</span>
+          </div>
+        </div>
+
+        <!-- Draft card -->
+        <div class="ann-card" style="opacity:0.82;">
+          <div class="draft-banner" style="margin-bottom:14px;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            DRAFT — Not yet published
+          </div>
+          <div class="ann-header">
+            <div class="ann-icon" style="background:#f5f5f5;color:#9e9e9e;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="ann-meta">
+              <div class="ann-title" style="color:var(--text-secondary);">2024/2025 First Semester Registration — Complaint Window Opens</div>
+              <div class="ann-sub"><span>Draft by Super Admin</span><span>·</span><span>Jun 14, 2024</span><span class="target-badge target-student">Students</span></div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-primary btn-sm">Publish</button>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="ann-body" style="color:var(--text-muted);">The complaint window for the 2024/2025 First Semester opens on <strong>1 September 2024</strong>. Students who experience issues during registration, course allocation, or fee payment should use the portal to submit their complaints promptly...</div>
+          <div class="ann-footer">
+            <div class="ann-stats"><span class="ann-stat" style="color:var(--text-muted);">Not published yet</span></div>
+          </div>
+        </div>
+
+      </div><!-- /annList -->
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- Compose Modal -->
+<div id="composeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border-radius:20px;padding:32px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <h3 style="font-size:18px;font-weight:800;">New Announcement</h3>
+      <button onclick="document.getElementById('composeModal').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--text-muted);">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Title <span class="required">*</span></label>
+      <input type="text" class="form-control" placeholder="e.g. System Maintenance on Saturday">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message <span class="required">*</span></label>
+      <textarea class="form-control" rows="5" placeholder="Write your announcement here..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target Audience</label>
+      <div class="target-chips">
+        <button class="target-chip active" onclick="toggleChip(this)">All Users</button>
+        <button class="target-chip" onclick="toggleChip(this)">Students Only</button>
+        <button class="target-chip" onclick="toggleChip(this)">Staff Only</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-control form-select">
+          <option>Normal</option>
+          <option>Urgent</option>
+          <option>Critical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Expiry Date (optional)</label>
+        <input type="date" class="form-control">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px;">
+      <label class="form-check"><input type="checkbox" class="form-check-input" checked><span class="form-check-label" style="font-size:13px;">Pin to top</span></label>
+      <label class="form-check" style="margin-left:12px;"><input type="checkbox" class="form-check-input" checked><span class="form-check-label" style="font-size:13px;">Send push notification</span></label>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button class="btn btn-danger btn-full" onclick="publishAnn()">Publish Now</button>
+      <button class="btn btn-ghost" style="min-width:120px;" onclick="document.getElementById('composeModal').style.display='none'">Save Draft</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterAnn(btn, type) {
+    document.querySelectorAll('.page-content > div:nth-child(3) button').forEach(b => { b.className = 'btn btn-ghost'; b.style.padding = '6px 16px'; b.style.fontSize = '13px'; });
+    btn.className = 'btn btn-danger';
+    btn.style.padding = '6px 16px';
+    btn.style.fontSize = '13px';
+  }
+  function toggleChip(el) {
+    document.querySelectorAll('.target-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function publishAnn() {
+    document.getElementById('composeModal').style.display = 'none';
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#34a853;color:#fff;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);';
+    toast.textContent = '✓ Announcement published successfully';
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.remove(); }, 3500);
+  }
+</script>
+</body>
+</html>

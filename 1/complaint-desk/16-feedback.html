@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .star-rating { display:flex;gap:6px;margin:6px 0 2px; }
+  .star { font-size:28px;cursor:pointer;transition:transform 0.1s;line-height:1; }
+  .star.filled { color:#fbbc04; }
+  .star.empty  { color:#dadce0; }
+  .star:hover  { transform:scale(1.2); }
+
+  .category-chips { display:flex;flex-wrap:wrap;gap:8px;margin-top:8px; }
+  .chip { padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;background:var(--card); }
+  .chip:hover  { border-color:var(--primary);color:var(--primary); }
+  .chip.active { border-color:var(--primary);background:var(--primary-light);color:var(--primary);font-weight:700; }
+
+  .feedback-card {
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
+    padding:18px 20px;display:flex;gap:14px;align-items:flex-start;
+    box-shadow:var(--shadow-sm);transition:box-shadow 0.15s;
+  }
+  .feedback-card:hover { box-shadow:var(--shadow-md); }
+  .feedback-avatar { width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0; }
+  .feedback-meta { font-size:12px;color:var(--text-muted);margin-top:3px; }
+  .feedback-text { font-size:13.5px;color:var(--text);line-height:1.6;margin-top:8px; }
+  .feedback-stars { display:flex;gap:2px;margin-top:6px; }
+  .feedback-stars span { font-size:14px; }
+  .filled-s { color:#fbbc04; }
+  .empty-s  { color:#dadce0; }
+
+  .summary-card { background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;text-align:center; }
+  .summary-num  { font-size:36px;font-weight:800;line-height:1;color:var(--text);margin-bottom:4px; }
+  .summary-lbl  { font-size:12.5px;color:var(--text-muted); }
+
+  .bar-row { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+  .bar-label { font-size:12.5px;color:var(--text-muted);width:40px;text-align:right;flex-shrink:0; }
+  .bar-track { flex:1;height:10px;background:var(--border-light);border-radius:5px;overflow:hidden; }
+  .bar-fill  { height:100%;border-radius:5px;background:#fbbc04; }
+  .bar-count { font-size:12px;color:var(--text-muted);width:20px;flex-shrink:0; }
+
+  .success-toast { display:none;position:fixed;bottom:24px;right:24px;background:#1a1f2e;color:#fff;padding:14px 20px;border-radius:var(--radius);box-shadow:var(--shadow-lg);font-size:13.5px;font-weight:500;z-index:9999;align-items:center;gap:10px; }
+  .success-toast.show { display:flex; }
+  .success-toast svg { width:20px;height:20px;color:#34a853;flex-shrink:0; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <span class="logo-text">Complaint<span>Desk</span></span>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="03-user-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="04-submit-complaint.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Submit Complaint</a>
+        <a href="05-my-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Complaints<span class="badge-count">3</span></a>
+        <a href="06-complaint-detail.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Track Status</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Support</div>
+      <nav class="sidebar-nav">
+        <a href="16-feedback.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>Feedback</a>
+        <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; FAQ</a>
+        <a href="13-profile-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div>
+        <div class="sidebar-user-info"><div class="user-name">John Smith</div><div class="user-role">CSC/2021/045 · Student</div></div>
+      </div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search"><svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" placeholder="Search..."></div>
+      <div class="topnav-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">3</span></button>
+        <div class="topnav-profile">
+          <div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div>
+          <span class="profile-name">John Smith</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb">
+            <a href="03-user-dashboard.html">Dashboard</a>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            Feedback
+          </div>
+          <h2>Share Your Feedback</h2>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
+
+        <!-- Left: Form + Past Feedback -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Submit Form -->
+          <div class="card card-lg">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Rate Your Experience</h3>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Help us improve ComplaintDesk by sharing your thoughts about our complaint resolution service.</p>
+
+            <form onsubmit="submitFeedback(event)">
+
+              <!-- Star Rating -->
+              <div class="form-group">
+                <label class="form-label">Overall Satisfaction <span class="required">*</span></label>
+                <div class="star-rating" id="star-rating">
+                  <span class="star filled" data-val="1" onclick="setRating(1)">★</span>
+                  <span class="star filled" data-val="2" onclick="setRating(2)">★</span>
+                  <span class="star filled" data-val="3" onclick="setRating(3)">★</span>
+                  <span class="star filled" data-val="4" onclick="setRating(4)">★</span>
+                  <span class="star empty"  data-val="5" onclick="setRating(5)">★</span>
+                </div>
+                <div id="rating-label" style="font-size:12.5px;color:var(--text-muted);margin-top:4px;">4 out of 5 — Good</div>
+              </div>
+
+              <!-- Category -->
+              <div class="form-group">
+                <label class="form-label">Feedback Category <span class="required">*</span></label>
+                <div class="category-chips">
+                  <div class="chip active" onclick="toggleChip(this)">Complaint Process</div>
+                  <div class="chip" onclick="toggleChip(this)">Response Time</div>
+                  <div class="chip" onclick="toggleChip(this)">Staff Professionalism</div>
+                  <div class="chip" onclick="toggleChip(this)">System Usability</div>
+                  <div class="chip" onclick="toggleChip(this)">Resolution Quality</div>
+                  <div class="chip" onclick="toggleChip(this)">Communication</div>
+                  <div class="chip" onclick="toggleChip(this)">Other</div>
+                </div>
+              </div>
+
+              <!-- Subject -->
+              <div class="form-group">
+                <label class="form-label">Subject</label>
+                <input type="text" class="form-control" value="Complaint resolution was handled professionally" placeholder="Brief summary of your feedback">
+              </div>
+
+              <!-- Message -->
+              <div class="form-group">
+                <label class="form-label">Your Feedback <span class="required">*</span></label>
+                <textarea class="form-control" rows="5" placeholder="Tell us about your experience..." style="resize:vertical;">I submitted a complaint about the broken air conditioning in the CSC lab block and I'm happy to say it was resolved within 4 days. The admin team kept me updated at every stage and the facilities team was very professional. The ComplaintDesk platform made the whole process smooth and transparent.</textarea>
+                <div style="font-size:11.5px;color:var(--text-muted);text-align:right;margin-top:4px;">264/1000 characters</div>
+              </div>
+
+              <!-- Anonymous -->
+              <div class="form-group">
+                <label class="form-check">
+                  <input type="checkbox" class="form-check-input">
+                  <span class="form-check-label">Submit anonymously — your name will not be shown publicly</span>
+                </label>
+              </div>
+
+              <!-- Allow follow-up -->
+              <div class="form-group" style="margin-bottom:24px;">
+                <label class="form-check">
+                  <input type="checkbox" class="form-check-input" checked>
+                  <span class="form-check-label">Allow the team to follow up with me about this feedback</span>
+                </label>
+              </div>
+
+              <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn-primary">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                  Submit Feedback
+                </button>
+                <button type="button" class="btn btn-ghost" onclick="this.form.reset()">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- My Previous Feedback -->
+          <div class="card card-lg">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <h3 style="font-size:15px;font-weight:700;">My Previous Feedback</h3>
+              <span class="badge badge-blue">3 submissions</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;">
+
+              <!-- Feedback 1 -->
+              <div class="feedback-card">
+                <div class="feedback-avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);color:#fff;">JS</div>
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div style="font-size:13.5px;font-weight:700;color:var(--text);">Complaint Process</div>
+                    <span class="badge badge-green" style="font-size:11px;">Published</span>
+                  </div>
+                  <div class="feedback-meta">John Smith · CSC/2021/045 · 12 Nov 2024</div>
+                  <div class="feedback-stars">
+                    <span class="filled-s">★</span><span class="filled-s">★</span><span class="filled-s">★</span><span class="filled-s">★</span><span class="filled-s">★</span>
+                  </div>
+                  <div class="feedback-text">The system is very easy to use. I submitted my hostel maintenance complaint and it was resolved in just 2 days. Highly recommend to all students.</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:8px;font-style:italic;">Admin reply: Thank you for your kind feedback! We're glad we could resolve this quickly.</div>
+                </div>
+              </div>
+
+              <!-- Feedback 2 -->
+              <div class="feedback-card">
+                <div class="feedback-avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);color:#fff;">JS</div>
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div style="font-size:13.5px;font-weight:700;color:var(--text);">Response Time</div>
+                    <span class="badge badge-yellow" style="font-size:11px;">Under Review</span>
+                  </div>
+                  <div class="feedback-meta">John Smith · CSC/2021/045 · 3 Oct 2024</div>
+                  <div class="feedback-stars">
+                    <span class="filled-s">★</span><span class="filled-s">★</span><span class="filled-s">★</span><span class="filled-s">★</span><span class="empty-s">★</span>
+                  </div>
+                  <div class="feedback-text">Response time could be improved. My complaint about the library WIFI took 6 days to be assigned. Otherwise the resolution itself was excellent and the staff were courteous.</div>
+                </div>
+              </div>
+
+              <!-- Feedback 3 -->
+              <div class="feedback-card">
+                <div class="feedback-avatar" style="background:#e8e8e8;color:#5f6368;font-size:12px;">Anon</div>
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div style="font-size:13.5px;font-weight:700;color:var(--text);">System Usability</div>
+                    <span class="badge badge-green" style="font-size:11px;">Published</span>
+                  </div>
+                  <div class="feedback-meta">Anonymous · 18 Aug 2024</div>
+                  <div class="feedback-stars">
+                    <span class="filled-s">★</span><span class="filled-s">★</span><span class="filled-s">★</span><span class="empty-s">★</span><span class="empty-s">★</span>
+                  </div>
+                  <div class="feedback-text">The mobile interface needs improvement. Some buttons are too small on a phone screen and it's hard to attach files from mobile. Desktop version is excellent though.</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:8px;font-style:italic;">Admin reply: Thank you — we are actively working on improving mobile experience in our next release.</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Summary Stats -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Overall Rating -->
+          <div class="summary-card">
+            <div class="summary-num" style="color:#fbbc04;">4.2</div>
+            <div style="font-size:22px;color:#fbbc04;margin:4px 0;">★★★★☆</div>
+            <div class="summary-lbl">Average rating from 284 responses</div>
+            <div style="margin-top:16px;">
+              <div class="bar-row"><span class="bar-label">5★</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#34a853;"></div></div><span class="bar-count">170</span></div>
+              <div class="bar-row"><span class="bar-label">4★</span><div class="bar-track"><div class="bar-fill" style="width:20%;"></div></div><span class="bar-count">57</span></div>
+              <div class="bar-row"><span class="bar-label">3★</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:#fbbc04;"></div></div><span class="bar-count">28</span></div>
+              <div class="bar-row"><span class="bar-label">2★</span><div class="bar-track"><div class="bar-fill" style="width:5%;background:#ff7043;"></div></div><span class="bar-count">17</span></div>
+              <div class="bar-row"><span class="bar-label">1★</span><div class="bar-track"><div class="bar-fill" style="width:4%;background:#ea4335;"></div></div><span class="bar-count">12</span></div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="card" style="padding:18px 20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Feedback Overview</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
+                <span style="font-size:13px;color:var(--text-muted);">Total Responses</span>
+                <span style="font-size:13.5px;font-weight:700;color:var(--text);">284</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
+                <span style="font-size:13px;color:var(--text-muted);">This Month</span>
+                <span style="font-size:13.5px;font-weight:700;color:var(--secondary);">+38</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
+                <span style="font-size:13px;color:var(--text-muted);">Positive (4–5★)</span>
+                <span style="font-size:13.5px;font-weight:700;color:var(--secondary);">79.9%</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+                <span style="font-size:13px;color:var(--text-muted);">Admin Reply Rate</span>
+                <span style="font-size:13.5px;font-weight:700;color:var(--primary);">68%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Feedback Topics -->
+          <div class="card" style="padding:18px 20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Top Categories</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12.5px;color:var(--text);">Complaint Process</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:80px;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:75%;height:100%;background:var(--primary);border-radius:3px;"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted);">87</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12.5px;color:var(--text);">Response Time</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:80px;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:55%;height:100%;background:var(--warning);border-radius:3px;"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted);">63</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12.5px;color:var(--text);">System Usability</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:80px;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:40%;height:100%;background:var(--secondary);border-radius:3px;"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted);">47</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12.5px;color:var(--text);">Staff Professionalism</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:80px;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:35%;height:100%;background:#9334e6;border-radius:3px;"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted);">41</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12.5px;color:var(--text);">Communication</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:80px;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:25%;height:100%;background:var(--danger);border-radius:3px;"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted);">29</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tip -->
+          <div class="alert alert-info" style="margin:0;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div class="alert-content">
+              <div class="alert-title">Your feedback matters</div>
+              <div class="alert-msg">All submissions are reviewed by the quality assurance team every week.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div class="success-toast" id="successToast">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  Feedback submitted successfully! Thank you.
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  let currentRating = 4;
+  const ratingLabels = ['','Very Poor','Poor','Average','Good','Excellent'];
+
+  function setRating(val) {
+    currentRating = val;
+    document.querySelectorAll('.star').forEach((s, i) => {
+      s.className = i < val ? 'star filled' : 'star empty';
+    });
+    document.getElementById('rating-label').textContent = val + ' out of 5 — ' + ratingLabels[val];
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('active');
+  }
+
+  function submitFeedback(e) {
+    e.preventDefault();
+    const toast = document.getElementById('successToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}Upload Resumes — Lush Hair NG{% endblock %}
+{% block page_title %}Upload Resumes{% endblock %}
+{% block nav_upload %}active{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <!-- Upload card -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold mb-4"><i class="bi bi-cloud-upload-fill text-primary me-2"></i>Bulk Resume Upload</h5>
+
+        <form id="uploadForm">
+          <!-- Job role selector -->
+          <div class="mb-4">
+            <label class="form-label fw-medium">Select Job Role <span class="text-danger">*</span></label>
+            <select class="form-select form-select-lg" id="jobRoleSelect" name="job_role_id" required>
+              <option value="">Loading job roles…</option>
+            </select>
+          </div>
+
+          <!-- Drag-drop zone -->
+          <div class="drop-zone mb-4" id="dropZone">
+            <div class="drop-zone-icon"><i class="bi bi-file-earmark-arrow-up"></i></div>
+            <p class="drop-zone-text">Drag &amp; drop resumes here</p>
+            <p class="text-muted small mb-3">Supports PDF, DOCX, DOC · Up to 10MB per file</p>
+            <label class="btn btn-primary" for="fileInput">
+              <i class="bi bi-folder2-open me-2"></i>Browse Files
+            </label>
+            <input type="file" id="fileInput" name="files" multiple
+                   accept=".pdf,.docx,.doc" class="d-none"/>
+          </div>
+
+          <!-- File list -->
+          <div id="fileList" class="mb-4 d-none">
+            <h6 class="fw-medium mb-2">Selected Files</h6>
+            <div id="fileItems"></div>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+              <i class="bi bi-rocket-takeoff me-2"></i>Start Processing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Processing status card (hidden initially) -->
+    <div class="card border-0 shadow-sm d-none" id="processingCard">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold mb-4">
+          <span class="spinner-border spinner-border-sm text-primary me-2" id="processingSpinner"></span>
+          Processing Resumes
+        </h5>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span id="stepText" class="text-muted small">Initialising…</span>
+            <span id="progressPct" class="text-muted small fw-medium">0%</span>
+          </div>
+          <div class="progress" style="height:10px">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                 id="progressBar" role="progressbar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div id="stepLog" class="step-log"></div>
+
+        <div class="d-grid mt-3 d-none" id="viewResultsBtn">
+          <a href="#" class="btn btn-success btn-lg" id="viewResultsLink">
+            <i class="bi bi-trophy me-2"></i>View Ranked Results
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedFiles = [];
+let currentJobId = null;
+let pollInterval = null;
+
+// Load job roles
+fetch('/api/job-roles')
+  .then(r => r.json())
+  .then(roles => {
+    const sel = document.getElementById('jobRoleSelect');
+    sel.innerHTML = '<option value="">— Choose a role —</option>' +
+      roles.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+  });
+
+// Drag-drop
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  addFiles(Array.from(e.dataTransfer.files));
+});
+fileInput.addEventListener('change', () => addFiles(Array.from(fileInput.files)));
+
+function addFiles(newFiles) {
+  const allowed = ['.pdf', '.docx', '.doc'];
+  newFiles.forEach(f => {
+    const ext = '.' + f.name.split('.').pop().toLowerCase();
+    if (allowed.includes(ext) && !selectedFiles.find(x => x.name === f.name)) {
+      selectedFiles.push(f);
+    }
+  });
+  renderFileList();
+}
+
+function removeFile(name) {
+  selectedFiles = selectedFiles.filter(f => f.name !== name);
+  renderFileList();
+}
+
+function renderFileList() {
+  const container = document.getElementById('fileItems');
+  const listDiv = document.getElementById('fileList');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (!selectedFiles.length) {
+    listDiv.classList.add('d-none');
+    submitBtn.disabled = true;
+    return;
+  }
+
+  listDiv.classList.remove('d-none');
+  submitBtn.disabled = !document.getElementById('jobRoleSelect').value;
+
+  container.innerHTML = selectedFiles.map(f => `
+    <div class="file-item d-flex align-items-center gap-3 mb-2">
+      <i class="bi bi-file-earmark-text text-primary fs-5"></i>
+      <div class="flex-grow-1">
+        <div class="fw-medium small">${f.name}</div>
+        <div class="text-muted" style="font-size:0.75rem">${(f.size/1024).toFixed(0)} KB</div>
+      </div>
+      <button class="btn btn-sm btn-outline-danger" onclick="removeFile('${f.name}')">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+document.getElementById('jobRoleSelect').addEventListener('change', renderFileList);
+
+// Form submit
+document.getElementById('uploadForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const jobRoleId = document.getElementById('jobRoleSelect').value;
+  if (!jobRoleId || !selectedFiles.length) return;
+
+  const formData = new FormData();
+  formData.append('job_role_id', jobRoleId);
+  selectedFiles.forEach(f => formData.append('files', f));
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('processingCard').classList.remove('d-none');
+  addLogEntry('Uploading resumes to server…', 'info');
+
+  try {
+    const resp = await fetch('/api/upload', { method: 'POST', body: formData });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || 'Upload failed');
+
+    currentJobId = data.job_id;
+    addLogEntry(`✓ ${data.total_files} file(s) uploaded. Starting AI analysis…`, 'success');
+    pollInterval = setInterval(() => pollStatus(currentJobId), 1500);
+  } catch (err) {
+    addLogEntry('✗ ' + err.message, 'error');
+    showToast(err.message, 'danger');
+    document.getElementById('submitBtn').disabled = false;
+  }
+});
+
+async function pollStatus(jobId) {
+  try {
+    const resp = await fetch(`/api/status/${jobId}`);
+    const data = await resp.json();
+
+    document.getElementById('stepText').textContent = data.current_step || data.status;
+    document.getElementById('progressPct').textContent = data.progress + '%';
+    document.getElementById('progressBar').style.width = data.progress + '%';
+
+    if (data.status === 'completed') {
+      clearInterval(pollInterval);
+      document.getElementById('processingSpinner').classList.add('d-none');
+      addLogEntry('✓ All resumes processed! Ranking complete.', 'success');
+      const viewBtn = document.getElementById('viewResultsBtn');
+      viewBtn.classList.remove('d-none');
+      document.getElementById('viewResultsLink').href = `/results/${jobId}`;
+      showToast('Processing complete! View your ranked candidates.', 'success');
+    } else if (data.status === 'failed') {
+      clearInterval(pollInterval);
+      addLogEntry('✗ Processing failed: ' + (data.error || 'Unknown error'), 'error');
+      showToast('Processing failed. Please try again.', 'danger');
+    }
+  } catch (err) {
+    // network hiccup — keep polling
+  }
+}
+
+const loggedSteps = new Set();
+function addLogEntry(msg, type = 'info') {
+  if (loggedSteps.has(msg)) return;
+  loggedSteps.add(msg);
+  const colors = { info: 'text-primary', success: 'text-success', error: 'text-danger' };
+  const icons = { info: 'bi-info-circle', success: 'bi-check-circle', error: 'bi-x-circle' };
+  const el = document.createElement('div');
+  el.className = `log-entry ${colors[type] || ''}`;
+  el.innerHTML = `<i class="bi ${icons[type]} me-2"></i>${msg}`;
+  document.getElementById('stepLog').appendChild(el);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Dashboard — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  /* Staff accent: green */
+  .sidebar-nav a.active { background: rgba(52,168,83,0.15); color: #34a853; }
+  .logo-icon-staff { background: linear-gradient(135deg,#34a853,#2d8f47); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <div>
+        <span class="logo-text">Complaint<span style="color:#34a853;">Desk</span></span>
+        <div style="font-size:10px;color:var(--text-muted);font-weight:500;margin-top:-2px;letter-spacing:0.05em;">STAFF PORTAL</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="staff-dashboard.html" class="active">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Dashboard
+        </a>
+        <a href="04-submit-complaint.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Submit Complaint
+        </a>
+        <a href="05-my-complaints.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          My Complaints
+          <span class="badge-count">2</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Support</div>
+      <nav class="sidebar-nav">
+        <a href="16-feedback.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          Feedback
+        </a>
+        <a href="#">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Help &amp; FAQ
+        </a>
+        <a href="13-profile-settings.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Settings
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#34a853,#2d8f47);">CO</div>
+        <div class="sidebar-user-info">
+          <div class="user-name">Chioma Okafor</div>
+          <div class="user-role">Staff — Computer Science</div>
+        </div>
+      </div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:var(--text-muted);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('active');">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="topnav-search">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Search your complaints...">
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn notification-btn">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="topbar-user">
+          <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#34a853,#2d8f47);">CO</div>
+          <span>Chioma Okafor</span>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Welcome banner -->
+      <div style="background:linear-gradient(135deg,#34a853 0%,#2d8f47 100%);border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
+        <div style="position:absolute;right:-10px;top:-20px;opacity:0.08;">
+          <svg fill="white" viewBox="0 0 24 24" width="180" height="180"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+          <div class="avatar" style="background:rgba(255,255,255,0.25);color:#fff;font-weight:700;font-size:16px;width:48px;height:48px;">CO</div>
+          <div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Staff Portal</div>
+            <h2 style="font-size:20px;font-weight:800;color:#fff;">Good morning, Dr. Okafor</h2>
+          </div>
+        </div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.8);margin-bottom:20px;">Department of Computer Science &nbsp;·&nbsp; Staff ID: FMG-004 &nbsp;·&nbsp; Academic Staff</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="04-submit-complaint.html" style="background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);color:#fff;padding:9px 18px;border-radius:8px;font-size:13.5px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.25);transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Submit a Complaint
+          </a>
+          <a href="05-my-complaints.html" style="background:rgba(255,255,255,0.12);color:#fff;padding:9px 18px;border-radius:8px;font-size:13.5px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.15);">
+            View My Complaints
+          </a>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" style="margin-bottom:28px;">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e6f4ea;color:#34a853;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div><div class="stat-num" style="color:#34a853;">5</div><div class="stat-label">Total Complaints</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fff3cd;color:#f9ab00;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div><div class="stat-num" style="color:#f9ab00;">2</div><div class="stat-label">In Progress</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e8f0fe;color:#1a73e8;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </div>
+          <div><div class="stat-num" style="color:#1a73e8;">1</div><div class="stat-label">Under Review</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e6f4ea;color:#34a853;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div><div class="stat-num" style="color:#34a853;">2</div><div class="stat-label">Resolved</div></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;">
+
+        <!-- Recent Complaints -->
+        <div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <h3 style="font-size:15px;font-weight:800;">My Recent Complaints</h3>
+              <a href="05-my-complaints.html" style="font-size:13px;font-weight:600;color:var(--primary);">View all</a>
+            </div>
+
+            <!-- complaint rows -->
+            <div style="padding:18px 24px;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;gap:14px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#f9ab00;margin-top:6px;flex-shrink:0;"></div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:14px;font-weight:700;color:var(--text);">Office Internet Not Working — Block C, Room 201</span>
+                  <span class="status-badge status-in-progress">In Progress</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text-muted);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap;">
+                  <span>REF: CMP-2024-007</span><span>IT Category</span><span>Submitted Mar 10, 2024</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text-secondary);margin-top:6px;">Assigned to: M. Adeyemi (IT Department)</div>
+              </div>
+              <a href="06-complaint-detail.html" style="font-size:12.5px;font-weight:600;color:var(--primary);white-space:nowrap;">View →</a>
+            </div>
+
+            <div style="padding:18px 24px;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;gap:14px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#1a73e8;margin-top:6px;flex-shrink:0;"></div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:14px;font-weight:700;color:var(--text);">Salary Discrepancy — March Payslip</span>
+                  <span class="status-badge status-under-review">Under Review</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text-muted);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap;">
+                  <span>REF: CMP-2024-003</span><span>Finance Category</span><span>Submitted Feb 28, 2024</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text-secondary);margin-top:6px;">Assigned to: B. Eze (Finance)</div>
+              </div>
+              <a href="06-complaint-detail.html" style="font-size:12.5px;font-weight:600;color:var(--primary);white-space:nowrap;">View →</a>
+            </div>
+
+            <div style="padding:18px 24px;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;gap:14px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#34a853;margin-top:6px;flex-shrink:0;"></div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:14px;font-weight:700;color:var(--text);">Broken Projector — CS Lecture Hall 1</span>
+                  <span class="status-badge status-resolved">Resolved</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text-muted);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap;">
+                  <span>REF: CMP-2024-001</span><span>Facilities</span><span>Submitted Feb 5, 2024</span>
+                </div>
+                <div style="font-size:12.5px;color:#34a853;margin-top:6px;">✓ Resolved in 3 days</div>
+              </div>
+              <a href="06-complaint-detail.html" style="font-size:12.5px;font-weight:600;color:var(--primary);white-space:nowrap;">View →</a>
+            </div>
+
+            <div style="padding:18px 24px;">
+              <a href="04-submit-complaint.html" class="btn btn-success btn-full" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Submit New Complaint
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right panel -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Role info -->
+          <div class="card" style="padding:20px 22px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+              <div class="avatar" id="profile-card-avatar" style="background:linear-gradient(135deg,#34a853,#2d8f47);width:48px;height:48px;font-size:15px;">CO</div>
+              <div>
+                <div id="profile-card-name" style="font-size:14px;font-weight:800;color:var(--text);">—</div>
+                <div id="profile-card-email" style="font-size:12.5px;color:var(--text-muted);">—</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span style="color:var(--text-muted);">Role</span><span style="font-weight:600;color:var(--text);">Staff</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span style="color:var(--text-muted);">Staff ID</span><span id="profile-card-staffid" style="font-weight:600;color:var(--text);">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span style="color:var(--text-muted);">Department</span><span id="profile-card-dept" style="font-weight:600;color:var(--text);">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span style="color:var(--text-muted);">Faculty</span><span style="font-weight:600;color:var(--text);">Science &amp; Technology</span>
+              </div>
+            </div>
+            <a href="13-profile-settings.html" class="btn btn-ghost btn-full" style="margin-top:16px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Edit Profile
+            </a>
+          </div>
+
+          <!-- Announcements -->
+          <div class="card" style="padding:20px 22px;">
+            <h4 style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="#f9ab00" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+              Announcements
+            </h4>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="padding:12px;background:#fff8e1;border-radius:8px;border-left:3px solid #f9ab00;">
+                <div style="font-size:12.5px;font-weight:700;color:#7a5200;margin-bottom:4px;">⚠ Portal Maintenance — Sat 22 June</div>
+                <div style="font-size:12px;color:#92400e;line-height:1.5;">System unavailable 12 AM – 4 AM. Submit complaints before then.</div>
+              </div>
+              <div style="padding:12px;background:var(--bg);border-radius:8px;border-left:3px solid var(--border);">
+                <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px;">End-of-Semester Deadline — June 28</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">All semester complaints must be submitted by 28 June 2024.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick categories -->
+          <div class="card" style="padding:20px 22px;">
+            <h4 style="font-size:14px;font-weight:800;margin-bottom:14px;">Submit by Category</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <a href="04-submit-complaint.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;text-decoration:none;color:var(--text);font-size:13.5px;font-weight:600;transition:background 0.2s;" onmouseover="this.style.background='var(--border-light)'" onmouseout="this.style.background='var(--bg)'">
+                <span style="width:28px;height:28px;background:#e8f0fe;border-radius:6px;display:flex;align-items:center;justify-content:center;">💻</span>IT &amp; Technical Issues
+              </a>
+              <a href="04-submit-complaint.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;text-decoration:none;color:var(--text);font-size:13.5px;font-weight:600;transition:background 0.2s;" onmouseover="this.style.background='var(--border-light)'" onmouseout="this.style.background='var(--bg)'">
+                <span style="width:28px;height:28px;background:#fce8e6;border-radius:6px;display:flex;align-items:center;justify-content:center;">💰</span>Finance / Payroll
+              </a>
+              <a href="04-submit-complaint.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;text-decoration:none;color:var(--text);font-size:13.5px;font-weight:600;transition:background 0.2s;" onmouseover="this.style.background='var(--border-light)'" onmouseout="this.style.background='var(--bg)'">
+                <span style="width:28px;height:28px;background:#e6f4ea;border-radius:6px;display:flex;align-items:center;justify-content:center;">🏢</span>Facilities &amp; Infrastructure
+              </a>
+              <a href="04-submit-complaint.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;text-decoration:none;color:var(--text);font-size:13.5px;font-weight:600;transition:background 0.2s;" onmouseover="this.style.background='var(--border-light)'" onmouseout="this.style.background='var(--bg)'">
+                <span style="width:28px;height:28px;background:#f3e8ff;border-radius:6px;display:flex;align-items:center;justify-content:center;">👥</span>HR &amp; Admin
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+(async () => {
+  const user = await requireAuth('staff').catch(() => null);
+  if (!user) return;
+
+  const firstName = user.name.split(' ')[0];
+  const ini = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.querySelectorAll('.user-name, .profile-name').forEach(el => el.textContent = user.name);
+  document.querySelectorAll('.user-role').forEach(el => el.textContent = (user.staff_id || '') + ' · Staff');
+  document.querySelectorAll('.topbar-user span').forEach(el => { if(el.textContent.trim()) el.textContent = user.name; });
+  document.querySelectorAll('.avatar').forEach(el => el.textContent = ini);
+
+  // Profile card
+  const pcName  = document.getElementById('profile-card-name');
+  const pcEmail = document.getElementById('profile-card-email');
+  const pcStaff = document.getElementById('profile-card-staffid');
+  const pcDept  = document.getElementById('profile-card-dept');
+  const pcAva   = document.getElementById('profile-card-avatar');
+  if (pcName)  pcName.textContent  = user.name;
+  if (pcEmail) pcEmail.textContent = user.email;
+  if (pcStaff) pcStaff.textContent = user.staff_id || '—';
+  if (pcDept)  pcDept.textContent  = user.department || '—';
+  if (pcAva)   pcAva.textContent   = ini;
+
+  // Welcome banner
+  const wb = document.querySelector('.welcome-section h2, .welcome-banner h2, .card h2');
+  if (wb && wb.textContent.includes('Welcome')) wb.innerHTML = `Welcome back, ${firstName}! 👋`;
+
+  try {
+    const stats = await API.userStats();
+    const nums = document.querySelectorAll('.stat-num, .stat-number');
+    if (nums[0]) nums[0].textContent = stats.total;
+    if (nums[1]) nums[1].textContent = stats.open;
+    if (nums[2]) nums[2].textContent = stats.in_progress;
+    if (nums[3]) nums[3].textContent = stats.resolved;
+  } catch(e) {}
+
+  try {
+    const anns = await API.announcements();
+    const annEl = document.querySelector('.announcements-list');
+    if (annEl && anns.length) {
+      annEl.innerHTML = anns.slice(0,3).map(a => `
+        <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+          <div style="font-weight:600;font-size:13.5px;">${a.is_pinned?'📌 ':''}${a.title}</div>
+          <div style="font-size:12px;opacity:.6;margin-top:2px;">${fmtDate(a.created_at)}</div>
+        </div>`).join('');
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

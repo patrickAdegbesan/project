@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block title %}Statistics – TaskMind{% endblock %}
+{% block content %}
+
+<div class="profile-hero mb-4">
+  <div class="container" style="max-width:900px;">
+    <div class="d-flex align-items-center gap-4 py-4">
+      <div class="profile-avatar">{{ session.username[0].upper() }}</div>
+      <div>
+        <h3 class="fw-bold text-white mb-0">{{ session.username }}</h3>
+        <p class="text-white opacity-75 mb-0 small">Your productivity at a glance</p>
+      </div>
+      <div class="ms-auto d-none d-md-flex gap-4 text-white text-center">
+        <div>
+          <div class="fs-4 fw-bold">{{ total }}</div>
+          <div class="opacity-75 small">Total</div>
+        </div>
+        <div class="border-start border-white opacity-25"></div>
+        <div>
+          <div class="fs-4 fw-bold">{{ completed_count }}</div>
+          <div class="opacity-75 small">Done</div>
+        </div>
+        <div class="border-start border-white opacity-25"></div>
+        <div>
+          <div class="fs-4 fw-bold">{{ completion_rate }}%</div>
+          <div class="opacity-75 small">Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5" style="max-width:900px;">
+
+  <!-- Stat Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card stat-card-pro shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <div class="stat-icon-pro bg-primary-soft mx-auto mb-3">
+            <i class="fas fa-percent text-primary"></i>
+          </div>
+          <div class="stat-big text-primary">{{ completion_rate }}%</div>
+          <div class="stat-label-pro">Completion Rate</div>
+          <div class="progress mt-3" style="height:4px;">
+            <div class="progress-bar bg-primary" style="width:{{ completion_rate }}%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card stat-card-pro shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <div class="stat-icon-pro bg-success-soft mx-auto mb-3">
+            <i class="fas fa-check-circle text-success"></i>
+          </div>
+          <div class="stat-big text-success">{{ completed_count }}</div>
+          <div class="stat-label-pro">Tasks Completed</div>
+          <div class="progress mt-3" style="height:4px;">
+            <div class="progress-bar bg-success" style="width:{{ [completed_count * 5, 100] | min }}%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card stat-card-pro shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <div class="stat-icon-pro bg-warning-soft mx-auto mb-3">
+            <i class="fas fa-stopwatch text-warning"></i>
+          </div>
+          <div class="stat-big text-warning">{{ avg_effort }}</div>
+          <div class="stat-label-pro">Avg Effort (min)</div>
+          <div class="progress mt-3" style="height:4px;">
+            <div class="progress-bar bg-warning" style="width:{{ [avg_effort // 3, 100] | min }}%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card stat-card-pro shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <div class="stat-icon-pro bg-info-soft mx-auto mb-3">
+            <i class="fas fa-layer-group text-info"></i>
+          </div>
+          <div class="stat-big text-info">{{ total }}</div>
+          <div class="stat-label-pro">Total Tasks</div>
+          <div class="progress mt-3" style="height:4px;">
+            <div class="progress-bar bg-info" style="width:100%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly + Insight Row -->
+  <div class="row g-3 mb-4">
+
+    <!-- Weekly Comparison -->
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="section-icon bg-primary-soft me-3">
+              <i class="fas fa-calendar-week text-primary"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold mb-0">Weekly Comparison</h6>
+              <p class="text-muted small mb-0">Tasks completed</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-center justify-content-around mb-3">
+            <div class="text-center">
+              <div class="week-circle week-this">{{ this_week }}</div>
+              <div class="small text-muted mt-2 fw-semibold">This Week</div>
+            </div>
+            <div class="week-vs text-muted">VS</div>
+            <div class="text-center">
+              <div class="week-circle week-last">{{ last_week }}</div>
+              <div class="small text-muted mt-2 fw-semibold">Last Week</div>
+            </div>
+          </div>
+          {% if this_week > last_week %}
+          <div class="trend-badge trend-up">
+            <i class="fas fa-arrow-trend-up me-2"></i>Up {{ this_week - last_week }} task{{ 's' if (this_week - last_week) != 1 }} from last week!
+          </div>
+          {% elif this_week < last_week %}
+          <div class="trend-badge trend-down">
+            <i class="fas fa-arrow-trend-down me-2"></i>Down {{ last_week - this_week }} task{{ 's' if (last_week - this_week) != 1 }} from last week.
+          </div>
+          {% else %}
+          <div class="trend-badge trend-neutral">
+            <i class="fas fa-equals me-2"></i>Same pace as last week.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Productivity Insight -->
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="section-icon bg-warning-soft me-3">
+              <i class="fas fa-bolt text-warning"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold mb-0">Productivity Insight</h6>
+              <p class="text-muted small mb-0">Based on your history</p>
+            </div>
+          </div>
+          <div class="insight-day-card mb-3">
+            <div class="small text-muted mb-1">Your peak day</div>
+            <div class="fw-bold fs-5 text-primary">{{ most_productive_day }}</div>
+          </div>
+          <p class="text-muted small mb-0">
+            <i class="fas fa-lightbulb me-1 text-warning"></i>
+            Schedule your most important tasks on <strong>{{ most_productive_day }}</strong> for best results.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password -->
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center mb-4">
+        <div class="section-icon bg-danger-soft me-3">
+          <i class="fas fa-key text-danger"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-0">Change Password</h6>
+          <p class="text-muted small mb-0">Keep your account secure</p>
+        </div>
+      </div>
+      <form method="POST" action="{{ url_for('change_password') }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Current Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+              <input type="password" class="form-control border-start-0" name="current_password" required placeholder="Enter current password"/>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">New Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock-open text-muted"></i></span>
+              <input type="password" class="form-control border-start-0" name="new_password" required minlength="6" placeholder="Min 6 characters"/>
+            </div>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="fas fa-save me-2"></i>Update Password
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

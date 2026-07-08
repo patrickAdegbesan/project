@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard – TaskMind{% endblock %}
+{% block content %}
+<div class="container-fluid py-4 px-4">
+
+  <!-- Do Next + Stats Row -->
+  <div class="row g-3 mb-4">
+
+    <!-- Do Next Card -->
+    <div class="col-lg-5">
+      {% if do_next %}
+      <div class="card do-next-card h-100 text-white shadow">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex align-items-center mb-3">
+            <span class="do-next-label me-2"><i class="fas fa-bolt me-1"></i>DO NEXT</span>
+            <span class="badge do-next-match ms-auto">{{ do_next_pct }}% match</span>
+          </div>
+          <h5 class="card-title fw-bold mb-3 lh-sm">{{ do_next.title }}</h5>
+          <div class="d-flex flex-wrap gap-3 mb-3">
+            <span class="do-next-meta"><i class="fas fa-calendar-alt me-1"></i>{{ do_next.due_date_fmt }}{% if do_next.due_time %} · {{ do_next.due_time }}{% endif %}</span>
+            <span class="do-next-meta"><i class="fas fa-stopwatch me-1"></i>{{ do_next.effort_fmt }}</span>
+            <span class="do-next-meta"><i class="fas fa-flag me-1"></i>{{ do_next.priority_label }}</span>
+          </div>
+          <p class="small do-next-reason mb-3">
+            <i class="fas fa-robot me-1"></i>
+            Recommended based on: {{ do_next.priority_label|lower }} priority + deadline proximity + your productive hours
+          </p>
+          <div class="mt-auto">
+            <button class="btn do-next-done-btn w-100" onclick="completeDoNext({{ do_next.id }})">
+              <i class="fas fa-check-circle me-2"></i>Mark as Done
+            </button>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="card do-next-card h-100 text-white shadow d-flex align-items-center justify-content-center">
+        <div class="text-center p-4">
+          <i class="fas fa-check-circle fa-3x mb-3 opacity-75"></i>
+          <h5>All caught up!</h5>
+          <p class="opacity-75 mb-0">No pending tasks. Add one below.</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="col-lg-7">
+      <div class="row g-3 h-100">
+        <div class="col-6">
+          <div class="card stat-card h-100 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <div class="stat-icon bg-primary-soft me-3"><i class="fas fa-tasks fa-lg text-primary"></i></div>
+              <div>
+                <div class="stat-number">{{ total }}</div>
+                <div class="stat-label">Total Tasks</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card stat-card h-100 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <div class="stat-icon bg-success-soft me-3"><i class="fas fa-check-circle fa-lg text-success"></i></div>
+              <div>
+                <div class="stat-number text-success">{{ completed }}</div>
+                <div class="stat-label">Completed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card stat-card h-100 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <div class="stat-icon bg-warning-soft me-3"><i class="fas fa-hourglass-half fa-lg text-warning"></i></div>
+              <div>
+                <div class="stat-number text-warning">{{ pending }}</div>
+                <div class="stat-label">Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card stat-card h-100 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <div class="stat-icon bg-danger-soft me-3"><i class="fas fa-exclamation-triangle fa-lg text-danger"></i></div>
+              <div>
+                <div class="stat-number text-danger">{{ overdue }}</div>
+                <div class="stat-label">Overdue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart + NLP Input Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3"><i class="fas fa-chart-bar me-2 text-primary"></i>Tasks Completed (Last 7 Days)</h6>
+          <canvas id="productivityChart" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="fw-bold mb-2"><i class="fas fa-magic me-2 text-primary"></i>Add Task with Natural Language</h6>
+          <p class="text-muted small mb-3">Try: <em>"Submit report by Friday 5pm, high priority"</em> or <em>"Call dentist tomorrow, 15 minutes"</em></p>
+          <div class="input-group mb-2">
+            <input type="text" id="nlpInput" class="form-control form-control-lg"
+              placeholder="Type a task like: Submit report by Friday 5pm, high priority"
+              autofocus/>
+            <button class="btn btn-primary" id="nlpParseBtn" type="button">
+              <i class="fas fa-magic me-1"></i>Parse
+            </button>
+          </div>
+          <div id="nlpStatus" class="small text-muted"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task List -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-3 flex-wrap gap-2">
+        <h6 class="fw-bold mb-0 me-3"><i class="fas fa-list me-2 text-primary"></i>Tasks</h6>
+        <div class="btn-group btn-group-sm" role="group">
+          <button class="btn btn-primary filter-btn active" data-filter="all">All</button>
+          <button class="btn btn-outline-secondary filter-btn" data-filter="pending">Pending</button>
+          <button class="btn btn-outline-success filter-btn" data-filter="completed">Completed</button>
+          <button class="btn btn-outline-danger filter-btn" data-filter="overdue">Overdue</button>
+        </div>
+        <button class="btn btn-sm btn-outline-primary ms-auto" onclick="openManualModal()">
+          <i class="fas fa-plus me-1"></i>Add Manually
+        </button>
+      </div>
+      <div id="taskList">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NLP Confirm Modal -->
+<div class="modal fade" id="nlpModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold"><i class="fas fa-magic me-2 text-primary"></i>Parsed Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">Review and edit before creating:</p>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Task Title</label>
+          <input type="text" class="form-control" id="modalTitle"/>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Due Date</label>
+            <input type="date" class="form-control" id="modalDate"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Due Time</label>
+            <input type="time" class="form-control" id="modalTime"/>
+          </div>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Importance</label>
+            <select class="form-select" id="modalImportance">
+              <option value="3">High</option>
+              <option value="2" selected>Medium</option>
+              <option value="1">Low</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Effort (minutes)</label>
+            <input type="number" class="form-control" id="modalEffort" min="5" value="30"/>
+          </div>
+        </div>
+        <div class="ai-score-box rounded p-3">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-brain me-2 text-primary"></i>
+            <span class="fw-semibold">AI Priority Score: </span>
+            <span id="modalScore" class="ms-2 fw-bold"></span>
+            <span id="modalPriorityBadge" class="ms-2 badge"></span>
+          </div>
+          <div class="small text-muted mt-1" id="modalScoreExpl"></div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modalCreateBtn">
+          <i class="fas fa-plus me-1"></i>Create Task
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Task Modal -->
+<div class="modal fade" id="manualModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold"><i class="fas fa-plus me-2 text-primary"></i>New Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Task Title *</label>
+          <input type="text" class="form-control" id="manualTitle" placeholder="What needs to be done?"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Description</label>
+          <textarea class="form-control" id="manualDesc" rows="2" placeholder="Optional details..."></textarea>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Due Date</label>
+            <input type="date" class="form-control" id="manualDate"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Due Time</label>
+            <input type="time" class="form-control" id="manualTime"/>
+          </div>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Importance</label>
+            <select class="form-select" id="manualImportance">
+              <option value="3">High</option>
+              <option value="2" selected>Medium</option>
+              <option value="1">Low</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Effort (minutes)</label>
+            <input type="number" class="form-control" id="manualEffort" min="5" value="30"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="manualCreateBtn">
+          <i class="fas fa-plus me-1"></i>Create Task
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2 text-primary"></i>Edit Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editTaskId"/>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Task Title</label>
+          <input type="text" class="form-control" id="editTitle"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Description</label>
+          <textarea class="form-control" id="editDesc" rows="2"></textarea>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Due Date</label>
+            <input type="date" class="form-control" id="editDate"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Due Time</label>
+            <input type="time" class="form-control" id="editTime"/>
+          </div>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Importance</label>
+            <select class="form-select" id="editImportance">
+              <option value="3">High</option>
+              <option value="2">Medium</option>
+              <option value="1">Low</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Effort (minutes)</label>
+            <input type="number" class="form-control" id="editEffort" min="5"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="editSaveBtn">
+          <i class="fas fa-save me-1"></i>Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const TASKS_DATA = {{ tasks | tojson }};
+const CHART_LABELS = {{ chart_labels | safe }};
+const CHART_DATA = {{ chart_data | safe }};
+</script>
+{% endblock %}

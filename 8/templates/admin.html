@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard – NCS System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-shield-lock me-2 text-primary"></i>Admin Dashboard</h2>
+
+<!-- Stats row -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-list-ul text-primary fs-3"></i>
+        <h3 class="mt-2 mb-0 fw-bold">{{ total }}</h3>
+        <div class="text-muted small">Total Runs</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-check-circle-fill text-success fs-3"></i>
+        <h3 class="mt-2 mb-0 fw-bold">{{ done }}</h3>
+        <div class="text-muted small">Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-arrow-repeat text-warning fs-3"></i>
+        <h3 class="mt-2 mb-0 fw-bold">{{ running }}</h3>
+        <div class="text-muted small">Running</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center h-100">
+      <div class="card-body">
+        <i class="bi bi-x-circle-fill text-danger fs-3"></i>
+        <h3 class="mt-2 mb-0 fw-bold">{{ error }}</h3>
+        <div class="text-muted small">Errors</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent runs with delete -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-dark text-white fw-semibold">
+    <i class="bi bi-table me-2"></i>All Simulation Runs
+  </div>
+  {% if recent %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>#</th><th>Name</th><th>Nodes</th><th>Status</th>
+          <th>Created</th><th>Completed</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for run in recent %}
+        <tr>
+          <td>{{ run.id }}</td>
+          <td>{{ run.run_name }}</td>
+          <td>{{ run.num_nodes }}</td>
+          <td>
+            {% if run.status == 'done' %}
+              <span class="badge bg-success">Done</span>
+            {% elif run.status == 'running' %}
+              <span class="badge bg-warning text-dark">Running</span>
+            {% elif run.status == 'error' %}
+              <span class="badge bg-danger">Error</span>
+            {% else %}
+              <span class="badge bg-secondary">Pending</span>
+            {% endif %}
+          </td>
+          <td class="small text-muted">{{ run.created_at.strftime('%d %b %Y %H:%M') }}</td>
+          <td class="small text-muted">
+            {{ run.completed_at.strftime('%H:%M:%S') if run.completed_at else '—' }}
+          </td>
+          <td>
+            <a href="{{ url_for('results', run_id=run.id) }}"
+               class="btn btn-sm btn-outline-primary me-1">View</a>
+            <form method="POST" action="{{ url_for('delete_run', run_id=run.id) }}"
+                  class="d-inline"
+                  onsubmit="return confirm('Delete run #{{ run.id }}?')">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body text-muted text-center py-4">No runs found.</div>
+  {% endif %}
+</div>
+{% endblock %}

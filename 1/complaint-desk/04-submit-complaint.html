@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit Complaint — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.success-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:999; align-items:center; justify-content:center; }
+.success-overlay.show { display:flex; }
+.success-card { background:var(--card); border-radius:var(--radius-xl); padding:44px 40px; text-align:center; max-width:420px; width:90%; box-shadow:var(--shadow-lg); }
+.ref-pill { display:inline-block; background:var(--primary-light); color:var(--primary); font-family:'Courier New',monospace; font-size:18px; font-weight:800; padding:8px 20px; border-radius:var(--radius); margin:12px 0; border:1.5px dashed var(--primary); letter-spacing:1px; }
+
+.char-count { font-size:11.5px; color:var(--text-muted); text-align:right; margin-top:4px; }
+.attachment-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.att-thumb { width:80px; height:80px; border-radius:var(--radius-sm); object-fit:cover; border:2px solid var(--border); position:relative; overflow:hidden; background:var(--bg); display:flex;align-items:center;justify-content:center; }
+.att-thumb svg { width:28px;height:28px;color:var(--text-muted); }
+.att-thumb .att-remove { position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer; }
+.att-thumb .att-remove svg { width:10px;height:10px;color:#fff; }
+.att-thumb .att-name { position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);font-size:9px;color:#fff;padding:2px 4px;text-align:center; }
+
+.form-section { margin-bottom:28px; }
+.form-section-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border-light); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <span class="logo-text">Complaint<span>Desk</span></span>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="03-user-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="04-submit-complaint.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Submit Complaint</a>
+        <a href="05-my-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Complaints<span class="badge-count">3</span></a>
+        <a href="06-complaint-detail.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Track Status</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Support</div>
+      <nav class="sidebar-nav">
+        <a href="16-feedback.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>Feedback</a>
+        <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; FAQ</a>
+        <a href="13-profile-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div>
+        <div class="sidebar-user-info"><div class="user-name">John Smith</div><div class="user-role">CSC/2021/045 · Student</div></div>
+      </div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search"><svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" placeholder="Search..."></div>
+      <div class="topnav-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">3</span></button>
+        <div class="topnav-profile"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div><span class="profile-name">John Smith</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb">
+            <a href="03-user-dashboard.html">Dashboard</a>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            Submit Complaint
+          </div>
+          <h2>Submit New Complaint</h2>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-bottom:20px;">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="alert-content">
+          <div class="alert-title">Before you submit</div>
+          <div class="alert-msg">Provide as much detail as possible. Your complaint will be reviewed within 24 hours and assigned to the relevant department.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:20px;">
+        <!-- Main Form -->
+        <div class="card card-lg">
+          <form id="complaint-form" onsubmit="doSubmit(event);">
+
+            <!-- Complaint Info -->
+            <div class="form-section">
+              <div class="form-section-title">Complaint Information</div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Category <span class="required">*</span></label>
+                  <select class="form-control" id="cat-select">
+                    <option value="">Loading categories…</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Priority Level <span class="required">*</span></label>
+                  <select class="form-control" id="priority-select">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Subject / Title <span class="required">*</span></label>
+              <div class="input-group">
+                <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                <input type="text" id="complaint-title" class="form-control" placeholder="Brief, clear title for your complaint">
+              </div>
+              <div class="form-hint">Keep it concise — 10 to 100 characters</div>
+            </div>
+
+            <!-- Priority Selection -->
+            <div class="form-group">
+              <label class="form-label">Priority Level <span class="required">*</span></label>
+              <div class="priority-group">
+                <label class="priority-radio">
+                  <input type="radio" name="priority" value="low">
+                  <span class="priority-label low">🟢 Low</span>
+                </label>
+                <label class="priority-radio">
+                  <input type="radio" name="priority" value="medium" checked>
+                  <span class="priority-label medium">🟡 Medium</span>
+                </label>
+                <label class="priority-radio">
+                  <input type="radio" name="priority" value="high">
+                  <span class="priority-label high">🔴 High</span>
+                </label>
+                <label class="priority-radio">
+                  <input type="radio" name="priority" value="critical">
+                  <span class="priority-label critical">🚨 Critical</span>
+                </label>
+              </div>
+              <div class="form-hint">Select <strong>Critical</strong> only for issues requiring immediate attention (e.g., safety hazards).</div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label">Detailed Description <span class="required">*</span></label>
+              <textarea id="complaint-desc" class="form-control" rows="7" placeholder="Provide a detailed description of your complaint...">
+
+The delay is affecting my CGPA calculation and scholarship eligibility review scheduled for April 2024. I kindly request an urgent investigation and resolution.
+
+Student: John Adebayo Smith | Matric: CSC/2021/045 | Department: Computer Science | Level: 300</textarea>
+              <div class="char-count">456 / 2000 characters</div>
+            </div>
+
+            <!-- Incident Date -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Date of Incident <span class="required">*</span></label>
+                <input type="date" class="form-control" value="2024-01-18">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Location / Venue</label>
+                <input type="text" class="form-control" value="Examinations &amp; Records Office, Block D">
+              </div>
+            </div>
+            <div style="margin-bottom:18px;"></div>
+
+            <!-- Supporting Evidence -->
+            <div class="form-section">
+              <div class="form-section-title">Supporting Evidence</div>
+              <div class="upload-zone" onclick="document.getElementById('fileInput').click();">
+                <svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                <div class="upload-title">Drag &amp; drop files here</div>
+                <div class="upload-hint">or <span style="color:var(--primary);font-weight:600;">click to browse</span> — PNG, JPG, PDF, DOCX up to 10 MB each</div>
+                <input type="file" id="fileInput" multiple style="display:none;">
+              </div>
+
+              <!-- Pre-filled attachments -->
+              <div class="file-list" style="margin-top:14px;">
+                <div class="file-item">
+                  <div class="file-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                  <div class="file-name">student_portal_screenshot.png</div>
+                  <div class="file-size">248 KB</div>
+                  <button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;margin-left:8px;font-size:12px;">✕</button>
+                </div>
+                <div class="file-item">
+                  <div class="file-icon" style="background:var(--danger-light);"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></div>
+                  <div class="file-name">exam_timetable_evidence.pdf</div>
+                  <div class="file-size">512 KB</div>
+                  <button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;margin-left:8px;font-size:12px;">✕</button>
+                </div>
+                <div class="file-item">
+                  <div class="file-icon" style="background:var(--secondary-light);"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--secondary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                  <div class="file-name">adviser_email_thread.docx</div>
+                  <div class="file-size">87 KB</div>
+                  <button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;margin-left:8px;font-size:12px;">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional options -->
+            <div class="form-section">
+              <div class="form-section-title">Additional Options</div>
+              <label class="form-check" style="margin-bottom:10px;">
+                <input type="checkbox" class="form-check-input" checked>
+                <span class="form-check-label">Receive email updates when status changes</span>
+              </label>
+              <label class="form-check" style="margin-bottom:10px;">
+                <input type="checkbox" class="form-check-input" checked>
+                <span class="form-check-label">Submit anonymously (hides your identity from the assignee)</span>
+              </label>
+              <label class="form-check">
+                <input type="checkbox" id="anon-check" class="form-check-input">
+                <span class="form-check-label">This is a duplicate of a previously submitted complaint (enter reference number below)</span>
+              </label>
+            </div>
+
+            <!-- Submit -->
+            <div style="display:flex;gap:10px;margin-top:8px;">
+              <button type="submit" class="btn btn-primary btn-lg" style="min-width:200px;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                Submit Complaint
+              </button>
+              <button type="button" class="btn btn-ghost btn-lg">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                Save as Draft
+              </button>
+              <a href="03-user-dashboard.html" class="btn btn-ghost btn-lg">Cancel</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tips Sidebar -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card" style="border-left:4px solid var(--primary);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span style="font-weight:700;font-size:13.5px;">Writing Tips</span>
+            </div>
+            <ul style="display:flex;flex-direction:column;gap:8px;">
+              <li style="display:flex;gap:7px;font-size:12.5px;color:var(--text-secondary);"><span style="color:var(--primary);font-weight:700;flex-shrink:0;">1.</span> Be specific — include dates, names, and locations</li>
+              <li style="display:flex;gap:7px;font-size:12.5px;color:var(--text-secondary);"><span style="color:var(--primary);font-weight:700;flex-shrink:0;">2.</span> Attach relevant evidence (screenshots, receipts)</li>
+              <li style="display:flex;gap:7px;font-size:12.5px;color:var(--text-secondary);"><span style="color:var(--primary);font-weight:700;flex-shrink:0;">3.</span> State the desired outcome clearly</li>
+              <li style="display:flex;gap:7px;font-size:12.5px;color:var(--text-secondary);"><span style="color:var(--primary);font-weight:700;flex-shrink:0;">4.</span> Avoid abusive or threatening language</li>
+              <li style="display:flex;gap:7px;font-size:12.5px;color:var(--text-secondary);"><span style="color:var(--primary);font-weight:700;flex-shrink:0;">5.</span> Check for duplicates before submitting</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">What Happens Next?</div>
+            <div class="timeline" style="padding-left:24px;">
+              <div class="timeline-item">
+                <div class="timeline-dot done"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                <div class="timeline-content">
+                  <div class="step-label" style="font-size:12.5px;">Complaint Submitted</div>
+                  <div class="step-date" style="font-size:11.5px;">You receive a reference number</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot done"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                <div class="timeline-content">
+                  <div class="step-label" style="font-size:12.5px;">Under Review</div>
+                  <div class="step-date" style="font-size:11.5px;">Admin reviews within 24 hours</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                <div class="timeline-content">
+                  <div class="step-label" style="font-size:12.5px;">Assigned to Handler</div>
+                  <div class="step-date" style="font-size:11.5px;">Routed to right department</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="var(--border)"/></svg></div>
+                <div class="timeline-content">
+                  <div class="step-label" style="font-size:12.5px;color:var(--text-muted);">In Progress</div>
+                  <div class="step-date" style="font-size:11.5px;">Active resolution</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="var(--border)"/></svg></div>
+                <div class="timeline-content">
+                  <div class="step-label" style="font-size:12.5px;color:var(--text-muted);">Resolved &amp; Closed</div>
+                  <div class="step-date" style="font-size:11.5px;">You're notified via email</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:var(--secondary-light);border-color:rgba(52,168,83,0.2);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--secondary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span style="font-weight:700;font-size:13px;color:var(--secondary);">Average Resolution Time</span>
+            </div>
+            <div style="font-size:28px;font-weight:800;color:var(--secondary);">3.2 days</div>
+            <div style="font-size:12px;color:#1e7e34;margin-top:4px;">Based on last 45 resolved complaints</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <h2 style="font-size:22px;margin-bottom:8px;">Complaint Submitted!</h2>
+    <p style="font-size:13.5px;margin-bottom:16px;">Your complaint has been received and is now being reviewed. You will be notified via email within 24 hours.</p>
+    <div class="ref-pill" id="success-ref">—</div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Keep this reference number for tracking your complaint</p>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:22px;">
+      <a href="06-complaint-detail.html" class="btn btn-primary">Track Complaint</a>
+      <a href="03-user-dashboard.html" class="btn btn-ghost">Go to Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+(async () => {
+  await requireAuth().catch(() => null);
+  // Load categories
+  try {
+    const cats = await API.categories();
+    const sel = document.getElementById('cat-select');
+    if (sel) {
+      sel.innerHTML = '<option value="">Select category…</option>' +
+        cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+  } catch(e) {}
+})();
+
+async function doSubmit(e) {
+  e.preventDefault();
+  const title = (document.getElementById('complaint-title').value || '').trim();
+  const desc  = (document.getElementById('complaint-desc').value  || '').trim();
+  const catId = document.getElementById('cat-select').value;
+  const pri   = document.getElementById('priority-select').value;
+  const anon  = document.getElementById('anon-check') && document.getElementById('anon-check').checked;
+
+  if (!title)  { showToast('Please enter a complaint title.', 'error'); return; }
+  if (!desc)   { showToast('Please describe your complaint.', 'error'); return; }
+  if (!catId)  { showToast('Please select a category.', 'error'); return; }
+
+  const btn = document.querySelector('button[type="submit"], button[onclick*="doSubmit"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+
+  try {
+    const res = await API.submitComplaint({ title, description: desc, category_id: catId, priority: pri, anonymous: anon });
+    // Show success overlay with ref number
+    const refEl = document.getElementById('success-ref');
+    if (refEl) refEl.textContent = res.ref_no;
+    document.getElementById('successOverlay').classList.add('show');
+  } catch(err) {
+    showToast(err.message || 'Submission failed. Please try again.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit Complaint'; }
+  }
+}
+
+document.getElementById('successOverlay').addEventListener('click', function(e){
+  if(e.target === this) this.classList.remove('show');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Results – {{ run.run_name }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-center mb-4">
+  <div>
+    <h2 class="mb-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>{{ run.run_name }}</h2>
+    <span class="text-muted small">Run #{{ run.id }} &bull; Created {{ run.created_at.strftime('%d %b %Y %H:%M') }}</span>
+  </div>
+  <div class="ms-auto">
+    <a href="{{ url_for('simulate') }}" class="btn btn-outline-primary">
+      <i class="bi bi-plus-circle me-1"></i>New Run
+    </a>
+  </div>
+</div>
+
+<!-- Status banner -->
+{% if run.status == 'pending' or run.status == 'running' %}
+<div class="alert alert-info d-flex align-items-center" id="statusBanner">
+  <div class="spinner-border spinner-border-sm me-3 text-info"></div>
+  <div>
+    <strong>Simulation is running…</strong><br/>
+    <span class="small">This page will refresh automatically when complete.</span>
+  </div>
+</div>
+{% elif run.status == 'error' %}
+<div class="alert alert-danger">
+  <i class="bi bi-x-circle me-2"></i><strong>Simulation encountered an error.</strong>
+  {% if summary_records and summary_records.error %}
+    <br/>{{ summary_records.error }}
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Configuration summary card -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-light fw-semibold">
+    <i class="bi bi-gear me-2"></i>Configuration
+  </div>
+  <div class="card-body">
+    <div class="row g-3 text-center">
+      <div class="col-6 col-md-2">
+        <div class="fw-bold fs-5">{{ run.num_nodes }}</div>
+        <div class="text-muted small">Nodes</div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="fw-bold fs-5">{{ run.service_rate }}</div>
+        <div class="text-muted small">μ (pkt/s)</div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="fw-bold fs-5">{{ run.buffer_size }}</div>
+        <div class="text-muted small">Buffer Size</div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="fw-bold fs-5">{{ run.duration }} s</div>
+        <div class="text-muted small">Duration</div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="fw-bold fs-5">{{ run.num_reps }}</div>
+        <div class="text-muted small">Replications</div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="fw-bold fs-5">{{ run.seed }}</div>
+        <div class="text-muted small">Seed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if run.status == 'done' and summary_records %}
+
+<!-- Chart -->
+{% if chart_b64 %}
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-primary text-white fw-semibold">
+    <i class="bi bi-graph-up me-2"></i>Performance vs. Traffic Load
+  </div>
+  <div class="card-body text-center">
+    <img src="data:image/png;base64,{{ chart_b64 }}"
+         class="img-fluid rounded" alt="Performance chart"
+         style="max-width:900px;"/>
+  </div>
+</div>
+{% endif %}
+
+<!-- Results table -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-success text-white fw-semibold">
+    <i class="bi bi-table me-2"></i>Summary Statistics (Mean ± Std Dev across {{ run.num_reps }} replications)
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>Load</th>
+          <th>Avg Delay (s)</th>
+          <th>±Std</th>
+          <th>Loss Ratio</th>
+          <th>±Std</th>
+          <th>Throughput (pkt/s)</th>
+          <th>±Std</th>
+          <th>Avg Queue Len</th>
+          <th>±Std</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in summary_records %}
+        <tr>
+          <td><span class="badge
+            {% if row.load <= 0.5 %}bg-success
+            {% elif row.load <= 0.8 %}bg-primary
+            {% elif row.load <= 1.0 %}bg-warning text-dark
+            {% else %}bg-danger
+            {% endif %}">
+            {{ (row.load * 100) | int }}%
+          </span></td>
+          <td>{{ "%.4f"|format(row.avg_delay_mean) }}</td>
+          <td class="text-muted">{{ "%.4f"|format(row.avg_delay_std or 0) }}</td>
+          <td>{{ "%.4f"|format(row.loss_ratio_mean) }}</td>
+          <td class="text-muted">{{ "%.4f"|format(row.loss_ratio_std or 0) }}</td>
+          <td>{{ "%.4f"|format(row.throughput_mean) }}</td>
+          <td class="text-muted">{{ "%.4f"|format(row.throughput_std or 0) }}</td>
+          <td>{{ "%.4f"|format(row.avg_queue_length_mean) }}</td>
+          <td class="text-muted">{{ "%.4f"|format(row.avg_queue_length_std or 0) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Interpretation -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-warning text-dark fw-semibold">
+    <i class="bi bi-lightbulb me-2"></i>Result Interpretation
+  </div>
+  <div class="card-body">
+    <ul class="mb-0">
+      {% for row in summary_records %}
+        {% set load_pct = (row.load * 100) | int %}
+        <li class="mb-1">
+          <strong>{{ load_pct }}% load</strong>:
+          Mean sojourn time = <strong>{{ "%.3f"|format(row.avg_delay_mean) }} s</strong>,
+          packet loss = <strong>{{ "%.2f"|format(row.loss_ratio_mean * 100) }}%</strong>,
+          throughput = <strong>{{ "%.3f"|format(row.throughput_mean) }} pkt/s</strong>.
+          {% if row.load >= 1.2 and row.loss_ratio_mean > 0.01 %}
+            <span class="badge bg-danger ms-1">Congested</span>
+          {% elif row.load >= 1.0 %}
+            <span class="badge bg-warning text-dark ms-1">Near capacity</span>
+          {% else %}
+            <span class="badge bg-success ms-1">Stable</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endif %} {# end if done #}
+
+{% endblock %}
+
+{% block scripts %}
+{% if run.status in ['pending', 'running'] %}
+<script>
+// Poll for status every 3 seconds and reload when done
+(function poll() {
+  fetch("/api/run_status/{{ run.id }}")
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === "done" || data.status === "error") {
+        window.location.reload();
+      } else {
+        setTimeout(poll, 3000);
+      }
+    })
+    .catch(() => setTimeout(poll, 5000));
+})();
+</script>
+{% endif %}
+{% endblock %}

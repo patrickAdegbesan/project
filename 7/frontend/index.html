@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Student Study Planner — manage tasks, schedules, and track your academic progress." />
+  <title>Study Planner — Caleb University</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dark-mode.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+
+  <style>
+    .sidebar-overlay { display: none; }
+    .btn-menu { display: none; }
+    .task-item.highlight { box-shadow: 0 0 0 3px var(--clr-primary); transition: box-shadow .3s; }
+    .search-wrapper { position: relative; }
+    #searchResults {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0; right: 0;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      z-index: 500;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+    /* Icon sizing helpers */
+    .nav-icon { width: 20px; text-align: center; font-size: .95rem; }
+    .stat-icon { font-size: 1.6rem; color: var(--clr-primary); margin-bottom: var(--space-2); }
+    .stat-icon.danger  { color: var(--clr-danger); }
+    .stat-icon.success { color: var(--clr-success); }
+    .stat-icon.warning { color: var(--clr-warning); }
+    .stat-icon.info    { color: var(--clr-info); }
+  </style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+  <div class="spinner"></div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- =====================================================================
+     AUTH WRAPPER
+     ===================================================================== -->
+<div class="auth-wrapper" id="authWrapper" role="main">
+  <div class="auth-card" role="region" aria-label="Authentication">
+
+    <div class="auth-logo">
+      <i class="fa-solid fa-book-open" style="font-size:2.2rem;color:var(--clr-primary)"></i>
+      <h1>Study Planner</h1>
+      <p>Caleb University &mdash; Computer Science</p>
+    </div>
+
+    <!-- Login pane -->
+    <div id="loginPane">
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i> Email Address <span>*</span>
+          </label>
+          <input class="form-control" type="email" id="loginEmail" name="email"
+                 placeholder="you@example.com" required autocomplete="email"
+                 aria-describedby="loginError" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i> Password <span>*</span>
+          </label>
+          <input class="form-control" type="password" id="loginPassword" name="password"
+                 placeholder="Your password" required autocomplete="current-password" />
+        </div>
+        <div class="form-error" id="loginError" role="alert"></div>
+        <button class="btn btn-primary btn-full mt-4" type="submit" id="btnLogin">
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Sign In
+        </button>
+      </form>
+      <p class="text-center mt-4" style="font-size:.875rem">
+        Don't have an account? <a href="#" id="showRegister">Create one</a>
+      </p>
+    </div>
+
+    <!-- Register pane -->
+    <div id="registerPane" class="hidden">
+      <form id="registerForm" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="regFullName">Full Name</label>
+            <input class="form-control" type="text" id="regFullName" name="full_name"
+                   placeholder="Chibuzor Benjamin" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regUsername">Username <span>*</span></label>
+            <input class="form-control" type="text" id="regUsername" name="username"
+                   placeholder="chibuzor99" required autocomplete="username" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regEmail">Email Address <span>*</span></label>
+          <input class="form-control" type="email" id="regEmail" name="email"
+                 placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="regPassword">Password <span>*</span></label>
+            <input class="form-control" type="password" id="regPassword" name="password"
+                   placeholder="Min. 8 characters" required autocomplete="new-password" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regConfirm">Confirm Password <span>*</span></label>
+            <input class="form-control" type="password" id="regConfirm" name="confirm"
+                   placeholder="Repeat password" required autocomplete="new-password" />
+          </div>
+        </div>
+        <div class="form-error" id="registerError" role="alert"></div>
+        <button class="btn btn-primary btn-full mt-4" type="submit" id="btnRegister">
+          <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Create Account
+        </button>
+      </form>
+      <p class="text-center mt-4" style="font-size:.875rem">
+        Already have an account? <a href="#" id="showLogin">Sign in</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- =====================================================================
+     APP SHELL
+     ===================================================================== -->
+<div class="app-shell" id="appShell" style="display:none" role="application" aria-label="Study Planner">
+
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- ================================================================
+       SIDEBAR
+       ================================================================ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+
+    <div class="sidebar-brand">
+      <i class="fa-solid fa-book-open" style="color:var(--clr-primary);font-size:1.3rem;margin-right:8px" aria-hidden="true"></i>
+      <h2 style="display:inline">Study Planner</h2>
+      <small style="display:block;margin-top:2px">Caleb University</small>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="App sections">
+      <div class="nav-section-label">Main</div>
+
+      <a href="#dashboard" data-page="dashboard" aria-current="page">
+        <span class="nav-icon"><i class="fa-solid fa-house" aria-hidden="true"></i></span>
+        Dashboard
+      </a>
+      <a href="#tasks" data-page="tasks">
+        <span class="nav-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span>
+        My Tasks
+      </a>
+      <a href="#schedule" data-page="schedule">
+        <span class="nav-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
+        Schedule
+      </a>
+      <a href="#progress" data-page="progress">
+        <span class="nav-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+        Progress
+      </a>
+
+      <div class="nav-section-label">Insights</div>
+
+      <a href="#analytics" data-page="analytics">
+        <span class="nav-icon"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i></span>
+        Analytics
+      </a>
+      <a href="#adaptive" data-page="adaptive">
+        <span class="nav-icon"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        Recommendations
+      </a>
+      <a href="#reminders" data-page="reminders">
+        <span class="nav-icon"><i class="fa-solid fa-bell" aria-hidden="true"></i></span>
+        Reminders
+        <span class="badge reminder-badge-count" style="display:none">0</span>
+      </a>
+
+      <div class="nav-section-label">Account</div>
+
+      <a href="#admin" data-page="admin" id="adminNavLink" style="display:none">
+        <span class="nav-icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></span>
+        Admin Panel
+        <span class="badge" style="background:var(--clr-secondary);margin-left:auto">Admin</span>
+      </a>
+
+      <a href="#settings" data-page="settings">
+        <span class="nav-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></span>
+        Settings
+      </a>
+      <a href="#" id="btnLogout">
+        <span class="nav-icon"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></span>
+        Logout
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile-mini">
+        <div class="avatar user-avatar" aria-hidden="true">?</div>
+        <div class="user-info">
+          <strong class="user-display-name">User</strong>
+          <span class="user-username">@user</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <header class="topbar" role="banner">
+      <div class="topbar-left" style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="btn-icon btn-menu" id="btnMenu" aria-label="Open navigation menu"
+                aria-controls="sidebar" aria-expanded="false">
+          <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <h2 id="pageTitle">Dashboard</h2>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Search -->
+        <div class="search-wrapper" role="search" aria-label="Search tasks">
+          <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+            <input type="search" id="globalSearch" placeholder="Search tasks… (Ctrl+K)"
+                   aria-label="Search tasks by meaning" autocomplete="off" />
+          </div>
+          <div id="searchResults" role="listbox" aria-label="Search results"></div>
+        </div>
+
+        <!-- Dark mode -->
+        <button class="btn-icon" id="darkModeToggle" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon icon-moon" aria-hidden="true"></i>
+          <i class="fa-solid fa-sun  icon-sun"  aria-hidden="true"></i>
+        </button>
+
+        <!-- Notifications -->
+        <button class="btn-icon" aria-label="View reminders" onclick="Router.navigate('reminders')">
+          <i class="fa-solid fa-bell" aria-hidden="true"></i>
+          <span class="notification-badge" id="notifBadge" style="display:none" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==============================================================
+         PAGES
+         ============================================================== -->
+    <main id="mainContent">
+
+      <!-- ---- DASHBOARD ---- -->
+      <section class="page active" id="page-dashboard" aria-labelledby="dashTitle">
+        <h2 id="dashTitle" class="sr-only">Dashboard</h2>
+
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></div>
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-label">Total Tasks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+            <div class="stat-value" id="statCompleted">—</div>
+            <div class="stat-label">Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+            <div class="stat-value" id="statOverdue">—</div>
+            <div class="stat-label">Overdue</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon info"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>
+            <div class="stat-value" id="statHours7d">—</div>
+            <div class="stat-label">Study (7 days)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon warning"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
+            <div class="stat-value" id="statRate">—</div>
+            <div class="stat-label">Completion Rate</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-calendar-check" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Upcoming Deadlines</h3>
+              <button class="btn btn-sm btn-secondary" onclick="Router.navigate('tasks')">
+                View all <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="card-body" id="dashboardUpcoming">
+              <div class="spinner"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Task Status Overview</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="taskStatusChart" aria-label="Task status doughnut chart" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ---- TASKS ---- -->
+      <section class="page" id="page-tasks" aria-labelledby="tasksTitle">
+        <h2 id="tasksTitle" class="sr-only">My Tasks</h2>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5);flex-wrap:wrap;gap:var(--space-3)">
+          <div class="filters-bar" role="group" aria-label="Filter tasks">
+            <span class="filter-chip task-filter-chip active" data-filter="all">All</span>
+            <span class="filter-chip task-filter-chip" data-filter="pending">Pending</span>
+            <span class="filter-chip task-filter-chip" data-filter="in_progress">In Progress</span>
+            <span class="filter-chip task-filter-chip" data-filter="completed">Completed</span>
+            <span class="filter-chip task-filter-chip" data-filter="overdue">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Overdue
+            </span>
+            <span class="filter-chip task-filter-chip" data-filter="urgent">
+              <i class="fa-solid fa-fire" aria-hidden="true"></i> Urgent
+            </span>
+          </div>
+          <div style="display:flex;gap:var(--space-3);align-items:center">
+            <label class="sr-only" for="taskSort">Sort by</label>
+            <select class="form-control" id="taskSort" style="width:auto" aria-label="Sort tasks">
+              <option value="due_date">Sort: Due Date</option>
+              <option value="priority">Sort: Priority</option>
+              <option value="created">Sort: Newest</option>
+            </select>
+            <button class="btn btn-primary" id="btnAddTask" aria-label="Add new task">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i> New Task
+            </button>
+          </div>
+        </div>
+
+        <div id="taskList" role="list" aria-label="Task list">
+          <div class="spinner"></div>
+        </div>
+      </section>
+
+
+      <!-- ---- SCHEDULE ---- -->
+      <section class="page" id="page-schedule" aria-labelledby="schedTitle">
+        <h2 id="schedTitle" class="sr-only">Study Schedule</h2>
+
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" id="btnPrevWeek" aria-label="Previous week">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Prev
+          </button>
+          <strong id="weekLabel" style="min-width:200px;text-align:center">Week</strong>
+          <button class="btn btn-secondary btn-sm" id="btnNextWeek" aria-label="Next week">
+            Next <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+          <button class="btn btn-sm btn-secondary" id="btnThisWeek">
+            <i class="fa-solid fa-calendar-day" aria-hidden="true"></i> Today
+          </button>
+          <button class="btn btn-primary btn-sm" id="btnAddBlock">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Block
+          </button>
+        </div>
+
+        <div class="card" style="overflow-x:auto">
+          <div class="week-grid" id="weekGrid" role="grid" aria-label="Weekly schedule"></div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-calendar-day" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Today's Blocks</h3>
+          </div>
+          <div class="card-body" id="todayBlockList"></div>
+        </div>
+      </section>
+
+
+      <!-- ---- PROGRESS ---- -->
+      <section class="page" id="page-progress" aria-labelledby="progressTitle">
+        <h2 id="progressTitle" class="sr-only">Progress Tracker</h2>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-pen-to-square" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Log Study Session</h3>
+            </div>
+            <div class="card-body">
+              <form id="logSessionForm" novalidate>
+                <div class="form-group">
+                  <label class="form-label" for="logMinutes">
+                    <i class="fa-solid fa-clock" aria-hidden="true"></i> Minutes studied <span>*</span>
+                  </label>
+                  <input class="form-control" type="number" id="logMinutes" name="minutes"
+                         min="1" max="600" placeholder="e.g. 45" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="logSubject">
+                    <i class="fa-solid fa-book" aria-hidden="true"></i> Subject
+                  </label>
+                  <input class="form-control" type="text" id="logSubject" name="subject"
+                         placeholder="e.g. Data Structures" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="logNote">
+                    <i class="fa-solid fa-note-sticky" aria-hidden="true"></i> Note
+                  </label>
+                  <textarea class="form-control" id="logNote" name="note"
+                            placeholder="What did you cover?" rows="2"></textarea>
+                </div>
+                <button class="btn btn-primary btn-full" type="submit">
+                  <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Log Session
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-history" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Recent Sessions</h3>
+            </div>
+            <div class="card-body" id="studyLogList">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-trophy" aria-hidden="true" style="margin-right:6px;color:var(--clr-warning)"></i>Academic Goals</h3>
+            <button class="btn btn-primary btn-sm" id="btnAddGoal">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i> New Goal
+            </button>
+          </div>
+          <div class="card-body" id="goalList">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ---- ANALYTICS ---- -->
+      <section class="page" id="page-analytics" aria-labelledby="analyticsTitle">
+        <h2 id="analyticsTitle" class="sr-only">Analytics Dashboard</h2>
+
+        <div class="grid-2" style="margin-bottom:var(--space-6)">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-column" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Study Hours — Last 7 Days</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="studyHoursChart" aria-label="Study hours bar chart" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-fire" aria-hidden="true" style="margin-right:6px;color:var(--clr-danger)"></i>Tasks by Priority</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="priorityChart" aria-label="Priority bar chart" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:var(--space-6)">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie" aria-hidden="true" style="margin-right:6px;color:var(--clr-secondary)"></i>Subject Distribution</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="subjectChart" aria-label="Subject pie chart" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-arrow-trend-up" aria-hidden="true" style="margin-right:6px;color:var(--clr-success)"></i>Completion Trend (14 days)</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="trendChart" aria-label="Completion trend line chart" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-bullseye" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Goals Progress</h3>
+            </div>
+            <div class="card-body" id="analyticsGoals"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-star" aria-hidden="true" style="margin-right:6px;color:var(--clr-warning)"></i>Recently Completed</h3>
+            </div>
+            <div class="card-body" id="recentCompleted"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ---- ADAPTIVE ---- -->
+      <section class="page" id="page-adaptive" aria-labelledby="adaptiveTitle">
+        <h2 id="adaptiveTitle" class="sr-only">Adaptive Recommendations</h2>
+
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
+            <div class="stat-value" id="recCompletionRate">—</div>
+            <div class="stat-label">Completion Rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon info"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>
+            <div class="stat-value" id="recWeeklyHours">—</div>
+            <div class="stat-label">Study This Week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon warning"><i class="fa-solid fa-star" aria-hidden="true"></i></div>
+            <div class="stat-value" id="recPeakHours" style="font-size:1rem">—</div>
+            <div class="stat-label">Peak Study Hours</div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-circle-half-stroke" aria-hidden="true" style="margin-right:6px;color:var(--clr-danger)"></i>Recommended Pomodoro Intervals</h3>
+          </div>
+          <div class="card-body" id="pomodoroPanel"></div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-lightbulb" aria-hidden="true" style="margin-right:6px;color:var(--clr-warning)"></i>Personalised Tips</h3>
+          </div>
+          <div class="card-body" id="adaptiveTips"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true" style="margin-right:6px;color:var(--clr-danger)"></i>Urgent Tasks</h3>
+            </div>
+            <div class="card-body" id="urgentTasksPanel"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-book-open" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Subject Completion Rates</h3>
+            </div>
+            <div class="card-body" id="subjectBreakdownPanel"></div>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-sitemap" aria-hidden="true" style="margin-right:6px;color:var(--clr-secondary)"></i>Task Breakdown Suggestions</h3>
+          </div>
+          <div class="card-body" id="subtaskPanel"></div>
+        </div>
+      </section>
+
+
+      <!-- ---- REMINDERS ---- -->
+      <section class="page" id="page-reminders" aria-labelledby="remTitle">
+        <h2 id="remTitle" class="sr-only">Reminders</h2>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-bell" aria-hidden="true" style="margin-right:6px;color:var(--clr-warning)"></i>Notifications &amp; Reminders</h3>
+          </div>
+          <div class="card-body" id="remindersList" role="list">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ---- ADMIN ---- -->
+      <section class="page" id="page-admin" aria-labelledby="adminTitle">
+        <h2 id="adminTitle" class="sr-only">Admin Panel</h2>
+
+        <!-- Access denied (non-admins) -->
+        <div id="adminAccessDenied" class="hidden">
+          <div class="empty-state">
+            <i class="fa-solid fa-lock" style="font-size:3rem;color:var(--clr-danger);margin-bottom:var(--space-4)"></i>
+            <p>You do not have permission to access this page.</p>
+          </div>
+        </div>
+
+        <!-- Admin content -->
+        <div id="adminContent">
+
+          <!-- Stat cards row 1 — Users -->
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                    color:var(--clr-text-muted);margin-bottom:var(--space-3)">
+            <i class="fa-solid fa-users" aria-hidden="true"></i> Users
+          </p>
+          <div class="stat-cards" style="margin-bottom:var(--space-4)">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatUsers">—</div>
+              <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon success"><i class="fa-solid fa-user-plus" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatNewUsers">—</div>
+              <div class="stat-label">New (7 days)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon info"><i class="fa-solid fa-circle-dot" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatActiveToday">—</div>
+              <div class="stat-label">Active Today</div>
+            </div>
+          </div>
+
+          <!-- Stat cards row 2 — Tasks -->
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                    color:var(--clr-text-muted);margin-bottom:var(--space-3)">
+            <i class="fa-solid fa-list-check" aria-hidden="true"></i> Tasks &amp; Activity
+          </p>
+          <div class="stat-cards" style="margin-bottom:var(--space-8)">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatTasks">—</div>
+              <div class="stat-label">Total Tasks</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatCompleted">—</div>
+              <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatOverdue">—</div>
+              <div class="stat-label">Overdue</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon warning"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatRate">—</div>
+              <div class="stat-label">Completion Rate</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon info"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatHours">—</div>
+              <div class="stat-label">Total Study Time</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon success"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+              <div class="stat-value" id="adminStatAchieved">—</div>
+              <div class="stat-label">Goals Achieved</div>
+            </div>
+          </div>
+
+          <!-- Charts row -->
+          <div class="grid-2" style="margin-bottom:var(--space-8)">
+            <div class="card">
+              <div class="card-header">
+                <h3>
+                  <i class="fa-solid fa-user-plus" style="margin-right:6px;color:var(--clr-secondary)" aria-hidden="true"></i>
+                  User Signups — Last 30 Days
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="adminSignupsChart" aria-label="User signups chart" role="img"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3>
+                  <i class="fa-solid fa-circle-check" style="margin-right:6px;color:var(--clr-success)" aria-hidden="true"></i>
+                  Task Completions — Last 30 Days
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="adminTasksChart" aria-label="Task completions chart" role="img"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users table + Activity feed -->
+          <div class="grid-2" style="margin-bottom:var(--space-8);align-items:start">
+
+            <!-- User management table -->
+            <div class="card" style="grid-column:1 / -1">
+              <div class="card-header">
+                <h3>
+                  <i class="fa-solid fa-users-gear" style="margin-right:6px;color:var(--clr-primary)" aria-hidden="true"></i>
+                  User Management
+                </h3>
+                <div style="display:flex;gap:var(--space-3);align-items:center">
+                  <div class="search-bar" style="border-radius:var(--radius)">
+                    <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                    <input type="search" id="adminUserSearch" placeholder="Search users…"
+                           aria-label="Search users" style="min-width:180px" />
+                  </div>
+                </div>
+              </div>
+              <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:.875rem" role="grid">
+                  <thead>
+                    <tr style="border-bottom:2px solid var(--clr-border);background:var(--clr-surface-2)">
+                      <th style="text-align:left;padding:var(--space-3) var(--space-4);font-weight:600">User</th>
+                      <th style="text-align:left;padding:var(--space-3) var(--space-2);font-weight:600">Email</th>
+                      <th style="text-align:center;padding:var(--space-3) var(--space-2);font-weight:600">Tasks</th>
+                      <th style="text-align:center;padding:var(--space-3) var(--space-2);font-weight:600">Rate</th>
+                      <th style="text-align:center;padding:var(--space-3) var(--space-2);font-weight:600">Study Time</th>
+                      <th style="text-align:center;padding:var(--space-3) var(--space-2);font-weight:600">Joined</th>
+                      <th style="text-align:center;padding:var(--space-3) var(--space-4);font-weight:600">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUserTableBody">
+                    <tr><td colspan="7" style="text-align:center;padding:var(--space-8)">
+                      <div class="spinner"></div>
+                    </td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom row: Activity + Subjects -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3>
+                  <i class="fa-solid fa-bolt" style="margin-right:6px;color:var(--clr-warning)" aria-hidden="true"></i>
+                  Recent Activity
+                </h3>
+              </div>
+              <div class="card-body" id="adminActivityFeed"
+                   style="max-height:420px;overflow-y:auto">
+                <div class="spinner"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>
+                  <i class="fa-solid fa-book-open" style="margin-right:6px;color:var(--clr-primary)" aria-hidden="true"></i>
+                  Popular Subjects
+                </h3>
+              </div>
+              <div class="card-body" id="adminSubjectsTable">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /adminContent -->
+      </section><!-- /admin -->
+
+
+      <!-- ---- SETTINGS ---- -->
+      <section class="page" id="page-settings" aria-labelledby="settingsTitle">
+        <h2 id="settingsTitle" class="sr-only">Settings</h2>
+
+        <div class="card" style="max-width:640px">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-sliders" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>Account &amp; Preferences</h3>
+          </div>
+          <div class="card-body">
+            <form id="settingsForm" novalidate>
+              <div class="form-group">
+                <label class="form-label" for="settingFullName">
+                  <i class="fa-solid fa-user" aria-hidden="true"></i> Full Name
+                </label>
+                <input class="form-control" type="text" id="settingFullName" name="full_name"
+                       placeholder="Your full name" autocomplete="name" />
+              </div>
+
+              <hr style="border:none;border-top:1px solid var(--clr-border);margin:var(--space-6) 0" />
+              <h4 style="margin-bottom:var(--space-4)">
+                <i class="fa-solid fa-universal-access" aria-hidden="true" style="color:var(--clr-primary)"></i>
+                Accessibility &amp; Neurodiversity
+              </h4>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="settingNeuroMode">
+                    <i class="fa-solid fa-brain" aria-hidden="true"></i> Neuro Profile
+                  </label>
+                  <select class="form-control" id="settingNeuroMode" name="neuro_mode"
+                          aria-describedby="neuroHint">
+                    <option value="standard">Standard</option>
+                    <option value="adhd">ADHD-friendly</option>
+                    <option value="asd">ASD-friendly</option>
+                  </select>
+                  <div class="form-hint" id="neuroHint">
+                    Adjusts Pomodoro intervals, reminder frequency, and layout.
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="settingFontSize">
+                    <i class="fa-solid fa-text-height" aria-hidden="true"></i> Font Size
+                  </label>
+                  <select class="form-control" id="settingFontSize" name="font_size">
+                    <option value="small">Small</option>
+                    <option value="medium">Medium (default)</option>
+                    <option value="large">Large</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="flex-direction:row;align-items:center;gap:var(--space-3)">
+                <input type="checkbox" id="settingHighContrast" name="high_contrast"
+                       style="width:18px;height:18px" />
+                <label for="settingHighContrast" class="form-label" style="margin:0">
+                  <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i> High Contrast Mode
+                </label>
+              </div>
+
+              <div class="form-group" style="flex-direction:row;align-items:center;gap:var(--space-3);margin-top:var(--space-3)">
+                <input type="checkbox" id="settingSimplifiedView" name="simplified_view"
+                       style="width:18px;height:18px" />
+                <label for="settingSimplifiedView" class="form-label" style="margin:0">
+                  <i class="fa-solid fa-eye-low-vision" aria-hidden="true"></i> Simplified View
+                </label>
+              </div>
+              <div class="form-hint" style="margin-bottom:var(--space-6)">
+                Reduces visual noise — hides badges and decorative elements.
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="btnSaveSettings">
+                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+
+<!-- =====================================================================
+     MODALS
+     ===================================================================== -->
+
+<!-- Task modal -->
+<div class="modal-overlay" id="taskModal" role="dialog" aria-modal="true"
+     aria-labelledby="taskModalTitle" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="taskModalTitle">
+        <i class="fa-solid fa-list-check" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>New Task
+      </h3>
+      <button class="modal-close" aria-label="Close task modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="taskForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="taskTitle">Title <span>*</span></label>
+          <input class="form-control" type="text" id="taskTitle" name="title"
+                 placeholder="e.g. Complete Data Structures assignment" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="taskDescription">Description</label>
+          <textarea class="form-control" id="taskDescription" name="description"
+                    placeholder="Additional details…" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="taskSubject">Subject / Course</label>
+            <input class="form-control" type="text" id="taskSubject" name="subject"
+                   placeholder="e.g. CSC 301" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="taskPriority">Priority</label>
+            <select class="form-control" id="taskPriority" name="priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="taskStatus">Status</label>
+            <select class="form-control" id="taskStatus" name="status">
+              <option value="pending" selected>Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="taskEstMinutes">Estimated Time (mins)</label>
+            <input class="form-control" type="number" id="taskEstMinutes" name="estimated_minutes"
+                   value="60" min="1" max="1440" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="taskDueDate">Due Date &amp; Time</label>
+          <input class="form-control" type="datetime-local" id="taskDueDate" name="due_date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="taskTags">Tags</label>
+          <input class="form-control" type="text" id="taskTags" name="tags"
+                 placeholder="exam, project, revision (comma-separated)" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="UI.closeModal('taskModal')">Cancel</button>
+      <button class="btn btn-primary" id="btnSaveTask">
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Task
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule block modal -->
+<div class="modal-overlay" id="blockModal" role="dialog" aria-modal="true"
+     aria-labelledby="blockModalTitle" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="blockModalTitle">
+        <i class="fa-solid fa-calendar-plus" aria-hidden="true" style="margin-right:6px;color:var(--clr-primary)"></i>New Study Block
+      </h3>
+      <button class="modal-close" aria-label="Close block modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="blockForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="blockTitle">Title <span>*</span></label>
+          <input class="form-control" type="text" id="blockTitle" name="title"
+                 placeholder="e.g. Algorithms Revision" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="blockSubject">Subject</label>
+            <input class="form-control" type="text" id="blockSubject" name="subject"
+                   placeholder="e.g. CSC 302" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="blockType">Block Type</label>
+            <select class="form-control" id="blockType" name="block_type">
+              <option value="study">Study</option>
+              <option value="break">Break</option>
+              <option value="review">Review</option>
+              <option value="exam">Exam</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="blockDate">Date <span>*</span></label>
+            <input class="form-control" type="date" id="blockDate" name="block_date" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="blockColor">Colour</label>
+            <input class="form-control" type="color" id="blockColor" name="color"
+                   value="#4A90D9" style="height:42px;padding:4px" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="blockStart">Start Time <span>*</span></label>
+            <input class="form-control" type="time" id="blockStart" name="start_time"
+                   value="09:00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="blockEnd">End Time <span>*</span></label>
+            <input class="form-control" type="time" id="blockEnd" name="end_time"
+                   value="10:00" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="blockNotes">Notes</label>
+          <textarea class="form-control" id="blockNotes" name="notes"
+                    placeholder="Topics to cover…" rows="2"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="UI.closeModal('blockModal')">Cancel</button>
+      <button class="btn btn-primary" id="btnSaveBlock">
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Block
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal modal -->
+<div class="modal-overlay" id="goalModal" role="dialog" aria-modal="true"
+     aria-labelledby="goalModalTitle" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="goalModalTitle">
+        <i class="fa-solid fa-trophy" aria-hidden="true" style="margin-right:6px;color:var(--clr-warning)"></i>New Goal
+      </h3>
+      <button class="modal-close" aria-label="Close goal modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="goalForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="goalTitle">Title <span>*</span></label>
+          <input class="form-control" type="text" id="goalTitle" name="title"
+                 placeholder="e.g. Complete 20 assignments this semester" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="goalDescription">Description</label>
+          <textarea class="form-control" id="goalDescription" name="description"
+                    placeholder="Details about this goal…" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="goalMetric">Metric</label>
+            <select class="form-control" id="goalMetric" name="metric">
+              <option value="tasks">Tasks completed</option>
+              <option value="hours">Study hours</option>
+              <option value="score">Score / grade</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="goalTargetValue">Target Value <span>*</span></label>
+            <input class="form-control" type="number" id="goalTargetValue" name="target_value"
+                   value="10" min="1" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="goalTargetDate">Target Date</label>
+          <input class="form-control" type="date" id="goalTargetDate" name="target_date" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="UI.closeModal('goalModal')">Cancel</button>
+      <button class="btn btn-primary" id="btnSaveGoal">
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Goal
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Admin user detail modal -->
+<div class="modal-overlay" id="adminUserModal" role="dialog" aria-modal="true"
+     aria-labelledby="adminUserModalTitle" aria-hidden="true">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3 id="adminUserModalTitle">
+        <i class="fa-solid fa-user" style="margin-right:8px;color:var(--clr-primary)" aria-hidden="true"></i>
+        <span id="adminUserModalName">User</span>
+      </h3>
+      <button class="modal-close" aria-label="Close user detail modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2" style="margin-bottom:var(--space-5)">
+        <div>
+          <div style="font-size:.75rem;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:.05em">Email</div>
+          <div style="font-weight:600;font-size:.9rem" id="adminUserModalEmail">—</div>
+        </div>
+        <div>
+          <div style="font-size:.75rem;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:.05em">Joined</div>
+          <div style="font-weight:600;font-size:.9rem" id="adminUserModalJoined">—</div>
+        </div>
+        <div>
+          <div style="font-size:.75rem;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:.05em">Total Study Time</div>
+          <div style="font-weight:600;font-size:.9rem" id="adminUserModalHours">—</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <p style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+                    color:var(--clr-text-muted);margin-bottom:var(--space-3)">
+            Recent Tasks
+          </p>
+          <div id="adminUserTaskList"></div>
+        </div>
+        <div>
+          <p style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+                    color:var(--clr-text-muted);margin-bottom:var(--space-3)">
+            Subject Completion
+          </p>
+          <div id="adminUserSubjects"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="UI.closeModal('adminUserModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     SCRIPTS
+     ===================================================================== -->
+<script src="js/app.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/tasks.js"></script>
+<script src="js/schedule.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/adaptive.js"></script>
+<script src="js/search.js"></script>
+<script src="js/admin.js"></script>
+
+<script>
+  const _origNavigate = Router._onNavigate.bind(Router);
+  Router._onNavigate = function(page) {
+    _origNavigate(page);
+    if (page === 'settings') Settings.load();
+  };
+</script>
+
+</body>
+</html>

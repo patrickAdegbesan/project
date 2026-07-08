@@ -1,0 +1,103 @@
+/*
+ * dark-mode.css — Dark theme overrides
+ * Applied when <body> has the class `dark-mode`
+ */
+
+body.dark-mode {
+  --clr-bg:            #0f1117;
+  --clr-surface:       #1a1d27;
+  --clr-surface-2:     #22263a;
+  --clr-border:        #2e3348;
+  --clr-text:          #e8ecf5;
+  --clr-text-secondary:#9aa5c0;
+  --clr-text-muted:    #5a6482;
+  --clr-primary-light: #1c2c45;
+}
+
+body.dark-mode .auth-wrapper {
+  background: linear-gradient(135deg, #1a2c50 0%, #1e1b4b 100%);
+}
+
+body.dark-mode .topbar {
+  box-shadow: 0 1px 0 var(--clr-border);
+}
+
+body.dark-mode .sidebar {
+  background: #13161f;
+  border-right-color: var(--clr-border);
+}
+
+body.dark-mode .card,
+body.dark-mode .task-item,
+body.dark-mode .goal-card,
+body.dark-mode .reminder-item {
+  background: var(--clr-surface);
+}
+
+body.dark-mode .stat-card {
+  background: var(--clr-surface);
+  border-color: var(--clr-border);
+}
+
+body.dark-mode .form-control {
+  background: var(--clr-surface-2);
+  border-color: var(--clr-border);
+  color: var(--clr-text);
+}
+
+body.dark-mode .form-control:focus {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px rgba(74,144,217,.2);
+}
+
+body.dark-mode .modal {
+  background: var(--clr-surface);
+}
+
+body.dark-mode .filter-chip {
+  background: var(--clr-surface-2);
+  border-color: var(--clr-border);
+  color: var(--clr-text-secondary);
+}
+
+body.dark-mode .filter-chip.active,
+body.dark-mode .filter-chip:hover {
+  background: var(--clr-primary-light);
+  color: var(--clr-primary);
+}
+
+body.dark-mode .btn-secondary {
+  background: var(--clr-surface-2);
+  border-color: var(--clr-border);
+  color: var(--clr-text-secondary);
+}
+
+body.dark-mode .tip-card {
+  background: linear-gradient(135deg, #1c2c45, #1e1b45);
+  border-color: #2e3f60;
+  color: var(--clr-text);
+}
+
+body.dark-mode .tip-card.adhd-tip {
+  background: linear-gradient(135deg, #2e2410, #3a2c10);
+  border-color: #5a4010;
+}
+
+body.dark-mode .tip-card.asd-tip {
+  background: linear-gradient(135deg, #0e2d1e, #0e3020);
+  border-color: #1a5a35;
+}
+
+body.dark-mode .progress-bar-wrap {
+  background: var(--clr-surface-2);
+}
+
+body.dark-mode .reminder-item.unread {
+  background: var(--clr-primary-light);
+}
+
+/* Dark mode toggle button */
+#darkModeToggle .icon-moon { display: inline; }
+#darkModeToggle .icon-sun  { display: none;   }
+body.dark-mode #darkModeToggle .icon-moon { display: none;   }
+body.dark-mode #darkModeToggle .icon-sun  { display: inline; }

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Complaints — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .status-dot { width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px; }
+  .bulk-bar { display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--primary-light);border:1px solid rgba(26,115,232,0.2);border-radius:var(--radius-sm);margin-bottom:12px;font-size:13px;font-weight:500;color:var(--primary); }
+  .filter-select { padding:7px 28px 7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:13px;font-family:var(--font);color:var(--text);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239aa0a6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px; }
+  .category-badge { font-size:11.5px;font-weight:600; }
+  .table-check { width:16px;height:16px;accent-color:var(--primary); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;"><span class="logo-text">Complaint<span>Desk</span></span></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="03-user-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="04-submit-complaint.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Submit Complaint</a>
+        <a href="05-my-complaints.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Complaints<span class="badge-count">3</span></a>
+        <a href="06-complaint-detail.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Track Status</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Support</div>
+      <nav class="sidebar-nav">
+        <a href="16-feedback.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>Feedback</a>
+        <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; FAQ</a>
+        <a href="13-profile-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div><div class="sidebar-user-info"><div class="user-name">John Smith</div><div class="user-role">CSC/2021/045 · Student</div></div></div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search"><svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" placeholder="Search complaints..." value=""></div>
+      <div class="topnav-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">3</span></button>
+        <div class="topnav-profile"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div><span class="profile-name">John Smith</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb"><a href="03-user-dashboard.html">Dashboard</a><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>My Complaints</div>
+          <h2>My Complaints</h2>
+        </div>
+        <a href="04-submit-complaint.html" class="btn btn-primary">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          New Complaint
+        </a>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-4 mb-4">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--text);">12</div><div style="font-size:12px;color:var(--text-muted);">Total</div></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:8px;background:var(--secondary-light);display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--secondary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--text);">8</div><div style="font-size:12px;color:var(--text-muted);">Resolved</div></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:8px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#e37400"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--text);">3</div><div style="font-size:12px;color:var(--text-muted);">Pending</div></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:8px;background:var(--danger-light);display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--danger)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--text);">1</div><div style="font-size:12px;color:var(--text-muted);">Rejected</div></div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="input-group" style="flex:1;min-width:200px;">
+          <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" class="form-control search-input" placeholder="Search by keyword, ref #, or subject...">
+        </div>
+        <select class="filter-select">
+          <option>All Categories</option>
+          <option>Academic</option>
+          <option>Administrative</option>
+          <option>IT Services</option>
+          <option>Facilities</option>
+          <option>Finance</option>
+          <option>General</option>
+        </select>
+        <select class="filter-select">
+          <option>All Statuses</option>
+          <option>Submitted</option>
+          <option>Under Review</option>
+          <option>Assigned</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+          <option>Closed</option>
+          <option>Rejected</option>
+        </select>
+        <select class="filter-select">
+          <option>All Priorities</option>
+          <option>Critical</option>
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
+        <input type="date" class="form-control" value="2024-01-01" style="width:140px;">
+        <span style="font-size:12px;color:var(--text-muted);">to</span>
+        <input type="date" class="form-control" value="2024-03-31" style="width:140px;">
+        <button class="btn btn-primary btn-sm">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          Filter
+        </button>
+        <button class="btn btn-ghost btn-sm">Clear</button>
+      </div>
+
+      <!-- Results info -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;color:var(--text-muted);">Showing <strong>10</strong> of <strong>12</strong> complaints</div>
+        <select class="filter-select" style="font-size:12.5px;padding:5px 28px 5px 10px;">
+          <option>Newest first</option>
+          <option>Oldest first</option>
+          <option>Priority: High to Low</option>
+          <option>Status</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="table-check"></th>
+                <th>Ref #</th>
+                <th>Category</th>
+                <th>Subject</th>
+                <th>Priority</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-001</a></td>
+                <td><span class="badge badge-indigo">Academic</span></td>
+                <td>Missing Exam Results for CSC 301</td>
+                <td><span class="badge" style="background:#e8eaf6;color:#3949ab;font-size:11px;">Medium</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Jan 15, 2024</td>
+                <td><span class="badge badge-green"><span class="badge-dot" style="background:var(--secondary);"></span>Resolved</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-002</a></td>
+                <td><span class="badge badge-orange">Facilities</span></td>
+                <td>Broken AC Unit in Lecture Hall B</td>
+                <td><span class="badge priority-high" style="font-size:11px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Feb 03, 2024</td>
+                <td><span class="badge badge-yellow"><span class="badge-dot" style="background:var(--warning);"></span>In Progress</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-primary btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-003</a></td>
+                <td><span class="badge badge-blue">IT</span></td>
+                <td>WiFi Not Working in Main Library</td>
+                <td><span class="badge" style="background:#fce8e6;color:var(--danger);font-size:11px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Feb 10, 2024</td>
+                <td><span class="badge badge-blue"><span class="badge-dot" style="background:var(--primary);"></span>Under Review</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-004</a></td>
+                <td><span class="badge badge-green">Finance</span></td>
+                <td>Tuition Fee Overcharge — 2023/24 Session</td>
+                <td><span class="badge priority-critical" style="font-size:11px;">Critical</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Feb 15, 2024</td>
+                <td><span class="badge badge-purple"><span class="badge-dot" style="background:var(--purple);"></span>Assigned</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-005</a></td>
+                <td><span class="badge badge-gray">Administrative</span></td>
+                <td>Course Registration Error — Second Semester</td>
+                <td><span class="badge" style="background:var(--secondary-light);color:#1e7e34;font-size:11px;">Low</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 01, 2024</td>
+                <td><span class="badge badge-gray"><span class="badge-dot" style="background:#9aa0a6;"></span>Submitted</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-006</a></td>
+                <td><span class="badge badge-gray">General</span></td>
+                <td>Lost Student ID Card — Replacement Request</td>
+                <td><span class="badge" style="background:var(--secondary-light);color:#1e7e34;font-size:11px;">Low</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 05, 2024</td>
+                <td><span class="badge badge-green"><span class="badge-dot" style="background:var(--secondary);"></span>Resolved</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-007</a></td>
+                <td><span class="badge badge-indigo">Academic</span></td>
+                <td>Wrong Grade Recorded in Transcript — CSC 205</td>
+                <td><span class="badge" style="background:#fce8e6;color:var(--danger);font-size:11px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 10, 2024</td>
+                <td><span class="badge badge-yellow"><span class="badge-dot" style="background:var(--warning);"></span>In Progress</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-008</a></td>
+                <td><span class="badge badge-orange">Facilities</span></td>
+                <td>Leaking Roof in Block C Hostel — Room 214</td>
+                <td><span class="badge" style="background:#fce8e6;color:var(--danger);font-size:11px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 12, 2024</td>
+                <td><span class="badge badge-blue"><span class="badge-dot" style="background:var(--primary);"></span>Under Review</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-009</a></td>
+                <td><span class="badge badge-blue">IT</span></td>
+                <td>Student Portal Login Issues — Password Reset Broken</td>
+                <td><span class="badge" style="background:#e8eaf6;color:#3949ab;font-size:11px;">Medium</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 15, 2024</td>
+                <td><span class="badge badge-purple"><span class="badge-dot" style="background:var(--purple);"></span>Assigned</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="table-check"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-010</a></td>
+                <td><span class="badge badge-green">Finance</span></td>
+                <td>TETFUND Scholarship Payment Delayed — March 2024</td>
+                <td><span class="badge priority-critical" style="font-size:11px;">Critical</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 20, 2024</td>
+                <td><span class="badge badge-gray"><span class="badge-dot" style="background:#9aa0a6;"></span>Submitted</span></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+        <div style="font-size:12.5px;color:var(--text-muted);">Page <strong>1</strong> of <strong>2</strong> &nbsp;·&nbsp; 12 total records</div>
+        <div class="pagination">
+          <button class="page-btn disabled">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State (hidden but shown here for reference) -->
+      <div style="display:none;" class="card mt-4">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <h3>No complaints found</h3>
+          <p>No complaints match your current filters. Try adjusting the search criteria or submit a new complaint.</p>
+          <a href="04-submit-complaint.html" class="btn btn-primary">Submit New Complaint</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

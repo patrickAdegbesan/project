@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Lush Hair NG{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<!-- Stats cards -->
+<div class="row g-4 mb-4" id="statsRow">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people-fill"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statCandidates">—</div>
+        <div class="stat-label">Total Candidates</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-file-earmark-person-fill"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statResumes">—</div>
+        <div class="stat-label">Resumes Processed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statShortlisted">—</div>
+        <div class="stat-label">Shortlisted</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-graph-up-arrow"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statAvgScore">—</div>
+        <div class="stat-label">Avg. Match Score</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick actions -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold mb-3"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Quick Actions</h5>
+        <div class="d-grid gap-2">
+          <a href="/upload" class="btn btn-primary btn-lg">
+            <i class="bi bi-cloud-upload me-2"></i>Upload New Resumes
+          </a>
+          <a href="/jobs" class="btn btn-outline-primary">
+            <i class="bi bi-briefcase me-2"></i>Manage Job Roles
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold mb-3"><i class="bi bi-briefcase-fill text-primary me-2"></i>Job Roles</h5>
+        <div id="jobRolesQuick">
+          <div class="text-center py-3 text-muted">
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scoring weights info -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <h5 class="fw-semibold mb-3"><i class="bi bi-sliders text-primary me-2"></i>Scoring Algorithm Weights</h5>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="weight-block">
+          <div class="weight-pct text-primary">45%</div>
+          <div class="weight-label">Skill Match</div>
+          <div class="progress mt-2" style="height:6px">
+            <div class="progress-bar bg-primary" style="width:45%"></div>
+          </div>
+          <small class="text-muted">NLP skill extraction vs job requirements</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="weight-block">
+          <div class="weight-pct text-success">35%</div>
+          <div class="weight-label">Experience</div>
+          <div class="progress mt-2" style="height:6px">
+            <div class="progress-bar bg-success" style="width:35%"></div>
+          </div>
+          <small class="text-muted">Years of work experience, normalized</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="weight-block">
+          <div class="weight-pct text-info">20%</div>
+          <div class="weight-label">Proximity</div>
+          <div class="progress mt-2" style="height:6px">
+            <div class="progress-bar bg-info" style="width:20%"></div>
+          </div>
+          <small class="text-muted">Distance from Lush Hair hub (Ikeja)</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Load stats
+  fetch('/api/dashboard/stats')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('statCandidates').textContent = d.total_candidates;
+      document.getElementById('statResumes').textContent = d.total_resumes;
+      document.getElementById('statShortlisted').textContent = d.shortlisted_candidates;
+      document.getElementById('statAvgScore').textContent = d.average_score + '%';
+    });
+
+  // Load job roles
+  fetch('/api/job-roles')
+    .then(r => r.json())
+    .then(roles => {
+      const el = document.getElementById('jobRolesQuick');
+      if (!roles.length) {
+        el.innerHTML = '<p class="text-muted mb-0">No job roles yet. <a href="/jobs">Add one</a>.</p>';
+        return;
+      }
+      el.innerHTML = roles.map(r => `
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle">${r.title}</span>
+          <small class="text-muted">${r.required_skills.length} required skills · ${r.min_experience}+ yrs exp</small>
+        </div>
+      `).join('');
+    });
+});
+</script>
+{% endblock %}

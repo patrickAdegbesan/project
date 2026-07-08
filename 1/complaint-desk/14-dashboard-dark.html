@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard (Dark Mode) — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  /* Dark mode overrides on top of shared vars */
+  [data-theme="dark"] body { background:#0f1117; }
+  [data-theme="dark"] .sidebar { background:#12141f; border-right:1px solid #1f2235; }
+  [data-theme="dark"] .topnav { background:#1a1d27; border-color:#2d3142; }
+  [data-theme="dark"] .card { background:#1a1d27; border-color:#2d3142; }
+  [data-theme="dark"] .stat-card { background:#1a1d27; border-color:#2d3142; }
+  [data-theme="dark"] .stat-number { color:#e8eaed; }
+  [data-theme="dark"] thead th { background:#1f2235; color:#9aa0a6; border-color:#2d3142; }
+  [data-theme="dark"] tbody td { color:#e8eaed; border-color:#1f2235; }
+  [data-theme="dark"] tbody tr:hover { background:rgba(255,255,255,0.03); }
+  [data-theme="dark"] .welcome-banner { background:linear-gradient(135deg,#1558b0 0%,#0d47a1 100%); }
+  [data-theme="dark"] .quick-action { background:#1a1d27; border-color:#2d3142; }
+  [data-theme="dark"] .quick-action:hover { background:rgba(26,115,232,0.1); }
+  [data-theme="dark"] .activity-item { border-color:#1f2235; }
+  [data-theme="dark"] .topnav-search input { background:#1f2235; border-color:#2d3142; color:#e8eaed; }
+  [data-theme="dark"] .topnav-profile { border-color:transparent; }
+  [data-theme="dark"] .profile-name { color:#e8eaed; }
+  [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4 { color:#e8eaed; }
+  [data-theme="dark"] .chart-bar { opacity:0.9; }
+  [data-theme="dark"] .badge-gray { background:#2d3142; color:#9aa0a6; }
+  [data-theme="dark"] .icon-btn:hover { background:#2d3142; }
+  [data-theme="dark"] .page-body { background:#0f1117; }
+
+  .activity-item { display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light); }
+  .activity-item:last-child { border-bottom:none; }
+  .activity-dot { width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0; }
+  .activity-content .activity-title { font-size:13.5px;font-weight:500;color:var(--text); }
+  .activity-content .activity-time  { font-size:11.5px;color:var(--text-muted);margin-top:2px; }
+
+  .dark-badge {
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(26,115,232,0.2);color:#60a5fa;
+    border:1px solid rgba(96,165,250,0.3);
+    padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <span class="logo-text">Complaint<span>Desk</span></span>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="03-user-dashboard.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="04-submit-complaint.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Submit Complaint</a>
+        <a href="05-my-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Complaints<span class="badge-count">3</span></a>
+        <a href="06-complaint-detail.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Track Status</a>
+        <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>Feedback</a>
+        <a href="13-profile-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div>
+        <div class="sidebar-user-info"><div class="user-name">John Smith</div><div class="user-role">CSC/2021/045 · Student</div></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Search complaints...">
+      </div>
+      <div class="topnav-actions">
+        <div class="dark-badge" style="margin-right:6px;">🌙 Dark Mode</div>
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">3</span></button>
+        <div class="topnav-profile"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div><span class="profile-name">John Smith</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <!-- Dark Mode Welcome Banner -->
+      <div class="welcome-banner" style="background:linear-gradient(135deg,#1558b0 0%,#0d47a1 60%,#1a1d27 100%);">
+        <div style="position:relative;z-index:1;">
+          <h2>Welcome back, John Smith! 🌙</h2>
+          <p>You're viewing ComplaintDesk in <strong>Dark Mode</strong>. Track and manage your complaints with ease.</p>
+          <a href="04-submit-complaint.html" class="btn" style="background:rgba(255,255,255,0.12);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.2);">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Submit New Complaint
+          </a>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-4 mb-5">
+        <div class="stat-card">
+          <div class="stat-icon blue"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+          <div><div class="stat-number">12</div><div class="stat-label">Total Complaints</div><div class="stat-change up">↑ +2 this month</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><div class="stat-number">8</div><div class="stat-label">Resolved</div><div class="stat-change up">↑ 67% rate</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><div class="stat-number">3</div><div class="stat-label">Pending Action</div><div class="stat-change" style="color:var(--warning);">Awaiting response</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><div class="stat-number">1</div><div class="stat-label">Rejected</div><div class="stat-change down">↓ Needs resubmit</div></div>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid" style="grid-template-columns:1fr 320px;gap:20px;">
+        <!-- Table -->
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="card-header" style="padding:16px 20px;margin-bottom:0;">
+            <div><div class="card-title">Recent Complaints</div><div class="card-subtitle">Your last 5 submissions</div></div>
+            <a href="05-my-complaints.html" class="btn btn-ghost btn-sm">View All</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Ref #</th><th>Category</th><th>Subject</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td><span class="ref-id">CMP-2024-001</span></td><td><span class="badge badge-indigo">Academic</span></td><td>Missing Exam Results</td><td style="color:var(--text-muted);font-size:12.5px;white-space:nowrap;">Jan 15, 2024</td><td><span class="badge badge-green">Resolved</span></td><td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td></tr>
+                <tr><td><span class="ref-id">CMP-2024-002</span></td><td><span class="badge badge-orange">Facilities</span></td><td>Broken AC in Hall B</td><td style="color:var(--text-muted);font-size:12.5px;white-space:nowrap;">Feb 03, 2024</td><td><span class="badge badge-yellow">In Progress</span></td><td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td></tr>
+                <tr><td><span class="ref-id">CMP-2024-003</span></td><td><span class="badge badge-blue">IT</span></td><td>WiFi in Library</td><td style="color:var(--text-muted);font-size:12.5px;white-space:nowrap;">Feb 10, 2024</td><td><span class="badge badge-blue">Under Review</span></td><td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td></tr>
+                <tr><td><span class="ref-id">CMP-2024-004</span></td><td><span class="badge badge-green">Finance</span></td><td>Tuition Fee Overcharge</td><td style="color:var(--text-muted);font-size:12.5px;white-space:nowrap;">Feb 15, 2024</td><td><span class="badge badge-purple">Assigned</span></td><td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td></tr>
+                <tr><td><span class="ref-id">CMP-2024-005</span></td><td><span class="badge badge-gray">Admin</span></td><td>Course Reg Error</td><td style="color:var(--text-muted);font-size:12.5px;white-space:nowrap;">Mar 01, 2024</td><td><span class="badge badge-gray">Submitted</span></td><td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <a href="04-submit-complaint.html" class="quick-action"><div class="qa-icon" style="background:rgba(26,115,232,0.15);color:#60a5fa;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div><div><div class="qa-text">Submit Complaint</div><div class="qa-sub">Lodge a new issue</div></div></a>
+              <a href="05-my-complaints.html" class="quick-action"><div class="qa-icon" style="background:rgba(52,168,83,0.15);color:#4ade80;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></div><div><div class="qa-text">My Complaints</div><div class="qa-sub">View all submissions</div></div></a>
+              <a href="06-complaint-detail.html" class="quick-action"><div class="qa-icon" style="background:rgba(251,188,4,0.15);color:#fbbf24;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg></div><div><div class="qa-text">Track Status</div><div class="qa-sub">Live complaint progress</div></div></a>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">Recent Activity</div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--secondary);"></div><div class="activity-content"><div class="activity-title"><strong>#CMP-2024-001</strong> was resolved</div><div class="activity-time">Today, 9:14 AM</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--warning);"></div><div class="activity-content"><div class="activity-title">Technician assigned to <strong>#CMP-2024-002</strong></div><div class="activity-time">Yesterday, 3:42 PM</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--primary);"></div><div class="activity-content"><div class="activity-title">Admin replied on <strong>#CMP-2024-003</strong></div><div class="activity-time">Mar 12, 11:05 AM</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--purple);"></div><div class="activity-content"><div class="activity-title"><strong>#CMP-2024-004</strong> assigned to Finance</div><div class="activity-time">Mar 10, 2:30 PM</div></div></div>
+          </div>
+
+          <!-- Theme toggle -->
+          <div style="background:linear-gradient(135deg,#1f2235,#2d3142);border:1px solid #2d3142;border-radius:var(--radius);padding:14px;text-align:center;">
+            <div style="font-size:12.5px;color:rgba(255,255,255,0.6);margin-bottom:8px;">Currently viewing in</div>
+            <div style="font-size:22px;margin-bottom:4px;">🌙</div>
+            <div style="font-size:15px;font-weight:700;color:#e8eaed;">Dark Mode</div>
+            <a href="03-user-dashboard.html" class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%;justify-content:center;color:rgba(255,255,255,0.7);border-color:#2d3142;">Switch to Light Mode</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

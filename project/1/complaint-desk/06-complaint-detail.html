@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Detail — CMP-2024-002 — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .info-row { display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-light); }
+  .info-row:last-child { border-bottom:none; }
+  .info-label { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);min-width:120px; }
+  .info-value { font-size:13.5px;font-weight:500;color:var(--text);text-align:right; }
+  .message-composer { border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px; }
+  .message-composer textarea { width:100%;padding:12px 14px;border:none;resize:none;font-family:var(--font);font-size:13.5px;color:var(--text);background:var(--card);outline:none;min-height:80px; }
+  .message-composer-footer { padding:10px 14px;border-top:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between; }
+  .rating-stars { display:flex;gap:4px; }
+  .star { font-size:20px;cursor:pointer; }
+  .star.filled { color:var(--warning); }
+  .star.empty  { color:var(--border); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;"><span class="logo-text">Complaint<span>Desk</span></span></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="03-user-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="04-submit-complaint.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Submit Complaint</a>
+        <a href="05-my-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Complaints<span class="badge-count">3</span></a>
+        <a href="06-complaint-detail.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Track Status</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Support</div>
+      <nav class="sidebar-nav">
+        <a href="16-feedback.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>Feedback</a>
+        <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; FAQ</a>
+        <a href="13-profile-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div><div class="sidebar-user-info"><div class="user-name">John Smith</div><div class="user-role">CSC/2021/045 · Student</div></div></div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search"><svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" placeholder="Search..."></div>
+      <div class="topnav-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">3</span></button>
+        <div class="topnav-profile"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div><span class="profile-name">John Smith</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb">
+            <a href="03-user-dashboard.html">Dashboard</a>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="05-my-complaints.html">My Complaints</a>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            CMP-2024-002
+          </div>
+          <h2>Complaint Detail &amp; Tracking</h2>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Export PDF
+          </button>
+          <button class="btn btn-ghost btn-sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            Share
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Alert -->
+      <div class="alert alert-warning" style="margin-bottom:20px;">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="alert-content">
+          <div class="alert-title">In Progress</div>
+          <div class="alert-msg">A technician has been assigned and will visit Lecture Hall B tomorrow, Jan 21, 2024. Expected resolution: Jan 22, 2024.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
+
+        <!-- Left: Complaint Info + Conversation -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Complaint Info Card -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border-light);">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <span style="font-family:'Courier New',monospace;font-size:14px;font-weight:800;color:var(--primary);">CMP-2024-002</span>
+                  <span class="badge badge-orange">Facilities</span>
+                  <span class="badge" style="background:#fce8e6;color:var(--danger);font-size:11px;">🔴 High Priority</span>
+                </div>
+                <h3 style="font-size:17px;font-weight:700;color:var(--text);">Broken AC Unit in Lecture Hall B</h3>
+              </div>
+              <span class="badge badge-yellow" style="padding:6px 14px;font-size:12.5px;">
+                <span class="badge-dot" style="background:var(--warning);"></span>In Progress
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Submitted</span>
+              <span class="info-value">Feb 03, 2024 at 10:22 AM</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Complainant</span>
+              <span class="info-value">John Adebayo Smith (CSC/2021/045)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Department</span>
+              <span class="info-value">Facilities Management</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Assigned To</span>
+              <span class="info-value" style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+                <div class="avatar sm" style="background:linear-gradient(135deg,#34a853,#1e7e34);">SJ</div>
+                Sarah Johnson
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Due Date</span>
+              <span class="info-value" style="color:var(--danger);">Jan 22, 2024 (Overdue by 2 days)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Location</span>
+              <span class="info-value">Lecture Hall B, Academic Block 2</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Attachments</span>
+              <span class="info-value">2 files</span>
+            </div>
+
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-light);">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">Description</div>
+              <p style="font-size:13.5px;color:var(--text);line-height:1.7;">
+                The air conditioning unit in Lecture Hall B (Capacity: 200 students) has been malfunctioning for approximately 2 weeks. The unit is completely non-functional during class hours (8 AM – 5 PM), causing significant discomfort to students, especially during peak hours when temperatures reach 36°C.
+              </p>
+              <p style="font-size:13.5px;color:var(--text);line-height:1.7;margin-top:8px;">
+                Multiple verbal complaints have been made to the hall attendant but no action has been taken. This is particularly concerning as several students with heat-related medical conditions (documented with the Health Centre) are in this class. CSC 301 lectures held in this hall have an attendance of 180+ students every Monday and Wednesday.
+              </p>
+            </div>
+
+            <!-- Attachments -->
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-light);">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">Attachments (2)</div>
+              <div class="file-list">
+                <div class="file-item">
+                  <div class="file-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                  <div class="file-name">ac_unit_broken_photo.jpg</div>
+                  <div class="file-size">1.2 MB</div>
+                  <button style="background:transparent;border:none;color:var(--primary);font-size:12px;cursor:pointer;font-weight:600;margin-left:8px;">Download</button>
+                </div>
+                <div class="file-item">
+                  <div class="file-icon" style="background:var(--danger-light);"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></div>
+                  <div class="file-name">hall_attendant_complaint_log.pdf</div>
+                  <div class="file-size">345 KB</div>
+                  <button style="background:transparent;border:none;color:var(--primary);font-size:12px;cursor:pointer;font-weight:600;margin-left:8px;">Download</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conversation Thread -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Conversation Thread</div>
+                <div class="card-subtitle">Communication between you and the admin team</div>
+              </div>
+              <span class="badge badge-blue">3 messages</span>
+            </div>
+
+            <div class="message-thread">
+              <!-- Admin message 1 -->
+              <div class="message admin">
+                <div class="avatar sm" style="background:linear-gradient(135deg,#9334e6,#7c3aed);flex-shrink:0;">AD</div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span style="font-size:13px;font-weight:700;">Admin Team</span>
+                    <span class="badge badge-blue" style="font-size:10px;">Staff</span>
+                  </div>
+                  <div class="message-bubble">
+                    Thank you for your complaint. We have acknowledged receipt of your submission and forwarded it to the Facilities Management department for assessment. A representative will contact you shortly.
+                  </div>
+                  <div class="message-meta">Feb 03, 2024 at 11:45 AM</div>
+                </div>
+              </div>
+
+              <!-- Admin message 2 -->
+              <div class="message admin">
+                <div class="avatar sm" style="background:linear-gradient(135deg,#34a853,#1e7e34);flex-shrink:0;">SJ</div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span style="font-size:13px;font-weight:700;">Sarah Johnson</span>
+                    <span class="badge badge-green" style="font-size:10px;">Facilities Manager</span>
+                  </div>
+                  <div class="message-bubble">
+                    Hello John, I have reviewed your complaint and confirmed the issue with the hall attendant. Our maintenance team has been notified and we are scheduling an HVAC technician to inspect and repair the AC unit. We will keep you updated.
+                  </div>
+                  <div class="message-meta">Feb 05, 2024 at 2:30 PM</div>
+                </div>
+              </div>
+
+              <!-- Admin message 3 -->
+              <div class="message admin">
+                <div class="avatar sm" style="background:linear-gradient(135deg,#34a853,#1e7e34);flex-shrink:0;">SJ</div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span style="font-size:13px;font-weight:700;">Sarah Johnson</span>
+                    <span class="badge badge-green" style="font-size:10px;">Facilities Manager</span>
+                  </div>
+                  <div class="message-bubble">
+                    Update: Our HVAC technician, Mr. Tunde Akinpelumi, has been assigned to this job. He will visit Lecture Hall B tomorrow, Tuesday Jan 21, 2024 at 8 AM before classes begin. Please note the lecture schedule may be temporarily moved to Hall C. The repair is expected to be completed by Jan 22, 2024.
+                  </div>
+                  <div class="message-meta">Feb 20, 2024 at 9:05 AM</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reply Composer -->
+            <div class="message-composer">
+              <textarea placeholder="Add a comment or provide additional information...">The AC unit was still not repaired as scheduled. Lecture Hall B still has no cooling as of today. Could you please provide an updated timeline?</textarea>
+              <div class="message-composer-footer">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <button class="btn btn-ghost btn-sm">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    Attach
+                  </button>
+                </div>
+                <button class="btn btn-primary btn-sm">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                  Send Comment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Timeline + Actions -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Status Timeline -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:18px;">Status Timeline</div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot done">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div class="timeline-content">
+                  <div class="step-label">Submitted</div>
+                  <div class="step-date">Feb 03, 2024 · 10:22 AM</div>
+                  <div class="step-note">Complaint received and auto-assigned reference number.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot done">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div class="timeline-content">
+                  <div class="step-label">Under Review</div>
+                  <div class="step-date">Feb 03, 2024 · 11:45 AM</div>
+                  <div class="step-note">Admin team reviewed and categorized the complaint.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot done">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div class="timeline-content">
+                  <div class="step-label">Assigned</div>
+                  <div class="step-date">Feb 05, 2024 · 2:30 PM</div>
+                  <div class="step-note">Assigned to Sarah Johnson (Facilities Manager).</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot active">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="timeline-content">
+                  <div class="step-label" style="color:var(--warning);">In Progress</div>
+                  <div class="step-date">Feb 20, 2024 · 9:05 AM</div>
+                  <div class="step-note">Technician visit scheduled. Active repair in progress.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:var(--card);border-color:var(--border);">
+                  <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="var(--border)"/></svg>
+                </div>
+                <div class="timeline-content">
+                  <div class="step-label" style="color:var(--text-muted);">Resolved</div>
+                  <div class="step-date" style="color:var(--text-muted);">Pending</div>
+                </div>
+              </div>
+              <div class="timeline-item" style="padding-bottom:0;">
+                <div class="timeline-dot" style="background:var(--card);border-color:var(--border);">
+                  <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="var(--border)"/></svg>
+                </div>
+                <div class="timeline-content">
+                  <div class="step-label" style="color:var(--text-muted);">Closed</div>
+                  <div class="step-date" style="color:var(--text-muted);">Pending</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border-light);">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+                <span style="color:var(--text-muted);font-weight:600;">Progress</span>
+                <span style="color:var(--warning);font-weight:700;">67% complete</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar yellow" style="width:67%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions (complainant) -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Actions</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button class="btn btn-ghost" style="justify-content:flex-start;gap:10px;padding:10px 14px;">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                Request Escalation
+              </button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;gap:10px;padding:10px 14px;">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Edit Complaint
+              </button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;gap:10px;padding:10px 14px;color:var(--secondary);">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Mark as Resolved
+              </button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;gap:10px;padding:10px 14px;color:var(--danger);">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Withdraw Complaint
+              </button>
+            </div>
+          </div>
+
+          <!-- Related Complaints -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Related Complaints</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="padding:10px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border-light);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <span class="ref-id" style="font-size:12px;">CMP-2024-008</span>
+                  <span class="badge badge-blue" style="font-size:10.5px;">Under Review</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text);font-weight:500;">Leaking Roof in Hostel Block C</div>
+                <div style="font-size:11.5px;color:var(--text-muted);">Mar 12, 2024 · Facilities</div>
+              </div>
+              <div style="padding:10px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border-light);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <span class="ref-id" style="font-size:12px;">CMP-2023-089</span>
+                  <span class="badge badge-green" style="font-size:10.5px;">Resolved</span>
+                </div>
+                <div style="font-size:12.5px;color:var(--text);font-weight:500;">Power outage in Computer Lab 2</div>
+                <div style="font-size:11.5px;color:var(--text-muted);">Nov 04, 2023 · Facilities</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

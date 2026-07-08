@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% block title %}Results — Lush Hair NG{% endblock %}
+{% block page_title %}Candidate Rankings{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+  <div>
+    <h4 class="fw-bold mb-0" id="jobRoleTitle">Loading results…</h4>
+    <p class="text-muted mb-0" id="resultsSummary"></p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <button class="btn btn-outline-success" id="shortlistBtn" onclick="saveShortlist()">
+      <i class="bi bi-bookmark-check me-2"></i>Save Shortlist
+    </button>
+    <a href="#" class="btn btn-outline-primary" id="exportBtn">
+      <i class="bi bi-download me-2"></i>Export CSV
+    </a>
+    <a href="/upload" class="btn btn-primary">
+      <i class="bi bi-plus me-2"></i>New Upload
+    </a>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="d-flex gap-3 mb-3 flex-wrap">
+  <span class="legend-item"><span class="dot bg-success"></span> &lt;5 km (Excellent)</span>
+  <span class="legend-item"><span class="dot bg-warning"></span> 5–15 km (Good)</span>
+  <span class="legend-item"><span class="dot bg-danger"></span> &gt;15 km (Far)</span>
+  <span class="legend-item"><span class="dot bg-secondary"></span> Unknown</span>
+</div>
+
+<!-- Results table -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="resultsTable">
+        <thead class="table-dark">
+          <tr>
+            <th style="width:50px">Rank</th>
+            <th>Candidate</th>
+            <th>Location</th>
+            <th>Skill Score</th>
+            <th>Exp Score</th>
+            <th>Proximity</th>
+            <th>Total Score</th>
+            <th>Distance</th>
+            <th>Shortlist</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr>
+            <td colspan="10" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="text-muted mt-2 mb-0">Loading results…</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Candidate detail modal -->
+<div class="modal fade" id="candidateModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-semibold" id="modalCandidateName">Candidate Detail</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const jobId = window.location.pathname.split('/').pop();
+let allResults = [];
+
+document.getElementById('exportBtn').href = `/api/export/${jobId}`;
+
+async function loadResults() {
+  const resp = await fetch(`/api/results/${jobId}`);
+  const data = await resp.json();
+  allResults = data.results || [];
+
+  document.getElementById('jobRoleTitle').textContent = `${data.job_role} — Ranked Candidates`;
+  document.getElementById('resultsSummary').textContent =
+    `${data.total_candidates} candidate(s) processed and ranked`;
+
+  renderTable(allResults);
+}
+
+function renderTable(results) {
+  const tbody = document.getElementById('resultsBody');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-5 text-muted">No results yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = results.map(r => `
+    <tr data-score-id="${r.score_id}">
+      <td>
+        <span class="rank-badge rank-${r.rank <= 3 ? r.rank : 'other'}">${r.rank}</span>
+      </td>
+      <td>
+        <div class="fw-semibold">${r.name}</div>
+        <div class="text-muted small">${r.email || '—'}</div>
+      </td>
+      <td>
+        <span class="badge bg-${r.proximity_color}-subtle text-${r.proximity_color} border border-${r.proximity_color}-subtle">
+          <i class="bi bi-geo-alt-fill me-1"></i>${r.location || 'Unknown'}
+        </span>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill bg-primary" style="width:${r.skill_score}%"></div>
+          <span class="score-label">${r.skill_score}%</span>
+        </div>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill bg-success" style="width:${r.exp_score}%"></div>
+          <span class="score-label">${r.exp_score}%</span>
+        </div>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill bg-info" style="width:${r.proximity_score}%"></div>
+          <span class="score-label">${r.proximity_score}%</span>
+        </div>
+      </td>
+      <td>
+        <span class="total-score fw-bold ${totalScoreClass(r.total_score)}">${r.total_score}%</span>
+      </td>
+      <td>
+        ${r.distance_km != null
+          ? `<span class="text-${r.proximity_color} fw-medium">${r.distance_km} km</span>`
+          : '<span class="text-muted">—</span>'}
+      </td>
+      <td class="text-center">
+        <input type="checkbox" class="form-check-input shortlist-cb" data-id="${r.score_id}"
+               ${r.shortlisted ? 'checked' : ''}/>
+      </td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary" onclick="viewCandidate(${r.candidate_id}, ${r.score_id})">
+          <i class="bi bi-eye"></i>
+        </button>
+      </td>
+    </tr>
+    <!-- Expandable skills row -->
+    <tr class="skills-row">
+      <td colspan="10" class="px-4 pb-3 pt-0">
+        <div class="skills-detail">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="detail-section">
+                <div class="detail-label"><i class="bi bi-check2-circle text-success me-1"></i>Matched Skills</div>
+                <div>${renderTags(r.matched_skills, 'success')}</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="detail-section">
+                <div class="detail-label"><i class="bi bi-x-circle text-danger me-1"></i>Missing Skills</div>
+                <div>${renderTags(r.missing_skills, 'danger')}</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="detail-section">
+                <div class="detail-label"><i class="bi bi-card-text text-primary me-1"></i>Skill Gap Summary</div>
+                <p class="small text-muted mb-0">${r.skill_gap_summary || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  // Make rows expandable
+  document.querySelectorAll('#resultsTable tbody tr[data-score-id]').forEach(row => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', e => {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      row.nextElementSibling.classList.toggle('d-none');
+    });
+  });
+
+  // Hide skill rows by default
+  document.querySelectorAll('.skills-row').forEach(r => r.classList.add('d-none'));
+}
+
+function totalScoreClass(score) {
+  if (score >= 70) return 'text-success';
+  if (score >= 50) return 'text-warning';
+  return 'text-danger';
+}
+
+function renderTags(items, color) {
+  if (!items || !items.length) return '<span class="text-muted small">None</span>';
+  return items.map(s => `<span class="badge bg-${color}-subtle text-${color} border border-${color}-subtle me-1 mb-1">${s}</span>`).join('');
+}
+
+async function saveShortlist() {
+  const checked = Array.from(document.querySelectorAll('.shortlist-cb:checked'))
+    .map(cb => parseInt(cb.dataset.id));
+  if (!checked.length) {
+    showToast('No candidates selected for shortlist.', 'warning');
+    return;
+  }
+
+  const resp = await fetch('/api/shortlist', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ score_ids: checked, shortlisted: true }),
+  });
+  const data = await resp.json();
+  showToast(`${data.updated} candidate(s) shortlisted successfully!`, 'success');
+}
+
+async function viewCandidate(candidateId, scoreId) {
+  const modal = new bootstrap.Modal(document.getElementById('candidateModal'));
+  document.getElementById('modalBody').innerHTML =
+    '<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>';
+  modal.show();
+
+  const resp = await fetch(`/api/candidate/${candidateId}`);
+  const data = await resp.json();
+  const c = data.candidate;
+  const score = data.scores.find(s => s.id === scoreId) || data.scores[0] || {};
+
+  document.getElementById('modalCandidateName').textContent = c.name;
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="candidate-avatar-lg mb-3">${initials(c.name)}</div>
+        <h5 class="fw-bold">${c.name}</h5>
+        <p class="text-muted mb-1"><i class="bi bi-envelope me-2"></i>${c.email || '—'}</p>
+        <p class="text-muted mb-1"><i class="bi bi-telephone me-2"></i>${c.phone || '—'}</p>
+        ${data.entities.locations[0]
+          ? `<p class="text-muted mb-1"><i class="bi bi-geo-alt me-2"></i>${data.entities.locations[0].value}</p>`
+          : ''}
+        ${score.distance_km != null
+          ? `<p class="text-muted mb-3"><i class="bi bi-signpost me-2"></i>${score.distance_km} km from hub</p>`
+          : ''}
+        <hr/>
+        <div class="score-summary">
+          ${scoreLine('Skill Match', score.skill_score, 'primary')}
+          ${scoreLine('Experience', score.exp_score, 'success')}
+          ${scoreLine('Proximity', score.proximity_score, 'info')}
+          ${scoreLine('Total Score', score.total_score, 'warning')}
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="row g-3">
+          <div class="col-12">
+            <h6 class="fw-semibold text-primary">Skills</h6>
+            ${renderTags(data.entities.skills.map(s => s.value), 'primary') || '<span class="text-muted">None extracted</span>'}
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-success">Education</h6>
+            ${data.entities.education.map(e => `<div class="small">${e.value}</div>`).join('') || '<span class="text-muted small">Not found</span>'}
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-info">Certifications</h6>
+            ${data.entities.certifications.map(e => `<div class="small">${e.value}</div>`).join('') || '<span class="text-muted small">Not found</span>'}
+          </div>
+          ${score.skill_gap ? `
+          <div class="col-12">
+            <h6 class="fw-semibold text-warning">Skill Gap Analysis</h6>
+            <div class="alert alert-warning py-2 px-3 mb-2">
+              <small>${score.skill_gap.summary || ''}</small>
+            </div>
+            <div>
+              <strong class="small">Missing:</strong>
+              ${renderTags(score.skill_gap.missing || [], 'danger')}
+            </div>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function scoreLine(label, val, color) {
+  return `
+    <div class="mb-2">
+      <div class="d-flex justify-content-between"><small>${label}</small><small class="fw-bold">${val ?? '—'}%</small></div>
+      <div class="progress" style="height:4px">
+        <div class="progress-bar bg-${color}" style="width:${val ?? 0}%"></div>
+      </div>
+    </div>`;
+}
+
+function initials(name) {
+  return (name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+loadResults();
+</script>
+{% endblock %}

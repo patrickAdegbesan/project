@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SentinelIQ — Credit Card Fraud Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #080c18;
+  --surface: #0d1526;
+  --surface2: #111d35;
+  --surface3: #162040;
+  --border: #1e2d4a;
+  --border2: #243455;
+  --text: #e8edf5;
+  --text2: #8b9ab5;
+  --text3: #5a6a85;
+  --accent: #3b7eff;
+  --accent2: #5b9aff;
+  --accent-glow: rgba(59,126,255,0.18);
+  --success: #00d68f;
+  --success-bg: rgba(0,214,143,0.1);
+  --warning: #ffb03a;
+  --warning-bg: rgba(255,176,58,0.1);
+  --danger: #ff4560;
+  --danger-bg: rgba(255,69,96,0.1);
+  --purple: #a78bfa;
+  --purple-bg: rgba(167,139,250,0.1);
+  --cyan: #22d3ee;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --transition: all 0.2s ease;
+}
+[data-theme="light"] {
+  --bg: #f0f4fa;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --surface3: #f1f5fd;
+  --border: #dde4f0;
+  --border2: #c8d4e8;
+  --text: #0f1729;
+  --text2: #4a5878;
+  --text3: #8a98b8;
+  --accent: #2563eb;
+  --accent2: #3b7eff;
+  --accent-glow: rgba(37,99,235,0.12);
+  --success: #059669;
+  --success-bg: rgba(5,150,105,0.08);
+  --warning: #d97706;
+  --warning-bg: rgba(217,119,6,0.08);
+  --danger: #dc2626;
+  --danger-bg: rgba(220,38,38,0.08);
+  --purple: #7c3aed;
+  --purple-bg: rgba(124,58,237,0.08);
+  --shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px;transition:background 0.3s,color 0.3s}
+/* Sidebar */
+.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;transition:var(--transition)}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#3b7eff,#a78bfa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-0.3px}
+.logo-sub{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
+.nav{padding:12px 10px;flex:1;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;padding:8px 8px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-weight:500;font-size:13px;transition:var(--transition);margin-bottom:2px;position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-glow);color:var(--accent);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.8}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sidebar-footer{padding:14px 10px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);background:var(--surface2)}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b7eff,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.user-info .name{font-size:12px;font-weight:600}
+.user-info .role{font-size:10px;color:var(--text3)}
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;background:var(--surface);flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:700;flex:1}
+.topbar-subtitle{font-size:12px;color:var(--text3);font-weight:400;margin-left:8px}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:var(--transition);font-family:inherit}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);box-shadow:0 0 20px var(--accent-glow)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-icon{width:34px;height:34px;padding:0;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition)}
+.btn-icon:hover{background:var(--surface3);color:var(--text)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.content{flex:1;overflow-y:auto;padding:24px}
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:var(--transition)}
+.card:hover{border-color:var(--border2)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+.card-value{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1}
+.card-delta{font-size:12px;font-weight:500;margin-top:4px}
+.delta-up{color:var(--success)}
+.delta-down{color:var(--danger)}
+/* Grid layouts */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.grid-13{display:grid;grid-template-columns:1fr 340px;gap:16px}
+.grid-31{display:grid;grid-template-columns:340px 1fr;gap:16px}
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+/* Page visibility */
+.page{display:none}
+.page.active{display:block}
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-success{background:var(--success-bg);color:var(--success)}
+.badge-danger{background:var(--danger-bg);color:var(--danger)}
+.badge-warning{background:var(--warning-bg);color:var(--warning)}
+.badge-accent{background:var(--accent-glow);color:var(--accent)}
+.badge-purple{background:var(--purple-bg);color:var(--purple)}
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+td:first-child{color:var(--text);font-weight:500}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+/* Progress bar */
+.progress{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.progress-bar{height:100%;border-radius:3px;transition:width 0.8s ease}
+/* Risk gauge canvas */
+canvas{display:block}
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--surface2);padding:3px;border-radius:var(--radius-sm);width:fit-content}
+.tab{padding:6px 14px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);transition:var(--transition)}
+.tab.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+/* Upload zone */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius);padding:48px;text-align:center;cursor:pointer;transition:var(--transition)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-glow)}
+/* Slider */
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--surface3);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px var(--accent-glow)}
+/* Toggle */
+.toggle{position:relative;width:42px;height:24px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--surface3);border-radius:12px;transition:0.3s}
+.toggle input:checked+.toggle-track{background:var(--accent)}
+.toggle-thumb{position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.toggle input:checked~.toggle-thumb{left:21px}
+/* Select */
+select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;cursor:pointer}
+select:focus{border-color:var(--accent)}
+/* Input */
+input[type=text],input[type=number]{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;width:100%}
+input:focus{border-color:var(--accent)}
+/* Metric row */
+.metric-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.metric-row:last-child{border-bottom:none}
+.metric-label{font-size:12px;color:var(--text2)}
+.metric-value{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace}
+/* SHAP bar */
+.shap-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.shap-label{width:140px;font-size:12px;color:var(--text2);text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shap-bar-wrap{flex:1;position:relative;height:22px;background:var(--surface2);border-radius:4px;overflow:hidden;display:flex;align-items:center}
+.shap-bar{height:100%;border-radius:4px;transition:width 0.8s ease}
+.shap-bar.pos{background:linear-gradient(90deg,#ff4560,#ff6b80)}
+.shap-bar.neg{background:linear-gradient(90deg,#3b7eff,#5b9aff);direction:rtl}
+.shap-val{position:absolute;right:6px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+/* Live feed */
+.feed-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-amount{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:80px}
+.feed-meta{flex:1;min-width:0}
+.feed-merchant{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-time{font-size:11px;color:var(--text3)}
+.risk-pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;min-width:48px;text-align:center}
+.risk-high{background:var(--danger-bg);color:var(--danger)}
+.risk-med{background:var(--warning-bg);color:var(--warning)}
+.risk-low{background:var(--success-bg);color:var(--success)}
+/* Confusion matrix */
+.cm-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:3px;width:fit-content}
+.cm-cell{width:100px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-weight:700}
+.cm-val{font-size:22px;font-family:'JetBrains Mono',monospace}
+.cm-lbl{font-size:10px;opacity:0.7;margin-top:2px}
+.cm-axis{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-weight:600;writing-mode:initial}
+/* Notification dot */
+.notif{position:relative}
+.notif::after{content:'';position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:2px solid var(--surface)}
+/* Glow cards */
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:0.06;filter:blur(20px)}
+.kpi-fraud::before{background:var(--danger)}
+.kpi-tx::before{background:var(--accent)}
+.kpi-acc::before{background:var(--success)}
+.kpi-fpr::before{background:var(--warning)}
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+/* Splash */
+#splash{position:fixed;inset:0;background:#080c18;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s ease}
+#splash.hide{opacity:0;pointer-events:none}
+.splash-logo{width:64px;height:64px;background:linear-gradient(135deg,#3b7eff,#a78bfa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:20px;box-shadow:0 0 60px rgba(59,126,255,0.4);animation:splashPulse 1.5s ease infinite}
+@keyframes splashPulse{0%,100%{box-shadow:0 0 40px rgba(59,126,255,0.4)}50%{box-shadow:0 0 80px rgba(59,126,255,0.7)}}
+.splash-title{font-size:28px;font-weight:800;letter-spacing:-0.5px;color:#e8edf5;margin-bottom:6px}
+.splash-sub{font-size:13px;color:#5a6a85;margin-bottom:32px}
+.splash-bar{width:200px;height:3px;background:#1e2d4a;border-radius:2px;overflow:hidden}
+.splash-fill{height:100%;background:linear-gradient(90deg,#3b7eff,#a78bfa);border-radius:2px;animation:splashLoad 1.8s ease forwards}
+@keyframes splashLoad{from{width:0}to{width:100%}}
+.splash-status{font-size:11px;color:#5a6a85;margin-top:12px;font-family:'JetBrains Mono',monospace}
+/* Toast */
+#toast-container{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:8888;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 16px;font-size:12px;font-weight:500;color:var(--text);box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;animation:toastIn 0.25s ease;pointer-events:all;min-width:240px;max-width:320px}
+.toast.out{animation:toastOut 0.25s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(20px)}}
+.toast-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* Model Comparison Table */
+.compare-table th,.compare-table td{padding:8px 14px}
+.compare-table td:not(:first-child){text-align:center}
+.compare-table th:not(:first-child){text-align:center}
+.best-cell{color:var(--success);font-weight:700}
+/* Training log */
+.log-console{background:#060a14;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;height:140px;overflow-y:auto;line-height:1.8}
+.log-line{color:var(--text3)}
+.log-line.ok{color:var(--success)}
+.log-line.warn{color:var(--warning)}
+.log-line.info{color:var(--accent)}
+/* Waterfall canvas wrapper */
+.wf-canvas-wrap{position:relative;overflow:hidden}
+/* Batch table */
+.batch-result{margin-top:16px}
+/* Score ring */
+.score-ring-wrap{display:flex;justify-content:center;align-items:center;height:100px}
+/* Heatmap cell */
+.hm-cell{width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:rgba(255,255,255,0.9);cursor:default;transition:transform 0.15s}
+.hm-cell:hover{transform:scale(1.3);z-index:10;position:relative}
+.hm-grid{display:flex;flex-direction:column;gap:2px}
+.hm-row{display:flex;gap:2px;align-items:center}
+/* Animated number */
+@keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.count-anim{animation:countUp 0.5s ease both}
+/* Section label */
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+/* Training step */
+.step{display:flex;align-items:flex-start;gap:12px;padding:12px 0}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-num.done{background:var(--success)}
+.step-num.pending{background:var(--surface3);color:var(--text3)}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.step-desc{font-size:12px;color:var(--text3)}
+/* Alert */
+.alert{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:var(--radius-sm);margin-bottom:10px}
+.alert-danger{background:var(--danger-bg);border:1px solid rgba(255,69,96,0.2)}
+.alert-warning{background:var(--warning-bg);border:1px solid rgba(255,176,58,0.2)}
+.alert-success{background:var(--success-bg);border:1px solid rgba(0,214,143,0.2)}
+/* Tooltip */
+[data-tip]{position:relative;cursor:help}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a2540;color:var(--text);font-size:11px;padding:5px 10px;border-radius:5px;white-space:nowrap;z-index:100;pointer-events:none;border:1px solid var(--border2)}
+/* Chip group */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:var(--transition)}
+.chip.active,.chip:hover{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
+/* Model card */
+.model-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:var(--transition)}
+.model-card:hover{border-color:var(--border2)}
+.model-card.selected{border-color:var(--accent);background:var(--accent-glow)}
+/* Predictor form */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+/* Animation */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page.active{animation:fadeIn 0.25s ease}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+/* ROC info */
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">🛡</div>
+  <div class="splash-title">SentinelIQ</div>
+  <div class="splash-sub">Credit Card Fraud Detection Platform</div>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+  <div class="splash-status" id="splash-status">Initialising ML pipeline...</div>
+</div>
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    <div>
+      <div class="logo-text">SentinelIQ</div>
+      <div class="logo-sub">Fraud Intelligence</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('alerts',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      Alerts
+      <span class="nav-badge">12</span>
+    </div>
+
+    <div class="nav-section">ML Pipeline</div>
+    <div class="nav-item" onclick="showPage('upload',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Data Upload
+    </div>
+    <div class="nav-item" onclick="showPage('training',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Model Training
+    </div>
+    <div class="nav-item" onclick="showPage('performance',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Performance
+    </div>
+
+    <div class="nav-section">Operations</div>
+    <div class="nav-item" onclick="showPage('predictor',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Predict
+    </div>
+    <div class="nav-item" onclick="showPage('shap',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      SHAP Explainer
+    </div>
+    <div class="nav-item" onclick="showPage('settings',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">AP</div>
+      <div class="user-info">
+        <div class="name">Adegbesan P.</div>
+        <div class="role">Senior Analyst</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="status-dot"></div>
+      <span style="font-size:12px;color:var(--text3);font-weight:500">Live Monitoring</span>
+    </div>
+    <div class="topbar-title" id="page-title">Dashboard <span class="topbar-subtitle">— Real-time fraud intelligence</span></div>
+    <div class="topbar-actions">
+      <button class="btn-icon notif">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <button class="btn-icon" onclick="toggleTheme()" title="Toggle theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <button class="btn btn-primary" onclick="showPage('predictor',null)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Analyse Transaction
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ═══════════════════════════════════ DASHBOARD ═══════════════════════════════════ -->
+    <div class="page active" id="page-dashboard">
+      <!-- KPI Row -->
+      <div class="grid-4">
+        <div class="kpi-card kpi-tx">
+          <div class="card-header">
+            <span class="card-title">Transactions Today</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21h6"/></svg>
+          </div>
+          <div class="card-value">148,293</div>
+          <div class="card-delta delta-up">▲ 4.2% vs yesterday</div>
+        </div>
+        <div class="kpi-card kpi-fraud">
+          <div class="card-header">
+            <span class="card-title">Fraud Detected</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="card-value" style="color:var(--danger)">847</div>
+          <div class="card-delta delta-down">▲ 12.8% surge — investigate</div>
+        </div>
+        <div class="kpi-card kpi-acc">
+          <div class="card-header">
+            <span class="card-title">Model Accuracy</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="card-value" style="color:var(--success)">99.7%</div>
+          <div class="card-delta delta-up">AUC 0.984 · XGBoost</div>
+        </div>
+        <div class="kpi-card kpi-fpr">
+          <div class="card-header">
+            <span class="card-title">False Positive Rate</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-value" style="color:var(--warning)">0.31%</div>
+          <div class="card-delta delta-up">▼ 0.05% improvement</div>
+        </div>
+      </div>
+
+      <div class="grid-13 mt-16">
+        <!-- Fraud Trend Chart -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Fraud Detection Trend — 30 Days</span>
+            <div class="tabs">
+              <div class="tab active">Volume</div>
+              <div class="tab">Amount ($)</div>
+              <div class="tab">Rate (%)</div>
+            </div>
+          </div>
+          <canvas id="trendChart" height="200"></canvas>
+        </div>
+        <!-- Live Feed -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Live Transaction Feed</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="status-dot"></div>
+              <span style="font-size:11px;color:var(--text3)">Real-time</span>
+            </div>
+          </div>
+          <div id="live-feed">
+            <div class="feed-item">
+              <div class="feed-amount" style="color:var(--danger)">$4,299</div>
+              <div class="feed-meta">
+                <div class="feed-merchant">Amazon Marketplace — DE</div>
+                <div class="feed-time">Card ••4821 · Just now</div>
+              </div>
+              <div class="risk-pill risk-high">HIGH 94%</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-amount">$129</div>
+              <div class="feed-meta">
+                <div class="feed-merchant">Starbucks #0284 — NYC</div>
+                <div class="feed-time">Card ••7332 · 1m ago</div>
+              </div>
+              <div class="risk-pill risk-low">LOW 3%</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-amount" style="color:var(--warning)">$899</div>
+              <div class="feed-meta">
+                <div class="feed-merchant">Electronics Hub — SG</div>
+                <div class="feed-time">Card ••9103 · 2m ago</div>
+              </div>
+              <div class="risk-pill risk-med">MED 67%</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-amount" style="color:var(--danger)">$2,450</div>
+              <div class="feed-meta">
+                <div class="feed-merchant">Unknown Merchant — RU</div>
+                <div class="feed-time">Card ••5577 · 3m ago</div>
+              </div>
+              <div class="risk-pill risk-high">HIGH 98%</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-amount">$45</div>
+              <div class="feed-meta">
+                <div class="feed-merchant">Netflix Inc — US</div>
+                <div class="feed-time">Card ••2198 · 4m ago</div>
+              </div>
+              <div class="risk-pill risk-low">LOW 1%</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-amount" style="color:var(--warning)">$1,100</div>
+              <div class="feed-meta">
+                <div class="feed-merchant">Jewelry Plus — UAE</div>
+                <div class="feed-time">Card ••6644 · 5m ago</div>
+              </div>
+              <div class="risk-pill risk-med">MED 52%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3 mt-16">
+        <!-- Fraud by Category -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Fraud by Category</span></div>
+          <canvas id="categoryChart" height="200"></canvas>
+        </div>
+        <!-- Model Performance Summary -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Model Performance</span><span class="badge badge-success">● Live</span></div>
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text2)">Precision</span><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace">97.3%</span></div>
+            <div class="progress"><div class="progress-bar" style="width:97.3%;background:var(--success)"></div></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text2)">Recall</span><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace">94.8%</span></div>
+            <div class="progress"><div class="progress-bar" style="width:94.8%;background:var(--accent)"></div></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text2)">F1 Score</span><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace">96.0%</span></div>
+            <div class="progress"><div class="progress-bar" style="width:96%;background:var(--purple)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text2)">ROC-AUC</span><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace">98.4%</span></div>
+            <div class="progress"><div class="progress-bar" style="width:98.4%;background:var(--cyan)"></div></div>
+          </div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:var(--text3)">XGBoost · Threshold 0.42</span>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="showPage('performance',null)">View Full Report →</button>
+          </div>
+        </div>
+        <!-- Hourly pattern -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Hourly Fraud Pattern</span></div>
+          <canvas id="hourlyChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ ALERTS ═══════════════════════════════════ -->
+    <div class="page" id="page-alerts">
+      <div class="alert alert-danger">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:3px;color:var(--danger)">Critical Surge Detected</div>
+          <div style="font-size:12px;color:var(--text2)">Fraud volume increased 128% in the last 2 hours — Card-not-present transactions from Eastern Europe. 47 cards affected. Automated block initiated for cards ••48xx pattern.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Active Alerts — Last 24 Hours</span><span class="badge badge-danger">12 Active</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Alert ID</th><th>Severity</th><th>Type</th><th>Cards Affected</th><th>Amount at Risk</th><th>Time</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>ALT-9981</td><td><span class="badge badge-danger">Critical</span></td><td>Card-not-present burst</td><td>47</td><td>$284,100</td><td>14 min ago</td><td><span class="badge badge-warning">Investigating</span></td></tr>
+              <tr><td>ALT-9980</td><td><span class="badge badge-danger">High</span></td><td>Velocity check breach</td><td>12</td><td>$67,400</td><td>1h ago</td><td><span class="badge badge-accent">Blocked</span></td></tr>
+              <tr><td>ALT-9979</td><td><span class="badge badge-warning">Medium</span></td><td>Geographic anomaly</td><td>3</td><td>$8,200</td><td>2h ago</td><td><span class="badge badge-success">Resolved</span></td></tr>
+              <tr><td>ALT-9978</td><td><span class="badge badge-warning">Medium</span></td><td>Amount threshold exceeded</td><td>8</td><td>$41,500</td><td>3h ago</td><td><span class="badge badge-success">Resolved</span></td></tr>
+              <tr><td>ALT-9977</td><td><span class="badge badge-danger">High</span></td><td>Account takeover pattern</td><td>2</td><td>$15,800</td><td>5h ago</td><td><span class="badge badge-accent">Blocked</span></td></tr>
+              <tr><td>ALT-9976</td><td><span class="badge badge-danger">Critical</span></td><td>Synthetic identity fraud</td><td>29</td><td>$190,000</td><td>8h ago</td><td><span class="badge badge-accent">Blocked</span></td></tr>
+              <tr><td>ALT-9975</td><td><span class="badge badge-warning">Medium</span></td><td>Recurring small-amount test</td><td>1</td><td>$340</td><td>12h ago</td><td><span class="badge badge-success">Resolved</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ UPLOAD ═══════════════════════════════════ -->
+    <div class="page" id="page-upload">
+      <div class="grid-2">
+        <div>
+          <div class="upload-zone" id="uploadZone" onclick="simulateUpload()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" style="margin:0 auto 14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your CSV dataset here</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:16px">or click to browse · Supports CSV, Parquet, JSON</div>
+            <button class="btn btn-primary">Choose File</button>
+            <div style="margin-top:14px;font-size:11px;color:var(--text3)">Expected: creditcard.csv · 284,807 transactions · 30 features</div>
+          </div>
+          <div class="card mt-16" id="upload-preview" style="display:none">
+            <div class="card-header">
+              <span class="card-title">Dataset Preview</span>
+              <span class="badge badge-success">✓ Loaded</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+              <div style="text-align:center;padding:12px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace">284,807</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Total Rows</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace">30</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Features</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace">0</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Missing Values</div>
+              </div>
+            </div>
+            <div class="table-wrap" style="max-height:180px;overflow-y:auto">
+              <table>
+                <thead><tr><th>Time</th><th>V1</th><th>V2</th><th>V3</th><th>Amount</th><th>Class</th></tr></thead>
+                <tbody>
+                  <tr><td>0.0</td><td>-1.3598</td><td>-0.0728</td><td>2.5363</td><td>$149.62</td><td><span class="badge badge-success">Legit</span></td></tr>
+                  <tr><td>0.0</td><td>1.1919</td><td>0.2662</td><td>0.1664</td><td>$2.69</td><td><span class="badge badge-success">Legit</span></td></tr>
+                  <tr><td>1.0</td><td>-1.3583</td><td>-1.3400</td><td>1.7732</td><td>$378.66</td><td><span class="badge badge-success">Legit</span></td></tr>
+                  <tr><td>1.0</td><td>-0.9662</td><td>-0.1852</td><td>1.7928</td><td>$123.50</td><td><span class="badge badge-danger">Fraud</span></td></tr>
+                  <tr><td>2.0</td><td>-1.1582</td><td>0.8777</td><td>1.5488</td><td>$69.99</td><td><span class="badge badge-success">Legit</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Class Distribution</span></div>
+            <canvas id="classChart" height="220"></canvas>
+            <div style="margin-top:14px;padding:12px;background:var(--warning-bg);border:1px solid rgba(255,176,58,0.2);border-radius:8px">
+              <div style="font-size:12px;font-weight:600;color:var(--warning);margin-bottom:4px">⚠ Severe Class Imbalance Detected</div>
+              <div style="font-size:11px;color:var(--text2)">284,315 legitimate (99.83%) vs 492 fraudulent (0.17%). SMOTE oversampling is strongly recommended before training.</div>
+            </div>
+          </div>
+          <div class="card mt-16">
+            <div class="card-header"><span class="card-title">Feature Correlation Heatmap</span><span style="font-size:11px;color:var(--text3)">Top 10 PCA features</span></div>
+            <div id="heatmap-wrap" style="overflow-x:auto"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;justify-content:center">
+              <div style="width:60px;height:6px;background:linear-gradient(90deg,#3b7eff,#111d35,#ff4560);border-radius:3px"></div>
+              <span style="font-size:10px;color:var(--text3)">-1 (negative) → 0 → +1 (positive)</span>
+            </div>
+          </div>
+          <div class="card mt-16">
+            <div class="card-header"><span class="card-title">SMOTE Configuration</span><span class="badge badge-accent">Recommended</span></div>
+            <div style="margin-bottom:14px">
+              <div class="section-label">Sampling Strategy</div>
+              <select style="width:100%">
+                <option>auto — match minority to majority</option>
+                <option selected>0.5 — 1:2 ratio (Recommended)</option>
+                <option>0.25 — 1:4 ratio</option>
+                <option>minority — oversample only</option>
+              </select>
+            </div>
+            <div style="margin-bottom:14px">
+              <div class="section-label">K Neighbors</div>
+              <input type="number" value="5" style="width:100%">
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div>
+                <div style="font-size:13px;font-weight:500">ADASYN Variant</div>
+                <div style="font-size:11px;color:var(--text3)">Adaptive density estimation</div>
+              </div>
+              <label class="toggle"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="showPage('training',null)">Apply SMOTE &amp; Proceed to Training →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ TRAINING ═══════════════════════════════════ -->
+    <div class="page" id="page-training">
+      <div class="grid-2">
+        <div>
+          <!-- Model Selection -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">Algorithm Selection</span></div>
+            <div class="grid-2" style="gap:12px;margin-bottom:0">
+              <div class="model-card selected" onclick="selectModel(this)">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <div style="width:28px;height:28px;background:var(--accent-glow);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px">⚡</div>
+                  <div style="font-size:13px;font-weight:700">XGBoost</div>
+                </div>
+                <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Gradient boosting with extreme speed. Best for tabular fraud data.</div>
+                <div style="display:flex;gap:6px"><span class="chip active">Fast</span><span class="chip active">High AUC</span></div>
+              </div>
+              <div class="model-card" onclick="selectModel(this)">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <div style="width:28px;height:28px;background:var(--success-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px">🌲</div>
+                  <div style="font-size:13px;font-weight:700">Random Forest</div>
+                </div>
+                <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Ensemble of decision trees. Robust to outliers, interpretable.</div>
+                <div style="display:flex;gap:6px"><span class="chip">Robust</span><span class="chip">Interpretable</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- Hyperparameters -->
+          <div class="card mt-16">
+            <div class="card-header"><span class="card-title">Hyperparameters</span><button class="btn btn-ghost" style="font-size:11px;padding:4px 10px">Auto-tune (Optuna)</button></div>
+            <div class="grid-2" style="gap:12px">
+              <div><div class="section-label">n_estimators</div><input type="number" value="300"></div>
+              <div><div class="section-label">max_depth</div><input type="number" value="6"></div>
+              <div><div class="section-label">learning_rate</div><input type="number" value="0.05" step="0.01"></div>
+              <div><div class="section-label">subsample</div><input type="number" value="0.8" step="0.1"></div>
+              <div><div class="section-label">colsample_bytree</div><input type="number" value="0.8" step="0.1"></div>
+              <div><div class="section-label">scale_pos_weight</div><input type="number" value="578"></div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="section-label">Cross-Validation Folds</div>
+              <div class="chips">
+                <div class="chip active">3-Fold</div>
+                <div class="chip">5-Fold</div>
+                <div class="chip">10-Fold</div>
+                <div class="chip">StratifiedKFold</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <!-- Training Progress -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Training Pipeline</span>
+              <button class="btn btn-primary" onclick="startTraining()">▶ Start Training</button>
+            </div>
+            <div id="training-steps">
+              <div class="step">
+                <div class="step-num done" id="step1">✓</div>
+                <div class="step-content">
+                  <div class="step-title">Data Preprocessing</div>
+                  <div class="step-desc">Normalised Amount & Time · 284,807 rows</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num done" id="step2">✓</div>
+                <div class="step-content">
+                  <div class="step-title">SMOTE Oversampling</div>
+                  <div class="step-desc">Generated 141,665 synthetic fraud samples</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num" id="step3" style="background:var(--accent)">3</div>
+                <div class="step-content">
+                  <div class="step-title">Train/Test Split <span class="badge badge-accent" style="margin-left:4px">Running</span></div>
+                  <div class="step-desc">80/20 stratified split · Seed 42</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num pending" id="step4">4</div>
+                <div class="step-content">
+                  <div class="step-title">XGBoost Training</div>
+                  <div class="step-desc">300 estimators · 5-fold CV</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num pending" id="step5">5</div>
+                <div class="step-content">
+                  <div class="step-title">Model Evaluation</div>
+                  <div class="step-desc">ROC-AUC · Precision-Recall · Confusion Matrix</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num pending" id="step6">6</div>
+                <div class="step-content">
+                  <div class="step-title">SHAP Explanation</div>
+                  <div class="step-desc">TreeExplainer · Feature importance</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text2)">Overall Progress</span><span style="font-size:12px;font-weight:700" id="prog-label">33%</span></div>
+              <div class="progress"><div class="progress-bar" style="width:33%;background:linear-gradient(90deg,var(--accent),var(--purple))" id="prog-bar"></div></div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="section-label" style="margin-bottom:8px">Training Log</div>
+              <div class="log-console" id="train-log">
+                <div class="log-line ok">[09:14:02] ✓ Loaded creditcard.csv — 284,807 rows × 31 cols</div>
+                <div class="log-line ok">[09:14:03] ✓ StandardScaler applied to Amount, Time</div>
+                <div class="log-line ok">[09:14:04] ✓ SMOTE complete — minority: 492 → 142,157</div>
+                <div class="log-line info">[09:14:05] → Splitting 80/20 stratified (seed=42)…</div>
+                <div class="log-line">[09:14:05]   Train: 340,518 | Test: 85,129</div>
+              </div>
+            </div>
+          </div>
+          <!-- CV Results -->
+          <div class="card mt-16">
+            <div class="card-header"><span class="card-title">Cross-Validation Results</span><span class="badge badge-success">Completed</span></div>
+            <canvas id="cvChart" height="160"></canvas>
+            <div class="grid-3 mt-16" style="gap:8px">
+              <div style="text-align:center;padding:10px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:16px;font-weight:800;color:var(--success);font-family:'JetBrains Mono',monospace">0.9841</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">Mean AUC</div>
+              </div>
+              <div style="text-align:center;padding:10px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:16px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace">±0.003</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">Std Dev</div>
+              </div>
+              <div style="text-align:center;padding:10px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:16px;font-weight:800;color:var(--purple);font-family:'JetBrains Mono',monospace">12.4s</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">Train Time</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ PERFORMANCE ═══════════════════════════════════ -->
+    <div class="page" id="page-performance">
+      <!-- Metric row -->
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600;letter-spacing:0.5px">ROC-AUC</div>
+          <div style="font-size:26px;font-weight:800;color:var(--success);font-family:'JetBrains Mono',monospace">0.9841</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600;letter-spacing:0.5px">Precision</div>
+          <div style="font-size:26px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace">97.3%</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600;letter-spacing:0.5px">Recall</div>
+          <div style="font-size:26px;font-weight:800;color:var(--purple);font-family:'JetBrains Mono',monospace">94.8%</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600;letter-spacing:0.5px">F1 Score</div>
+          <div style="font-size:26px;font-weight:800;color:var(--warning);font-family:'JetBrains Mono',monospace">96.0%</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- ROC Curve -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">ROC Curve</span>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="display:flex;align-items:center;gap:6px"><div class="legend-dot" style="background:var(--accent)"></div><span style="font-size:11px;color:var(--text2)">XGBoost AUC=0.984</span></div>
+              <div style="display:flex;align-items:center;gap:6px"><div class="legend-dot" style="background:var(--success)"></div><span style="font-size:11px;color:var(--text2)">Random Forest AUC=0.971</span></div>
+            </div>
+          </div>
+          <canvas id="rocChart" height="240"></canvas>
+        </div>
+        <!-- Confusion Matrix -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Confusion Matrix</span><span style="font-size:11px;color:var(--text3)">Threshold: 0.42</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:8px">
+            <div style="display:grid;grid-template-columns:80px 120px 120px;gap:4px">
+              <div></div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text3);padding:6px">Predicted: Legit</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text3);padding:6px">Predicted: Fraud</div>
+              <div style="display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);writing-mode:horizontal-tb">Actual: Legit</div>
+              <div style="background:rgba(0,214,143,0.15);border:1px solid rgba(0,214,143,0.3);border-radius:8px;padding:20px;text-align:center">
+                <div style="font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--success)">56,854</div>
+                <div style="font-size:10px;color:var(--success);margin-top:4px;font-weight:600">TRUE NEGATIVE</div>
+              </div>
+              <div style="background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.2);border-radius:8px;padding:20px;text-align:center">
+                <div style="font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--danger)">175</div>
+                <div style="font-size:10px;color:var(--danger);margin-top:4px;font-weight:600">FALSE POSITIVE</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3)">Actual: Fraud</div>
+              <div style="background:rgba(255,176,58,0.1);border:1px solid rgba(255,176,58,0.2);border-radius:8px;padding:20px;text-align:center">
+                <div style="font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--warning)">5</div>
+                <div style="font-size:10px;color:var(--warning);margin-top:4px;font-weight:600">FALSE NEGATIVE</div>
+              </div>
+              <div style="background:rgba(59,126,255,0.12);border:1px solid rgba(59,126,255,0.25);border-radius:8px;padding:20px;text-align:center">
+                <div style="font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent)">90</div>
+                <div style="font-size:10px;color:var(--accent);margin-top:4px;font-weight:600">TRUE POSITIVE</div>
+              </div>
+            </div>
+          </div>
+          <div class="grid-3 mt-16" style="gap:8px">
+            <div class="metric-row" style="padding:8px 12px;background:var(--surface2);border-radius:6px;border:none"><span class="metric-label">Specificity</span><span class="metric-value" style="color:var(--success)">99.7%</span></div>
+            <div class="metric-row" style="padding:8px 12px;background:var(--surface2);border-radius:6px;border:none"><span class="metric-label">Sensitivity</span><span class="metric-value" style="color:var(--accent)">94.7%</span></div>
+            <div class="metric-row" style="padding:8px 12px;background:var(--surface2);border-radius:6px;border:none"><span class="metric-label">MCC</span><span class="metric-value" style="color:var(--purple)">0.958</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2 mt-16">
+        <!-- Feature Importance -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Feature Importance (Gain)</span></div>
+          <canvas id="featChart" height="220"></canvas>
+        </div>
+        <!-- Precision-Recall -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Precision–Recall Curve</span><span style="font-size:11px;color:var(--text3)">AP = 0.812</span></div>
+          <canvas id="prChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Model Comparison -->
+      <div class="card mt-16">
+        <div class="card-header">
+          <span class="card-title">Model Comparison</span>
+          <div style="display:flex;gap:8px">
+            <span class="badge badge-accent">XGBoost Recommended</span>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="toast('Exporting report…','info')">Export PDF</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Model</th><th>ROC-AUC</th><th>Precision</th><th>Recall</th><th>F1</th><th>MCC</th><th>Train Time</th><th>Inference</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:var(--accent-glow)">
+                <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">⚡</span><div><div style="font-weight:700">XGBoost v2.1</div><div style="font-size:10px;color:var(--text3)">n_est=300, depth=6</div></div></div></td>
+                <td class="best-cell">0.9841</td><td class="best-cell">97.3%</td><td class="best-cell">94.8%</td><td class="best-cell">96.0%</td><td class="best-cell">0.958</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">12.4s</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--success)">4.2ms</td>
+                <td><span class="badge badge-success">● Active</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🌲</span><div><div style="font-weight:700">Random Forest</div><div style="font-size:10px;color:var(--text3)">n_est=200, depth=12</div></div></div></td>
+                <td>0.9714</td><td>95.1%</td><td>91.2%</td><td>93.1%</td><td>0.931</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">38.2s</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">11.8ms</td>
+                <td><span class="badge badge-warning">Standby</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">📈</span><div><div style="font-weight:700">Logistic Regression</div><div style="font-size:10px;color:var(--text3)">C=1.0, solver=lbfgs</div></div></div></td>
+                <td>0.9482</td><td>89.4%</td><td>78.1%</td><td>83.4%</td><td>0.821</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">2.1s</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">0.8ms</td>
+                <td><span class="badge badge-purple">Baseline</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🧠</span><div><div style="font-weight:700">Neural Network</div><div style="font-size:10px;color:var(--text3)">3-layer MLP, ReLU</div></div></div></td>
+                <td>0.9768</td><td>96.2%</td><td>92.4%</td><td>94.2%</td><td>0.941</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">84.7s</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px">9.1ms</td>
+                <td><span class="badge badge-warning">Standby</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ PREDICTOR ═══════════════════════════════════ -->
+    <div class="page" id="page-predictor">
+      <div class="grid-13">
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Transaction Details</span></div>
+            <div class="tabs" style="margin-bottom:16px">
+              <div class="tab active">Single</div>
+              <div class="tab">Batch CSV</div>
+              <div class="tab">API</div>
+            </div>
+            <div class="form-row">
+              <div><div class="form-label">Amount ($)</div><input type="number" value="4299.00"></div>
+              <div><div class="form-label">Time (seconds)</div><input type="number" value="86400"></div>
+            </div>
+            <div class="form-row">
+              <div><div class="form-label">V1</div><input type="number" value="-3.0435" step="0.0001"></div>
+              <div><div class="form-label">V2</div><input type="number" value="1.9978" step="0.0001"></div>
+            </div>
+            <div class="form-row">
+              <div><div class="form-label">V3</div><input type="number" value="-3.5557" step="0.0001"></div>
+              <div><div class="form-label">V4</div><input type="number" value="1.2892" step="0.0001"></div>
+            </div>
+            <div class="form-row">
+              <div><div class="form-label">V14</div><input type="number" value="-9.6832" step="0.0001"></div>
+              <div><div class="form-label">V17</div><input type="number" value="-6.8810" step="0.0001"></div>
+            </div>
+            <div style="margin-bottom:14px">
+              <div class="form-label">Pre-fill scenario</div>
+              <div class="chips">
+                <div class="chip active" onclick="fillScenario('fraud',this)">High-Risk</div>
+                <div class="chip" onclick="fillScenario('legit',this)">Legitimate</div>
+                <div class="chip" onclick="fillScenario('border',this)">Borderline</div>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="runPrediction()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run Fraud Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Panel -->
+        <div>
+          <div class="card" style="text-align:center;margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:16px;display:block">Risk Assessment</div>
+            <canvas id="gaugeCanvas" width="280" height="160" style="margin:0 auto"></canvas>
+            <div id="gauge-label" style="font-size:32px;font-weight:800;color:var(--danger);font-family:'JetBrains Mono',monospace;margin-top:8px">94%</div>
+            <div id="gauge-verdict" style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:12px">⚠ HIGH FRAUD RISK — Recommend Block</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div style="padding:10px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--danger)">0.942</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">Fraud Score</div>
+              </div>
+              <div style="padding:10px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent)">XGB</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">Model</div>
+              </div>
+              <div style="padding:10px;background:var(--surface2);border-radius:8px">
+                <div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--warning)">4.2ms</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">Latency</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Top Risk Factors</span></div>
+            <div class="shap-bar-row">
+              <div class="shap-label">V14 = -9.68</div>
+              <div class="shap-bar-wrap"><div class="shap-bar pos" style="width:92%"></div><span class="shap-val" style="color:#fff">+0.847</span></div>
+            </div>
+            <div class="shap-bar-row">
+              <div class="shap-label">V17 = -6.88</div>
+              <div class="shap-bar-wrap"><div class="shap-bar pos" style="width:78%"></div><span class="shap-val" style="color:#fff">+0.612</span></div>
+            </div>
+            <div class="shap-bar-row">
+              <div class="shap-label">Amount = $4299</div>
+              <div class="shap-bar-wrap"><div class="shap-bar pos" style="width:64%"></div><span class="shap-val" style="color:#fff">+0.489</span></div>
+            </div>
+            <div class="shap-bar-row">
+              <div class="shap-label">V3 = -3.56</div>
+              <div class="shap-bar-wrap"><div class="shap-bar pos" style="width:55%"></div><span class="shap-val" style="color:#fff">+0.398</span></div>
+            </div>
+            <div class="shap-bar-row">
+              <div class="shap-label">V1 = -3.04</div>
+              <div class="shap-bar-wrap"><div class="shap-bar pos" style="width:48%"></div><span class="shap-val" style="color:#fff">+0.321</span></div>
+            </div>
+            <div class="shap-bar-row">
+              <div class="shap-label">V2 = 1.99</div>
+              <div class="shap-bar-wrap" style="justify-content:flex-end"><div class="shap-bar neg" style="width:28%;margin-left:auto"></div><span class="shap-val" style="color:var(--accent2);right:auto;left:6px">-0.198</span></div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="showPage('shap',null)">View Full SHAP Analysis →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batch Results -->
+    <div class="card mt-16" id="batch-results-card" style="display:none">
+      <div class="card-header">
+        <span class="card-title">Batch Prediction Results</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-danger">3 Fraud</span>
+          <span class="badge badge-success">7 Legitimate</span>
+          <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="toast('Exported batch_results.csv','success')">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Amount</th><th>Time</th><th>Fraud Score</th><th>Risk Level</th><th>Decision</th><th>Latency</th></tr></thead>
+          <tbody id="batch-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ SHAP ═══════════════════════════════════ -->
+    <div class="page" id="page-shap">
+      <div class="grid-2">
+        <!-- Waterfall -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">SHAP Waterfall Plot</span>
+            <span style="font-size:11px;color:var(--text3)">Transaction TXN-9981 · Score 0.942</span>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:14px">Each bar shows how much each feature pushed the prediction higher (red = towards fraud) or lower (blue = towards legitimate).</div>
+          <canvas id="waterfallChart" height="320"></canvas>
+        </div>
+        <!-- Global Importance -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Global Feature Impact (SHAP)</span></div>
+          <canvas id="shapGlobalChart" height="320"></canvas>
+        </div>
+      </div>
+      <div class="grid-2 mt-16">
+        <!-- SHAP Summary beeswarm (simplified bar) -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Feature Value vs SHAP Impact</span></div>
+          <canvas id="shapBeeChart" height="240"></canvas>
+          <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:20px">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:28px;height:8px;border-radius:4px;background:linear-gradient(90deg,#3b7eff,#ff4560)"></div><span style="font-size:11px;color:var(--text2)">Feature value (low → high)</span></div>
+          </div>
+        </div>
+        <!-- Explanation panel -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">SHAP Explanation</span><span class="badge badge-accent">Non-Expert View</span></div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:13px;font-weight:600;margin-bottom:8px">Why was this flagged as fraud?</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7">This transaction received a fraud probability of <strong style="color:var(--danger)">94.2%</strong>. The model's baseline fraud expectation was 0.17%, and the following features drove it up significantly:</div>
+          </div>
+          <div style="margin-bottom:14px;padding:12px;background:var(--danger-bg);border-radius:8px;border:1px solid rgba(255,69,96,0.15)">
+            <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">🔴 High-Risk Signals</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7">• <strong>V14</strong> is extremely negative (-9.68) — a known fraud indicator from PCA<br>• <strong>V17</strong> is abnormally low (-6.88) — correlates with fraudulent network usage<br>• <strong>Amount ($4,299)</strong> is unusually high for this card pattern</div>
+          </div>
+          <div style="margin-bottom:14px;padding:12px;background:var(--success-bg);border-radius:8px;border:1px solid rgba(0,214,143,0.15)">
+            <div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:6px">🟢 Legitimacy Signals</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7">• <strong>V2</strong> value partially mitigates the risk (-0.198 SHAP)<br>• Time of transaction is within business hours</div>
+          </div>
+          <div style="padding:12px;background:var(--warning-bg);border-radius:8px;border:1px solid rgba(255,176,58,0.15)">
+            <div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:4px">Recommended Action</div>
+            <div style="font-size:12px;color:var(--text2)">Block transaction and issue a security alert to the cardholder. Similar to 94% of confirmed fraud cases in the training data.</div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn btn-danger" style="flex:1">Block Transaction</button>
+            <button class="btn btn-ghost" style="flex:1">Send Alert</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ SETTINGS ═══════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Decision Threshold Tuning</span></div>
+            <div style="margin-bottom:20px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+                <span style="font-size:13px;font-weight:600">Classification Threshold</span>
+                <span style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent)" id="thresh-label">0.42</span>
+              </div>
+              <input type="range" min="0.1" max="0.9" step="0.01" value="0.42" oninput="updateThreshold(this.value)">
+              <div style="display:flex;justify-content:space-between;margin-top:4px">
+                <span style="font-size:10px;color:var(--text3)">0.1 — More Sensitive</span>
+                <span style="font-size:10px;color:var(--text3)">0.9 — More Specific</span>
+              </div>
+            </div>
+            <div style="margin-bottom:20px;padding:14px;background:var(--surface2);border-radius:8px">
+              <div class="section-label" style="margin-bottom:10px">Impact at Threshold 0.42</div>
+              <div class="metric-row"><span class="metric-label">Precision</span><span class="metric-value" id="t-prec" style="color:var(--success)">97.3%</span></div>
+              <div class="metric-row"><span class="metric-label">Recall</span><span class="metric-value" id="t-rec" style="color:var(--accent)">94.8%</span></div>
+              <div class="metric-row"><span class="metric-label">False Positives / day</span><span class="metric-value" id="t-fp" style="color:var(--warning)">~459</span></div>
+              <div class="metric-row"><span class="metric-label">Missed Frauds / day</span><span class="metric-value" id="t-fn" style="color:var(--danger)">~5</span></div>
+            </div>
+            <canvas id="threshChart" height="160"></canvas>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Alert Configuration</span></div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surface2);border-radius:8px">
+                <div><div style="font-size:13px;font-weight:600">Email Alerts</div><div style="font-size:11px;color:var(--text3)">Critical fraud detections</div></div>
+                <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surface2);border-radius:8px">
+                <div><div style="font-size:13px;font-weight:600">SMS Alerts</div><div style="font-size:11px;color:var(--text3)">High-value fraud only (&gt;$1,000)</div></div>
+                <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surface2);border-radius:8px">
+                <div><div style="font-size:13px;font-weight:600">Auto-Block Cards</div><div style="font-size:11px;color:var(--text3)">Score &gt; 0.90 triggers automatic block</div></div>
+                <label class="toggle"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surface2);border-radius:8px">
+                <div><div style="font-size:13px;font-weight:600">Daily Report</div><div style="font-size:11px;color:var(--text3)">PDF summary at 08:00 UTC</div></div>
+                <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </div>
+            </div>
+          </div>
+          <div class="card mt-16">
+            <div class="card-header"><span class="card-title">Model Deployment</span></div>
+            <div class="metric-row"><span class="metric-label">Active Model</span><span class="metric-value" style="color:var(--accent)">XGBoost v2.1</span></div>
+            <div class="metric-row"><span class="metric-label">Deployed</span><span class="metric-value">2024-11-14 09:32</span></div>
+            <div class="metric-row"><span class="metric-label">Serving Latency</span><span class="metric-value" style="color:var(--success)">4.2ms p99</span></div>
+            <div class="metric-row"><span class="metric-label">Predictions / sec</span><span class="metric-value">2,840</span></div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <button class="btn btn-primary" style="flex:1">Deploy New Model</button>
+              <button class="btn btn-ghost" style="flex:1">Rollback</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ───────────── SPLASH ─────────────
+const splashMsgs=['Initialising ML pipeline...','Loading XGBoost model...','Connecting to fraud database...','Calibrating decision threshold...','Ready.'];
+let splashIdx=0;
+function advanceSplash(){
+  const el=document.getElementById('splash-status');
+  if(!el)return;
+  el.textContent=splashMsgs[splashIdx++]||'Ready.';
+  if(splashIdx<splashMsgs.length)setTimeout(advanceSplash,360);
+}
+setTimeout(advanceSplash,200);
+setTimeout(()=>{
+  const s=document.getElementById('splash');
+  if(s){s.classList.add('hide');setTimeout(()=>s.remove(),500);}
+  initPageCharts('dashboard');
+  drawGauge(0.942);
+  buildHeatmap();
+  buildBatchTable();
+},2200);
+
+// ───────────── TOAST ─────────────
+function toast(msg,type='success'){
+  const colors={success:'var(--success)',danger:'var(--danger)',warning:'var(--warning)',info:'var(--accent)'};
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<div class="toast-dot" style="background:${colors[type]||colors.success}"></div><span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},2800);
+}
+
+// ───────────── THEME ─────────────
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('theme-icon').innerHTML=isDark
+    ?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    :'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+  setTimeout(()=>{ destroyAllCharts(); initPageCharts(currentPage); drawGauge(lastGaugeScore); },120);
+}
+
+// ───────────── NAVIGATION ─────────────
+let currentPage='dashboard';
+let lastGaugeScore=0.942;
+const pageTitles={
+  dashboard:'Dashboard <span class="topbar-subtitle">— Real-time fraud intelligence</span>',
+  alerts:'Alerts <span class="topbar-subtitle">— Active fraud incidents</span>',
+  upload:'Data Upload <span class="topbar-subtitle">— Ingest & preprocess dataset</span>',
+  training:'Model Training <span class="topbar-subtitle">— Configure & train ML pipeline</span>',
+  performance:'Performance Analytics <span class="topbar-subtitle">— Evaluation metrics & curves</span>',
+  predictor:'Transaction Predictor <span class="topbar-subtitle">— Real-time fraud scoring</span>',
+  shap:'SHAP Explainer <span class="topbar-subtitle">— Model interpretability</span>',
+  settings:'Settings <span class="topbar-subtitle">— Threshold & deployment config</span>',
+};
+function showPage(id,navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const page=document.getElementById('page-'+id);
+  if(page)page.classList.add('active');
+  if(navEl)navEl.classList.add('active');
+  else{
+    // find matching nav item and activate it
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');
+    });
+  }
+  document.getElementById('page-title').innerHTML=pageTitles[id]||id;
+  currentPage=id;
+  setTimeout(()=>initPageCharts(id),60);
+}
+
+function initPageCharts(id){
+  if(id==='dashboard'){initTrendChart();initCategoryChart();initHourlyChart();}
+  else if(id==='upload'){initClassChart();}
+  else if(id==='training'){initCVChart();}
+  else if(id==='performance'){initROCChart();initFeatChart();initPRChart();}
+  else if(id==='predictor'){drawGauge(lastGaugeScore);}
+  else if(id==='shap'){drawWaterfallCanvas();initShapGlobalChart();initShapBeeChart();}
+  else if(id==='settings'){initThreshChart();}
+}
+
+// ───────────── CHART STATE ─────────────
+const charts={};
+function destroyAllCharts(){Object.keys(charts).forEach(k=>{if(charts[k]){charts[k].destroy();delete charts[k];}});}
+function destroyChart(k){if(charts[k]){charts[k].destroy();delete charts[k];}}
+
+function getCSSVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function c(name){return getCSSVar('--'+name);}
+
+function chartDefaults(){
+  return {
+    color:c('text2'),
+    plugins:{legend:{labels:{color:c('text2'),font:{family:'Inter',size:11}}}},
+    scales:{x:{grid:{color:c('border')},ticks:{color:c('text3'),font:{family:'Inter',size:10}}},y:{grid:{color:c('border')},ticks:{color:c('text3'),font:{family:'Inter',size:10}}}},
+  };
+}
+
+// Trend
+function initTrendChart(){
+  const ctx=document.getElementById('trendChart');if(!ctx)return;
+  if(charts.trend){charts.trend.destroy();}
+  const labels=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
+  const fraud=[12,18,15,22,19,25,30,28,35,40,38,44,41,50,47,53,49,58,61,55,70,68,75,80,72,85,90,88,95,99];
+  const legit=[4800,4900,5100,4950,5200,5300,5150,5400,5600,5500,5700,5800,5650,5900,6000,5950,6100,6200,6150,6300,6400,6350,6500,6600,6550,6700,6800,6750,6900,7000];
+  charts.trend=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Fraud',data:fraud,borderColor:c('danger'),backgroundColor:'rgba(255,69,96,0.08)',tension:0.4,fill:true,pointRadius:2,borderWidth:2},
+      {label:'Legit (÷100)',data:legit.map(v=>v/100),borderColor:c('accent'),backgroundColor:'rgba(59,126,255,0.06)',tension:0.4,fill:true,pointRadius:0,borderWidth:1.5}
+    ]},
+    options:{...chartDefaults(),responsive:true,animation:{duration:800},plugins:{legend:{position:'top',labels:{color:c('text2'),font:{family:'Inter',size:11},boxWidth:12,usePointStyle:true}}}}
+  });
+}
+
+// Category donut
+function initCategoryChart(){
+  const ctx=document.getElementById('categoryChart');if(!ctx)return;
+  if(charts.cat){charts.cat.destroy();}
+  charts.cat=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:['Online / E-commerce','Card-Not-Present','ATM Skimming','Identity Theft','Phishing','Other'],
+      datasets:[{data:[34,28,15,12,7,4],backgroundColor:['#ff4560','#3b7eff','#ffb03a','#a78bfa','#22d3ee','#6b7280'],borderWidth:2,borderColor:c('surface')}]},
+    options:{cutout:'65%',responsive:true,plugins:{legend:{position:'right',labels:{color:c('text2'),font:{family:'Inter',size:11},padding:10,boxWidth:10,usePointStyle:true}}}}
+  });
+}
+
+// Hourly bar
+function initHourlyChart(){
+  const ctx=document.getElementById('hourlyChart');if(!ctx)return;
+  if(charts.hourly){charts.hourly.destroy();}
+  const hours=Array.from({length:24},(_,i)=>`${i}:00`);
+  const data=[2,1,1,2,3,4,8,15,22,18,16,14,12,10,11,13,18,25,30,28,24,20,15,8];
+  charts.hourly=new Chart(ctx,{
+    type:'bar',
+    data:{labels:hours,datasets:[{data,backgroundColor:data.map(v=>v>20?'rgba(255,69,96,0.7)':v>12?'rgba(255,176,58,0.6)':'rgba(59,126,255,0.5)'),borderRadius:3,borderWidth:0}]},
+    options:{...chartDefaults(),responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:c('text3'),font:{size:9},maxTicksLimit:8}},y:{grid:{color:c('border')},ticks:{color:c('text3'),font:{size:10}}}}}
+  });
+}
+
+// Class imbalance
+function initClassChart(){
+  const ctx=document.getElementById('classChart');if(!ctx)return;
+  if(charts.cls){charts.cls.destroy();}
+  charts.cls=new Chart(ctx,{
+    type:'bar',
+    data:{labels:['Legitimate (99.83%)','Fraudulent (0.17%)'],
+      datasets:[{data:[284315,492],backgroundColor:['rgba(59,126,255,0.6)','rgba(255,69,96,0.7)'],borderRadius:6,borderWidth:0}]},
+    options:{...chartDefaults(),indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{type:'logarithmic',grid:{color:c('border')},ticks:{color:c('text3')}},y:{grid:{display:false},ticks:{color:c('text2')}}}}
+  });
+}
+
+// CV results
+function initCVChart(){
+  const ctx=document.getElementById('cvChart');if(!ctx)return;
+  if(charts.cv){charts.cv.destroy();}
+  charts.cv=new Chart(ctx,{
+    type:'bar',
+    data:{labels:['Fold 1','Fold 2','Fold 3','Fold 4','Fold 5'],
+      datasets:[
+        {label:'AUC',data:[0.982,0.987,0.981,0.986,0.984],backgroundColor:'rgba(59,126,255,0.6)',borderRadius:4,borderWidth:0},
+        {label:'F1',data:[0.958,0.963,0.954,0.961,0.960],backgroundColor:'rgba(167,139,250,0.6)',borderRadius:4,borderWidth:0}
+      ]},
+    options:{...chartDefaults(),responsive:true,scales:{y:{min:0.93,max:1.0,grid:{color:c('border')},ticks:{color:c('text3')}},x:{grid:{display:false},ticks:{color:c('text2')}}},plugins:{legend:{position:'top',labels:{color:c('text2'),font:{size:11},boxWidth:10,usePointStyle:true}}}}
+  });
+}
+
+// ROC Curve
+function initROCChart(){
+  const ctx=document.getElementById('rocChart');if(!ctx)return;
+  if(charts.roc){charts.roc.destroy();}
+  // Generate smooth ROC-like curve
+  function rocPts(auc){
+    const pts=[{x:0,y:0}];
+    for(let i=1;i<=100;i++){const fpr=i/100;const tpr=Math.pow(fpr,1/(auc*3));pts.push({x:fpr,y:Math.min(tpr,1)});}
+    pts.push({x:1,y:1});return pts;
+  }
+  charts.roc=new Chart(ctx,{
+    type:'scatter',
+    data:{datasets:[
+      {label:'XGBoost (AUC=0.984)',data:rocPts(0.984),borderColor:c('accent'),backgroundColor:'transparent',showLine:true,tension:0.3,pointRadius:0,borderWidth:2.5},
+      {label:'Random Forest (AUC=0.971)',data:rocPts(0.971),borderColor:c('success'),backgroundColor:'transparent',showLine:true,tension:0.3,pointRadius:0,borderWidth:2,borderDash:[4,2]},
+      {label:'Random Classifier',data:[{x:0,y:0},{x:1,y:1}],borderColor:c('text3'),backgroundColor:'transparent',showLine:true,pointRadius:0,borderWidth:1,borderDash:[6,3]},
+    ]},
+    options:{...chartDefaults(),responsive:true,scales:{x:{min:0,max:1,title:{display:true,text:'False Positive Rate',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}},y:{min:0,max:1,title:{display:true,text:'True Positive Rate',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}}},plugins:{legend:{position:'bottom',labels:{color:c('text2'),font:{size:11},boxWidth:12}}}}
+  });
+}
+
+// Feature Importance
+function initFeatChart(){
+  const ctx=document.getElementById('featChart');if(!ctx)return;
+  if(charts.feat){charts.feat.destroy();}
+  const feats=['V14','V17','V12','Amount','V10','V4','V11','V7','V3','V16'];
+  const vals=[0.847,0.612,0.489,0.431,0.398,0.321,0.284,0.251,0.198,0.165];
+  charts.feat=new Chart(ctx,{
+    type:'bar',
+    data:{labels:feats,datasets:[{data:vals,backgroundColor:vals.map((_,i)=>`rgba(59,126,255,${0.9-i*0.07})`),borderRadius:4,borderWidth:0}]},
+    options:{...chartDefaults(),indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c('border')},ticks:{color:c('text3')}},y:{grid:{display:false},ticks:{color:c('text2'),font:{size:11}}}}}
+  });
+}
+
+// Precision-Recall
+function initPRChart(){
+  const ctx=document.getElementById('prChart');if(!ctx)return;
+  if(charts.pr){charts.pr.destroy();}
+  const pts=[];
+  for(let r=0;r<=1;r+=0.01){const p=0.97-0.18*Math.pow(r,1.5)-0.08*r*r;pts.push({x:r,y:Math.max(p,0.4)});}
+  charts.pr=new Chart(ctx,{
+    type:'scatter',
+    data:{datasets:[
+      {label:'XGBoost (AP=0.812)',data:pts,borderColor:c('purple'),backgroundColor:'rgba(167,139,250,0.08)',showLine:true,fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
+      {label:'Baseline',data:[{x:0,y:0.0017},{x:1,y:0.0017}],borderColor:c('text3'),showLine:true,pointRadius:0,borderWidth:1,borderDash:[4,3]},
+    ]},
+    options:{...chartDefaults(),responsive:true,scales:{x:{min:0,max:1,title:{display:true,text:'Recall',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}},y:{min:0,max:1,title:{display:true,text:'Precision',color:c('text2'),font:{size:11}},grid:{color:c('border')},ticks:{color:c('text3')}}},plugins:{legend:{position:'bottom',labels:{color:c('text2'),font:{size:11},boxWidth:12}}}}
+  });
+}
+
+// SHAP Waterfall — raw canvas for high-fidelity rendering
+function drawWaterfallCanvas(){
+  const canvas=document.getElementById('waterfallChart');
+  if(!canvas)return;
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const W=canvas.offsetWidth||480;
+  canvas.width=W;canvas.height=320;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,320);
+
+  const features=['E[f(x)] = 0.002','V14 = −9.68','V17 = −6.88','Amount = $4,299','V3 = −3.56','V1 = −3.04','V4 = 1.29','V12 = −1.12','V2 = +1.99','V7 = +0.84','f(x) = 0.942'];
+  const shapVals=[0,0.847,0.612,0.489,0.398,0.321,0.241,0.198,-0.198,-0.112,0];
+  const baseVal=0.002;
+  const textCol=isDark?'#8b9ab5':'#4a5878';
+  const gridCol=isDark?'rgba(30,45,74,0.8)':'rgba(200,212,232,0.6)';
+  const posCol='rgba(255,69,96,0.82)';
+  const negCol='rgba(59,126,255,0.82)';
+  const baseCol=isDark?'rgba(90,106,133,0.5)':'rgba(138,152,184,0.4)';
+
+  const rowH=26,paddingLeft=130,paddingRight=80,paddingTop=24,barH=14;
+  const chartW=W-paddingLeft-paddingRight;
+
+  // compute running values
+  const runVals=[baseVal];
+  shapVals.slice(1,-1).forEach(v=>runVals.push(runVals[runVals.length-1]+v));
+  runVals.push(0.942);
+
+  const allVals=[...runVals,...runVals.map((v,i)=>v+(shapVals[i]||0))];
+  const minV=Math.min(0,Math.min(...allVals))-0.05;
+  const maxV=Math.max(1,Math.max(...allVals))+0.05;
+  const scale=v=>(v-minV)/(maxV-minV)*chartW;
+
+  // grid lines
+  ctx.strokeStyle=gridCol;ctx.lineWidth=1;
+  [0,0.25,0.5,0.75,1].forEach(v=>{
+    const x=paddingLeft+scale(v);
+    ctx.beginPath();ctx.moveTo(x,paddingTop);ctx.lineTo(x,paddingTop+features.length*rowH);ctx.stroke();
+    ctx.fillStyle=textCol;ctx.font='9px Inter';ctx.textAlign='center';
+    ctx.fillText(v.toFixed(2),x,paddingTop-6);
+  });
+
+  // axis label
+  ctx.fillStyle=textCol;ctx.font='10px Inter';ctx.textAlign='center';
+  ctx.fillText('Model Output (Fraud Probability)',W/2,paddingTop+features.length*rowH+18);
+
+  // bars
+  features.forEach((feat,i)=>{
+    const y=paddingTop+i*rowH;
+    const cy=y+(rowH-barH)/2;
+
+    if(i===0){
+      // base value marker
+      const bx=paddingLeft+scale(baseVal);
+      ctx.fillStyle=baseCol;
+      ctx.fillRect(bx-2,cy,4,barH);
+      ctx.fillStyle=textCol;ctx.font='10px JetBrains Mono,monospace';ctx.textAlign='right';
+      ctx.fillText(feat,paddingLeft-8,cy+barH/2+4);
+      ctx.fillStyle=textCol;ctx.font='bold 10px JetBrains Mono,monospace';ctx.textAlign='left';
+      ctx.fillText('0.002',bx+6,cy+barH/2+4);
+      return;
+    }
+    if(i===features.length-1){
+      // final output bar
+      const fx=paddingLeft+scale(0);
+      const fw=scale(0.942)-scale(0);
+      const grad=ctx.createLinearGradient(fx,0,fx+fw,0);
+      grad.addColorStop(0,'rgba(255,69,96,0.3)');
+      grad.addColorStop(1,'rgba(255,69,96,0.9)');
+      ctx.fillStyle=grad;
+      ctx.beginPath();ctx.roundRect(fx,cy,fw,barH,3);ctx.fill();
+      ctx.fillStyle=textCol;ctx.font='10px JetBrains Mono,monospace';ctx.textAlign='right';
+      ctx.fillText(feat,paddingLeft-8,cy+barH/2+4);
+      ctx.fillStyle=isDark?'#ff4560':'#dc2626';ctx.font='bold 10px JetBrains Mono,monospace';ctx.textAlign='left';
+      ctx.fillText('0.942',paddingLeft+scale(0.942)+6,cy+barH/2+4);
+      return;
+    }
+    const sv=shapVals[i];
+    const start=runVals[i-1];
+    const end=start+sv;
+    const x1=paddingLeft+Math.min(scale(start),scale(end));
+    const bw=Math.abs(scale(end)-scale(start));
+    ctx.fillStyle=sv>0?posCol:negCol;
+    ctx.beginPath();ctx.roundRect(x1,cy,Math.max(bw,3),barH,3);ctx.fill();
+    // connector line
+    if(i<features.length-2){
+      const nextStart=runVals[i];
+      const nx=paddingLeft+scale(nextStart);
+      ctx.strokeStyle=isDark?'rgba(90,106,133,0.5)':'rgba(138,152,184,0.5)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(nx,cy+barH);ctx.lineTo(nx,cy+rowH+2);ctx.stroke();ctx.setLineDash([]);
+    }
+    // label
+    ctx.fillStyle=textCol;ctx.font='10px Inter';ctx.textAlign='right';
+    ctx.fillText(feat,paddingLeft-8,cy+barH/2+4);
+    // value
+    const sign=sv>0?'+':'';
+    ctx.fillStyle=sv>0?(isDark?'#ff8090':'#dc2626'):(isDark?'#5b9aff':'#2563eb');
+    ctx.font='bold 9px JetBrains Mono,monospace';ctx.textAlign=sv>0?'left':'right';
+    const valX=sv>0?x1+bw+5:x1-5;
+    ctx.fillText(sign+sv.toFixed(3),valX,cy+barH/2+4);
+  });
+}
+
+// SHAP Global
+function initShapGlobalChart(){
+  const ctx=document.getElementById('shapGlobalChart');if(!ctx)return;
+  if(charts.sg){charts.sg.destroy();}
+  const feats=['V14','V17','V12','Amount','V10','V4','V3','V11','V16','V7'];
+  const meanAbs=[0.712,0.524,0.401,0.368,0.312,0.278,0.241,0.198,0.155,0.121];
+  charts.sg=new Chart(ctx,{
+    type:'bar',
+    data:{labels:feats,datasets:[{label:'Mean |SHAP|',data:meanAbs,backgroundColor:'rgba(167,139,250,0.7)',borderRadius:4,borderWidth:0}]},
+    options:{...chartDefaults(),indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c('border')},ticks:{color:c('text3')},title:{display:true,text:'Mean |SHAP value|',color:c('text2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:c('text2'),font:{size:11}}}}}
+  });
+}
+
+// SHAP Bee simplified
+function initShapBeeChart(){
+  const ctx=document.getElementById('shapBeeChart');if(!ctx)return;
+  if(charts.bee){charts.bee.destroy();}
+  const features=['V14','V17','Amount','V3','V1','V4'];
+  const data=[];
+  features.forEach((f,fi)=>{
+    for(let i=0;i<30;i++){
+      const val=(Math.random()-0.5)*1.2;
+      const featureHigh=Math.random()>0.5;
+      data.push({x:val+(Math.random()-0.5)*0.1,y:fi+(Math.random()-0.5)*0.3,f:fi,high:featureHigh});
+    }
+  });
+  const gradient=ctx.getContext('2d').createLinearGradient(0,0,300,0);
+  gradient.addColorStop(0,'#3b7eff');
+  gradient.addColorStop(1,'#ff4560');
+  charts.bee=new Chart(ctx,{
+    type:'scatter',
+    data:{datasets:[{data:data.map(d=>({x:d.x,y:d.y})),backgroundColor:data.map(d=>d.high?'rgba(255,69,96,0.7)':'rgba(59,126,255,0.7)'),pointRadius:5,pointHoverRadius:6}]},
+    options:{...chartDefaults(),responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:c('border')},ticks:{color:c('text3')},title:{display:true,text:'SHAP value',color:c('text2'),font:{size:11}}},y:{min:-0.5,max:5.5,grid:{color:c('border')},ticks:{color:c('text2'),font:{size:11},callback:v=>features[Math.round(v)]||''}}}}
+  });
+}
+
+// Threshold chart
+function initThreshChart(){
+  const ctx=document.getElementById('threshChart');if(!ctx)return;
+  if(charts.thr){charts.thr.destroy();}
+  const labels=Array.from({length:81},(_,i)=>(0.1+i*0.01).toFixed(2));
+  const prec=labels.map(t=>Math.min(0.5+Number(t)*0.64,0.999));
+  const rec=labels.map(t=>Math.max(1.1-Number(t)*0.85,0.01));
+  const f1=labels.map((_,i)=>prec[i]&&rec[i]?2*prec[i]*rec[i]/(prec[i]+rec[i]):0);
+  charts.thr=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Precision',data:prec,borderColor:c('success'),tension:0.4,pointRadius:0,borderWidth:2},
+      {label:'Recall',data:rec,borderColor:c('accent'),tension:0.4,pointRadius:0,borderWidth:2},
+      {label:'F1',data:f1,borderColor:c('warning'),tension:0.4,pointRadius:0,borderWidth:2},
+    ]},
+    options:{...chartDefaults(),responsive:true,scales:{x:{grid:{display:false},ticks:{color:c('text3'),font:{size:9},maxTicksLimit:9}},y:{min:0,max:1,grid:{color:c('border')},ticks:{color:c('text3')}}},plugins:{legend:{position:'bottom',labels:{color:c('text2'),font:{size:11},boxWidth:10,usePointStyle:true}}}}
+  });
+}
+
+// ───────────── GAUGE ─────────────
+// polyfill roundRect for Firefox <112
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.beginPath();this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);
+    this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);
+    this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();
+  };
+}
+
+function drawGauge(score){
+  const canvas=document.getElementById('gaugeCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  const cx=w/2,cy=h-14,r=Math.min(w*0.45,h*0.82);
+  const startA=Math.PI,endA=2*Math.PI;
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+
+  // Background arc
+  ctx.beginPath();ctx.arc(cx,cy,r,startA,endA);
+  ctx.strokeStyle=isDark?'#162040':'#e2e8f0';ctx.lineWidth=20;ctx.lineCap='round';ctx.stroke();
+
+  // Zone arcs (colour bands)
+  const zones=[
+    {from:0,to:0.4,col:'rgba(0,214,143,0.25)'},
+    {from:0.4,to:0.7,col:'rgba(255,176,58,0.25)'},
+    {from:0.7,to:1.0,col:'rgba(255,69,96,0.25)'},
+  ];
+  zones.forEach(z=>{
+    ctx.beginPath();ctx.arc(cx,cy,r,startA+Math.PI*z.from,startA+Math.PI*z.to);
+    ctx.strokeStyle=z.col;ctx.lineWidth=20;ctx.lineCap='butt';ctx.stroke();
+  });
+
+  // Active arc gradient
+  const grad=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
+  grad.addColorStop(0,'#00d68f');grad.addColorStop(0.45,'#ffb03a');grad.addColorStop(1,'#ff4560');
+  ctx.beginPath();ctx.arc(cx,cy,r,startA,startA+Math.PI*Math.min(score,0.999));
+  ctx.strokeStyle=grad;ctx.lineWidth=20;ctx.lineCap='round';ctx.stroke();
+
+  // Tick marks
+  for(let i=0;i<=10;i++){
+    const a=Math.PI+Math.PI*i*0.1;
+    const inner=i%5===0?r-14:r-8;
+    ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*inner,cy+Math.sin(a)*inner);
+    ctx.lineTo(cx+Math.cos(a)*(r+2),cy+Math.sin(a)*(r+2));
+    ctx.strokeStyle=isDark?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.15)';ctx.lineWidth=i%5===0?2:1;ctx.stroke();
+  }
+
+  // Needle
+  const na=Math.PI+Math.PI*score;
+  const gn=ctx.createLinearGradient(cx,cy,cx+Math.cos(na)*(r-12),cy+Math.sin(na)*(r-12));
+  gn.addColorStop(0,'rgba(255,255,255,0.3)');gn.addColorStop(1,'#ffffff');
+  ctx.save();ctx.translate(cx,cy);
+  ctx.beginPath();ctx.moveTo(0,0);
+  ctx.lineTo(Math.cos(na-Math.PI)*(r*0.15),Math.sin(na-Math.PI)*(r*0.15));
+  ctx.lineTo(Math.cos(na)*(r-12),Math.sin(na)*(r-12));
+  ctx.closePath();ctx.fillStyle=gn;ctx.fill();
+  ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);
+  ctx.fillStyle=isDark?'#1e2d4a':'#ffffff';ctx.fill();
+  ctx.beginPath();ctx.arc(0,0,4,0,Math.PI*2);
+  ctx.fillStyle='#ffffff';ctx.fill();
+  ctx.restore();
+
+  // Labels
+  ctx.fillStyle=isDark?'#5a6a85':'#8a98b8';ctx.font='9px Inter';ctx.textAlign='center';
+  ['0','25','50','75','100'].forEach((t,i)=>{
+    const a=Math.PI+Math.PI*i*0.25;
+    ctx.fillText(t+'%',cx+Math.cos(a)*(r+16),cy+Math.sin(a)*(r+16));
+  });
+}
+
+// ───────────── TRAINING SIMULATION ─────────────
+const trainLogs=[
+  {cls:'info', msg:'→ Fitting XGBoost (300 estimators, max_depth=6)…'},
+  {cls:'log-line', msg:'[09:14:06]   Fold 1/5 — AUC: 0.9821'},
+  {cls:'log-line', msg:'[09:14:07]   Fold 2/5 — AUC: 0.9874'},
+  {cls:'log-line', msg:'[09:14:08]   Fold 3/5 — AUC: 0.9810'},
+  {cls:'log-line', msg:'[09:14:09]   Fold 4/5 — AUC: 0.9863'},
+  {cls:'log-line', msg:'[09:14:10]   Fold 5/5 — AUC: 0.9838'},
+  {cls:'ok', msg:'[09:14:10] ✓ CV complete — Mean AUC: 0.9841 ±0.003'},
+  {cls:'info', msg:'→ Running SHAP TreeExplainer…'},
+  {cls:'ok', msg:'[09:14:12] ✓ SHAP values computed for 85,129 test samples'},
+  {cls:'ok', msg:'[09:14:12] ✓ Model saved → xgb_fraud_v2.1.pkl (4.2 MB)'},
+  {cls:'warn', msg:'[09:14:12] ⚠ Threshold set to 0.42 (review in Settings)'},
+];
+function startTraining(){
+  const steps=[3,4,5,6];
+  let i=0;
+  let logI=0;
+  const logEl=document.getElementById('train-log');
+  function addLog(){
+    if(!logEl||logI>=trainLogs.length)return;
+    const l=trainLogs[logI++];
+    const d=document.createElement('div');
+    d.className='log-line '+(l.cls||'');
+    d.textContent='['+new Date().toTimeString().slice(0,8)+'] '+l.msg.replace(/^\[.*?\] /,'');
+    logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;
+    if(logI<trainLogs.length)setTimeout(addLog,600);
+  }
+  function next(){
+    if(i>=steps.length)return;
+    const s=steps[i];
+    const el=document.getElementById('step'+s);
+    if(el){el.textContent='✓';el.className='step-num done';}
+    const pct=Math.round(((i+3)/6)*100);
+    document.getElementById('prog-bar').style.width=pct+'%';
+    document.getElementById('prog-label').textContent=pct+'%';
+    i++;
+    if(i<steps.length)setTimeout(next,900);
+    else{toast('Model trained successfully — AUC 0.984','success');setTimeout(()=>showPage('performance',null),800);}
+  }
+  setTimeout(next,400);
+  setTimeout(addLog,800);
+}
+
+// ───────────── HEATMAP ─────────────
+function buildHeatmap(){
+  const wrap=document.getElementById('heatmap-wrap');
+  if(!wrap)return;
+  const feats=['V14','V17','V12','Amt','V10','V4','V11','V7','V3','V1'];
+  const n=feats.length;
+  // generate plausible correlation-like matrix
+  function corr(i,j){if(i===j)return 1;const v=(Math.sin(i*7+j*3)*Math.cos(i*2-j)*0.5);return Math.max(-1,Math.min(1,v));}
+  let html='<div class="hm-grid" style="margin:0 auto;width:fit-content">';
+  // header row
+  html+='<div class="hm-row"><div style="width:36px"></div>';
+  feats.forEach(f=>html+=`<div style="width:28px;font-size:9px;color:var(--text3);text-align:center;padding-bottom:2px">${f}</div>`);
+  html+='</div>';
+  feats.forEach((rf,i)=>{
+    html+=`<div class="hm-row"><div style="width:36px;font-size:9px;color:var(--text3);text-align:right;padding-right:6px;line-height:28px">${rf}</div>`;
+    feats.forEach((_,j)=>{
+      const v=corr(i,j);
+      const r=v>0?Math.round(255*v):0;
+      const b=v<0?Math.round(255*(-v)):0;
+      const g=0;
+      const a=Math.abs(v)*0.9+0.1;
+      const bg=`rgba(${r},${g},${b},${a.toFixed(2)})`;
+      const txt=v.toFixed(1);
+      html+=`<div class="hm-cell" style="background:${bg}" title="${rf} vs ${feats[j]}: ${v.toFixed(3)}">${txt}</div>`;
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  wrap.innerHTML=html;
+}
+
+// ───────────── UPLOAD SIMULATION ─────────────
+function simulateUpload(){
+  document.getElementById('upload-preview').style.display='block';
+  toast('Dataset loaded — 284,807 rows × 31 features','success');
+}
+
+// ───────────── BATCH TABLE ─────────────
+function buildBatchTable(){
+  const body=document.getElementById('batch-table-body');
+  if(!body)return;
+  const rows=[
+    {amt:'$4,299',time:'86400',score:0.942,lat:'4.1ms'},
+    {amt:'$129',time:'43200',score:0.023,lat:'3.8ms'},
+    {amt:'$899',time:'67800',score:0.671,lat:'4.2ms'},
+    {amt:'$2,450',time:'12300',score:0.981,lat:'4.0ms'},
+    {amt:'$45',time:'54000',score:0.008,lat:'3.9ms'},
+    {amt:'$1,100',time:'78900',score:0.521,lat:'4.3ms'},
+    {amt:'$3,800',time:'9800',score:0.913,lat:'4.1ms'},
+    {amt:'$230',time:'34500',score:0.145,lat:'3.7ms'},
+    {amt:'$60',time:'22000',score:0.031,lat:'3.8ms'},
+    {amt:'$780',time:'61000',score:0.412,lat:'4.4ms'},
+  ];
+  body.innerHTML=rows.map((r,i)=>{
+    const risk=r.score>0.7?'high':r.score>0.4?'med':'low';
+    const riskLbl=r.score>0.7?'HIGH':'MED';
+    const dec=r.score>0.7?'<span class="badge badge-danger">Block</span>':r.score>0.4?'<span class="badge badge-warning">Review</span>':'<span class="badge badge-success">Approve</span>';
+    const sc=`<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700;color:${r.score>0.7?'var(--danger)':r.score>0.4?'var(--warning)':'var(--success)'}">${(r.score).toFixed(3)}</span>`;
+    return `<tr><td>${i+1}</td><td>${r.amt}</td><td>${r.time}s</td><td>${sc}</td><td><div class="risk-pill risk-${risk}">${risk==='low'?'LOW':riskLbl} ${Math.round(r.score*100)}%</div></td><td>${dec}</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${r.lat}</td></tr>`;
+  }).join('');
+}
+
+// ───────────── PREDICTION ─────────────
+function runPrediction(){
+  drawGauge(lastGaugeScore);
+  toast('Analysis complete — fraud score: '+lastGaugeScore.toFixed(3), lastGaugeScore>0.7?'danger':lastGaugeScore>0.4?'warning':'success');
+  const card=document.getElementById('batch-results-card');
+  if(card)card.style.display='block';
+}
+
+function fillScenario(type,el){
+  document.querySelectorAll('#page-predictor .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  if(type==='fraud'){
+    lastGaugeScore=0.942;
+    document.getElementById('gauge-label').textContent='94%';
+    document.getElementById('gauge-label').style.color='var(--danger)';
+    document.getElementById('gauge-verdict').textContent='⚠ HIGH FRAUD RISK — Recommend Block';
+    document.getElementById('gauge-verdict').style.color='var(--danger)';
+    animateGauge(0.942);
+  }else if(type==='legit'){
+    lastGaugeScore=0.023;
+    document.getElementById('gauge-label').textContent='3%';
+    document.getElementById('gauge-label').style.color='var(--success)';
+    document.getElementById('gauge-verdict').textContent='✓ LOW RISK — Transaction Approved';
+    document.getElementById('gauge-verdict').style.color='var(--success)';
+    animateGauge(0.023);
+  }else{
+    lastGaugeScore=0.521;
+    document.getElementById('gauge-label').textContent='52%';
+    document.getElementById('gauge-label').style.color='var(--warning)';
+    document.getElementById('gauge-verdict').textContent='⚡ BORDERLINE — Manual Review Required';
+    document.getElementById('gauge-verdict').style.color='var(--warning)';
+    animateGauge(0.521);
+  }
+}
+
+function animateGauge(target){
+  const start=performance.now();
+  const from=lastGaugeScore||0;
+  const dur=600;
+  function step(now){
+    const t=Math.min((now-start)/dur,1);
+    const eased=t<0.5?2*t*t:(1-(2-2*t)*(2-2*t)/2);
+    drawGauge(from+(target-from)*eased);
+    if(t<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ───────────── THRESHOLD ─────────────
+function updateThreshold(val){
+  const t=parseFloat(val);
+  document.getElementById('thresh-label').textContent=t.toFixed(2);
+  const prec=Math.min(0.5+t*0.64,0.999);
+  const rec=Math.max(1.1-t*0.85,0.01);
+  const fp=Math.round(148293*(1-prec)*0.0017);
+  const fn=Math.round(492*(1-rec));
+  document.getElementById('t-prec').textContent=(prec*100).toFixed(1)+'%';
+  document.getElementById('t-rec').textContent=(rec*100).toFixed(1)+'%';
+  document.getElementById('t-fp').textContent='~'+fp;
+  document.getElementById('t-fn').textContent='~'+fn;
+}
+
+// ───────────── MODEL SELECTION ─────────────
+function selectModel(el){
+  document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ───────────── BOOT ─────────────
+// Wire up action buttons with toasts
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(!btn)return;
+  const txt=btn.textContent.trim();
+  if(txt==='Block Transaction')toast('Card blocked — alert sent to cardholder','danger');
+  else if(txt==='Send Alert')toast('Security alert dispatched via SMS & email','warning');
+  else if(txt==='Deploy New Model')toast('Deployment initiated — ETA 30 seconds','info');
+  else if(txt==='Rollback')toast('Rolling back to XGBoost v2.0…','warning');
+  else if(txt.includes('Auto-tune'))toast('Optuna hyperparameter search started (50 trials)','info');
+  else if(txt.includes('Apply SMOTE')){ toast('SMOTE applied — 141,665 samples generated','success'); }
+});
+
+window.addEventListener('load',()=>{
+  // Animate live feed
+  setInterval(()=>{
+    const amounts=['$120','$3,800','$55','$1,200','$890','$2,100','$45'];
+    const merchants=['Uber Eats — US','Cash Advance — NG','Apple Pay — UK','Crypto Exchange — CN','Hotel Booking — UAE','Walmart — US','Spotify — SE'];
+    const risks=['HIGH 91%','LOW 2%','MED 61%','HIGH 88%','LOW 5%','MED 44%'];
+    const riskCls=['risk-high','risk-low','risk-med','risk-high','risk-low','risk-med'];
+    const i=Math.floor(Math.random()*amounts.length);
+    const ri=Math.floor(Math.random()*risks.length);
+    const feed=document.getElementById('live-feed');
+    if(!feed)return;
+    const item=document.createElement('div');item.className='feed-item';
+    const amtColor=risks[ri].startsWith('HIGH')?'var(--danger)':risks[ri].startsWith('MED')?'var(--warning)':'inherit';
+    item.innerHTML=`<div class="feed-amount" style="color:${amtColor}">${amounts[i]}</div><div class="feed-meta"><div class="feed-merchant">${merchants[i]}</div><div class="feed-time">Card ••${Math.floor(Math.random()*9000+1000)} · Just now</div></div><div class="risk-pill ${riskCls[ri]}">${risks[ri]}</div>`;
+    feed.insertBefore(item,feed.firstChild);
+    if(feed.children.length>8)feed.removeChild(feed.lastChild);
+  },3500);
+});
+</script>
+</body>
+</html>

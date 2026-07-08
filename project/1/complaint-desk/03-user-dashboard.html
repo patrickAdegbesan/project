@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .activity-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border-light); }
+  .activity-item:last-child { border-bottom:none; }
+  .activity-dot { width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .activity-content .activity-title { font-size:13.5px; font-weight:500; color:var(--text); }
+  .activity-content .activity-time  { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+
+  .complaint-row td:first-child { font-family:'Courier New',monospace; font-weight:700; font-size:13px; color:var(--primary); }
+  .category-tag { font-size:12px; font-weight:600; color:var(--text-secondary); display:flex;align-items:center;gap:5px; }
+
+  .chart-bars { display:flex; align-items:flex-end; gap:8px; height:140px; }
+  .chart-col  { display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; }
+  .chart-bar  { width:100%; border-radius:4px 4px 0 0; background:var(--primary); opacity:0.8; }
+  .chart-bar:hover { opacity:1; }
+  .chart-lbl  { font-size:10.5px; color:var(--text-muted); font-weight:500; }
+  .chart-val  { font-size:11px; font-weight:700; color:var(--text); }
+
+  .mini-line { display:flex; align-items:flex-end; gap:3px; height:40px; }
+  .ml-bar { flex:1; border-radius:2px 2px 0 0; background:rgba(26,115,232,0.3); }
+  .ml-bar.active { background:var(--primary); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <span class="logo-text">Complaint<span>Desk</span></span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main Menu</div>
+      <nav class="sidebar-nav">
+        <a href="03-user-dashboard.html" class="active">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Dashboard
+        </a>
+        <a href="04-submit-complaint.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Submit Complaint
+        </a>
+        <a href="05-my-complaints.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          My Complaints
+          <span class="badge-count">3</span>
+        </a>
+        <a href="06-complaint-detail.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          Track Status
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Support</div>
+      <nav class="sidebar-nav">
+        <a href="#">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+          Feedback
+        </a>
+        <a href="#">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Help &amp; FAQ
+        </a>
+        <a href="13-profile-settings.html">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Settings
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div>
+        <div class="sidebar-user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">CSC/2021/045 · Student</div>
+        </div>
+      </div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main-content">
+
+    <!-- Top Navbar -->
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="topnav-search">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Search complaints, categories...">
+      </div>
+      <div class="topnav-actions">
+        <button class="icon-btn" title="Notifications">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="notif-badge">3</span>
+        </button>
+        <button class="icon-btn" title="Help">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </button>
+        <div class="topnav-profile">
+          <div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);">JS</div>
+          <span class="profile-name">John Smith</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <main class="page-body">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div style="position:relative;z-index:1;">
+          <h2>Welcome back, John Smith! 👋</h2>
+          <p>Track your complaints, submit new issues, and stay updated on resolutions.</p>
+          <a href="04-submit-complaint.html" class="btn">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Submit New Complaint
+          </a>
+        </div>
+        <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);opacity:0.12;">
+          <svg width="120" height="120" fill="none" viewBox="0 0 24 24" stroke="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-4 mb-5">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <div>
+            <div class="stat-number" data-target="12">12</div>
+            <div class="stat-label">Total Complaints</div>
+            <div class="stat-change up">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+              +2 this month
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="stat-number">8</div>
+            <div class="stat-label">Resolved</div>
+            <div class="stat-change up">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+              67% resolution rate
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="stat-number">3</div>
+            <div class="stat-label">Pending Action</div>
+            <div class="stat-change" style="color:var(--warning);">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+              Awaiting response
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="stat-number">1</div>
+            <div class="stat-label">Rejected</div>
+            <div class="stat-change down">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+              Needs resubmission
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="grid" style="grid-template-columns:1fr 340px;gap:20px;">
+
+        <!-- Recent Complaints Table -->
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="card-header" style="padding:16px 20px;margin-bottom:0;">
+            <div>
+              <div class="card-title">Recent Complaints</div>
+              <div class="card-subtitle">Your last 5 submitted complaints</div>
+            </div>
+            <a href="05-my-complaints.html" class="btn btn-ghost btn-sm">View All</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Category</th>
+                  <th>Subject</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="ref-id">CMP-2024-001</span></td>
+                  <td><span class="badge badge-indigo">Academic</span></td>
+                  <td style="max-width:180px;" class="truncate">Missing Exam Results</td>
+                  <td style="white-space:nowrap;color:var(--text-muted);font-size:12.5px;">Jan 15, 2024</td>
+                  <td><span class="badge badge-green"><span class="badge-dot" style="background:var(--secondary);"></span>Resolved</span></td>
+                  <td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td>
+                </tr>
+                <tr>
+                  <td><span class="ref-id">CMP-2024-002</span></td>
+                  <td><span class="badge badge-orange">Facilities</span></td>
+                  <td style="max-width:180px;" class="truncate">Broken AC in Lecture Hall B</td>
+                  <td style="white-space:nowrap;color:var(--text-muted);font-size:12.5px;">Feb 03, 2024</td>
+                  <td><span class="badge badge-yellow"><span class="badge-dot" style="background:var(--warning);"></span>In Progress</span></td>
+                  <td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td>
+                </tr>
+                <tr>
+                  <td><span class="ref-id">CMP-2024-003</span></td>
+                  <td><span class="badge badge-blue">IT</span></td>
+                  <td style="max-width:180px;" class="truncate">WiFi not working in Library</td>
+                  <td style="white-space:nowrap;color:var(--text-muted);font-size:12.5px;">Feb 10, 2024</td>
+                  <td><span class="badge badge-blue"><span class="badge-dot" style="background:var(--primary);"></span>Under Review</span></td>
+                  <td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td>
+                </tr>
+                <tr>
+                  <td><span class="ref-id">CMP-2024-004</span></td>
+                  <td><span class="badge badge-green">Finance</span></td>
+                  <td style="max-width:180px;" class="truncate">Tuition fee overcharge</td>
+                  <td style="white-space:nowrap;color:var(--text-muted);font-size:12.5px;">Feb 15, 2024</td>
+                  <td><span class="badge badge-purple"><span class="badge-dot" style="background:var(--purple);"></span>Assigned</span></td>
+                  <td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td>
+                </tr>
+                <tr>
+                  <td><span class="ref-id">CMP-2024-005</span></td>
+                  <td><span class="badge badge-gray">Administrative</span></td>
+                  <td style="max-width:180px;" class="truncate">Course registration error</td>
+                  <td style="white-space:nowrap;color:var(--text-muted);font-size:12.5px;">Mar 01, 2024</td>
+                  <td><span class="badge badge-gray"><span class="badge-dot" style="background:#9aa0a6;"></span>Submitted</span></td>
+                  <td><a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Quick Actions -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <a href="04-submit-complaint.html" class="quick-action">
+                <div class="qa-icon" style="background:var(--primary-light);color:var(--primary);">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </div>
+                <div>
+                  <div class="qa-text">Submit Complaint</div>
+                  <div class="qa-sub">Lodge a new issue</div>
+                </div>
+              </a>
+              <a href="05-my-complaints.html" class="quick-action">
+                <div class="qa-icon" style="background:var(--secondary-light);color:var(--secondary);">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                </div>
+                <div>
+                  <div class="qa-text">My Complaints</div>
+                  <div class="qa-sub">View all submissions</div>
+                </div>
+              </a>
+              <a href="06-complaint-detail.html" class="quick-action">
+                <div class="qa-icon" style="background:var(--warning-light);color:#e37400;">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                </div>
+                <div>
+                  <div class="qa-text">Track Status</div>
+                  <div class="qa-sub">Check progress live</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Activity Timeline -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">Recent Activity</div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--secondary);"></div>
+              <div class="activity-content">
+                <div class="activity-title">Complaint <strong>#CMP-2024-001</strong> was resolved</div>
+                <div class="activity-time">Today, 9:14 AM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--warning);"></div>
+              <div class="activity-content">
+                <div class="activity-title">Technician assigned to <strong>#CMP-2024-002</strong></div>
+                <div class="activity-time">Yesterday, 3:42 PM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--primary);"></div>
+              <div class="activity-content">
+                <div class="activity-title">Admin replied on <strong>#CMP-2024-003</strong></div>
+                <div class="activity-time">Mar 12, 2024, 11:05 AM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--purple);"></div>
+              <div class="activity-content">
+                <div class="activity-title"><strong>#CMP-2024-004</strong> assigned to Finance Officer</div>
+                <div class="activity-time">Mar 10, 2024, 2:30 PM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--text-muted);"></div>
+              <div class="activity-content">
+                <div class="activity-title">You submitted <strong>#CMP-2024-005</strong></div>
+                <div class="activity-time">Mar 01, 2024, 8:00 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mini Resolution Chart -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px;">This Month's Overview</div>
+            <div class="card-subtitle" style="margin-bottom:14px;">Complaints filed per week</div>
+            <div class="chart-bars">
+              <div class="chart-col">
+                <div class="chart-val">2</div>
+                <div class="chart-bar" style="height:56px;background:rgba(26,115,232,0.3);"></div>
+                <div class="chart-lbl">W1</div>
+              </div>
+              <div class="chart-col">
+                <div class="chart-val">3</div>
+                <div class="chart-bar" style="height:84px;background:rgba(26,115,232,0.5);"></div>
+                <div class="chart-lbl">W2</div>
+              </div>
+              <div class="chart-col">
+                <div class="chart-val">4</div>
+                <div class="chart-bar" style="height:112px;background:var(--primary);"></div>
+                <div class="chart-lbl">W3</div>
+              </div>
+              <div class="chart-col">
+                <div class="chart-val">3</div>
+                <div class="chart-bar" style="height:84px;background:rgba(26,115,232,0.6);"></div>
+                <div class="chart-lbl">W4</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--secondary);"></span>
+                <span style="color:var(--text-muted);">Resolved: 8</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--warning);"></span>
+                <span style="color:var(--text-muted);">Pending: 3</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--danger);"></span>
+                <span style="color:var(--text-muted);">Rejected: 1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- end .main-content -->
+</div><!-- end .app-shell -->
+
+<script src="js/app.js"></script>
+</body>
+</html>

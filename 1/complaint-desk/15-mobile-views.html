@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Views — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  body { background:#e8eaf0; padding:40px 20px; min-height:100vh; }
+  .page-title { text-align:center;font-size:24px;font-weight:800;color:#202124;margin-bottom:8px; }
+  .page-sub   { text-align:center;font-size:14px;color:#5f6368;margin-bottom:48px; }
+
+  .phones-row { display:flex;flex-wrap:wrap;gap:40px;justify-content:center; }
+
+  /* Phone frame */
+  .phone-frame {
+    background:#1a1a1a;
+    border-radius:40px;
+    padding:10px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.05);
+    width:300px; flex-shrink:0;
+  }
+  .phone-screen {
+    background:var(--bg);
+    border-radius:32px;
+    overflow:hidden;
+    height:580px;
+    overflow-y:auto;
+    scrollbar-width:none;
+    position:relative;
+  }
+  .phone-screen::-webkit-scrollbar { display:none; }
+  .phone-notch {
+    background:#1a1a1a;
+    width:100px; height:22px;
+    border-radius:0 0 16px 16px;
+    margin:0 auto;
+    position:relative;z-index:10;
+  }
+  .phone-label { text-align:center;font-size:13px;font-weight:700;color:#202124;margin-top:16px;letter-spacing:0.02em; }
+  .phone-desc  { text-align:center;font-size:12px;color:#5f6368;margin-top:4px;margin-bottom:0; }
+
+  /* Mobile topbar */
+  .m-topbar {
+    background:#fff;padding:12px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 1px 4px rgba(0,0,0,0.06);
+  }
+  .m-topbar .m-logo { font-size:15px;font-weight:800;color:var(--text); }
+  .m-topbar .m-logo span { color:var(--primary); }
+  .m-hamburger { display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:4px; }
+  .m-hamburger div { width:20px;height:2px;background:#5f6368;border-radius:2px; }
+
+  /* Mobile nav drawer (visible) */
+  .m-drawer {
+    background:#1e2a3a; padding:16px 14px;
+  }
+  .m-drawer-item {
+    display:flex;align-items:center;gap:10px;padding:10px 10px;
+    border-radius:8px;color:rgba(255,255,255,0.7);font-size:13.5px;font-weight:500;
+    margin-bottom:2px;
+  }
+  .m-drawer-item.active { background:var(--primary);color:#fff; }
+  .m-drawer-item svg { width:17px;height:17px;flex-shrink:0; }
+
+  /* Mobile dashboard content */
+  .m-body { padding:14px; }
+  .m-welcome { background:linear-gradient(135deg,#1a73e8,#0d47a1);border-radius:14px;padding:16px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden; }
+  .m-welcome h3 { font-size:15px;font-weight:700;color:#fff;margin-bottom:3px; }
+  .m-welcome p  { font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:12px; }
+  .m-welcome .m-btn { background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;display:inline-block;text-decoration:none; }
+
+  .m-stats { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
+  .m-stat-card { background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px; }
+  .m-stat-num { font-size:24px;font-weight:800;color:var(--text); }
+  .m-stat-lbl { font-size:11px;color:var(--text-muted);margin-top:1px; }
+  .m-stat-icon { width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:8px; }
+  .m-stat-icon svg { width:16px;height:16px; }
+
+  .m-section-title { font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px; }
+  .m-complaint-item { background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px; }
+  .m-complaint-ref { font-family:'Courier New',monospace;font-size:11.5px;font-weight:800;color:var(--primary); }
+  .m-complaint-title { font-size:13.5px;font-weight:600;color:var(--text);margin:4px 0 6px; }
+  .m-complaint-footer { display:flex;align-items:center;justify-content:space-between; }
+  .m-complaint-date { font-size:11px;color:var(--text-muted); }
+  .m-view-btn { font-size:11.5px;font-weight:600;color:var(--primary); }
+
+  /* Mobile form */
+  .m-form-card { background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px; }
+  .m-form-title { font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px; }
+  .m-form-label { font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;display:block; }
+  .m-form-control { width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--text);outline:none; }
+  .m-form-control:focus { border-color:var(--primary); }
+  .m-submit { background:var(--primary);color:#fff;border:none;border-radius:10px;padding:12px;width:100%;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:4px; }
+
+  /* Mobile complaints list */
+  .m-filter-row { display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px; }
+  .m-filter-row::-webkit-scrollbar { display:none; }
+  .m-chip { background:#fff;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--text-secondary);white-space:nowrap; }
+  .m-chip.active { background:var(--primary);color:#fff;border-color:var(--primary); }
+</style>
+</head>
+<body>
+  <div class="page-title">ComplaintDesk — Mobile Views</div>
+  <p class="page-sub">Fully responsive UI optimised for iPhone / Android screens (300px viewport simulation)</p>
+
+  <div class="phones-row">
+
+    <!-- Phone 1: Drawer Menu (open) -->
+    <div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <!-- Topbar -->
+          <div class="m-topbar">
+            <div class="m-hamburger"><div></div><div></div><div></div></div>
+            <div class="m-logo">Complaint<span>Desk</span></div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="position:relative;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#5f6368"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><div style="position:absolute;top:-3px;right:-3px;width:12px;height:12px;background:var(--danger);border-radius:50%;border:1.5px solid #fff;font-size:7px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;">3</div></div>
+              <div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);width:30px;height:30px;font-size:11px;">JS</div>
+            </div>
+          </div>
+          <!-- Drawer open -->
+          <div class="m-drawer">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:12px;">
+              <div class="avatar" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);width:40px;height:40px;font-size:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">JS</div>
+              <div><div style="font-size:13.5px;font-weight:700;color:#fff;">John Smith</div><div style="font-size:11.5px;color:rgba(255,255,255,0.5);">CSC/2021/045 · Student</div></div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.08);margin-bottom:10px;"></div>
+            <div class="m-drawer-item active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</div>
+            <div class="m-drawer-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Submit Complaint</div>
+            <div class="m-drawer-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Complaints <span style="background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;">3</span></div>
+            <div class="m-drawer-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Track Status</div>
+            <div class="m-drawer-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>Feedback</div>
+            <div style="height:1px;background:rgba(255,255,255,0.08);margin:10px 0;"></div>
+            <div class="m-drawer-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</div>
+            <div class="m-drawer-item" style="color:rgba(255,100,100,0.8);"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Sign Out</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">Navigation Drawer</div>
+      <p class="phone-desc">Hamburger menu expands to<br>full sidebar on mobile</p>
+    </div>
+
+    <!-- Phone 2: Mobile Dashboard -->
+    <div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="m-topbar">
+            <div class="m-hamburger"><div></div><div></div><div></div></div>
+            <div class="m-logo">Complaint<span>Desk</span></div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="position:relative;"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#5f6368"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><div style="position:absolute;top:-3px;right:-3px;width:12px;height:12px;background:var(--danger);border-radius:50%;border:1.5px solid #fff;font-size:7px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;">3</div></div>
+              <div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#42a5f5);width:30px;height:30px;font-size:11px;">JS</div>
+            </div>
+          </div>
+          <div class="m-body">
+            <!-- Welcome -->
+            <div class="m-welcome">
+              <h3>Welcome back, John! 👋</h3>
+              <p>Track your complaints and stay updated on resolutions.</p>
+              <a href="#" class="m-btn">+ New Complaint</a>
+              <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,0.05);border-radius:50%;"></div>
+            </div>
+            <!-- Stats -->
+            <div class="m-stats">
+              <div class="m-stat-card"><div class="m-stat-icon" style="background:var(--primary-light);"><svg fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="m-stat-num">12</div><div class="m-stat-lbl">Total</div></div>
+              <div class="m-stat-card"><div class="m-stat-icon" style="background:var(--secondary-light);"><svg fill="none" viewBox="0 0 24 24" stroke="var(--secondary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="m-stat-num" style="color:var(--secondary);">8</div><div class="m-stat-lbl">Resolved</div></div>
+              <div class="m-stat-card"><div class="m-stat-icon" style="background:var(--warning-light);"><svg fill="none" viewBox="0 0 24 24" stroke="#e37400"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="m-stat-num" style="color:#e37400;">3</div><div class="m-stat-lbl">Pending</div></div>
+              <div class="m-stat-card"><div class="m-stat-icon" style="background:var(--danger-light);"><svg fill="none" viewBox="0 0 24 24" stroke="var(--danger)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="m-stat-num" style="color:var(--danger);">1</div><div class="m-stat-lbl">Rejected</div></div>
+            </div>
+            <!-- Recent Complaints -->
+            <div class="m-section-title">Recent Complaints</div>
+            <div class="m-complaint-item">
+              <div class="m-complaint-ref">CMP-2024-002</div>
+              <div class="m-complaint-title">Broken AC in Lecture Hall B</div>
+              <div class="m-complaint-footer">
+                <span class="badge badge-yellow" style="font-size:10.5px;">In Progress</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <div class="m-complaint-item">
+              <div class="m-complaint-ref">CMP-2024-003</div>
+              <div class="m-complaint-title">WiFi Not Working in Library</div>
+              <div class="m-complaint-footer">
+                <span class="badge badge-blue" style="font-size:10.5px;">Under Review</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <div class="m-complaint-item">
+              <div class="m-complaint-ref">CMP-2024-004</div>
+              <div class="m-complaint-title">Tuition Fee Overcharge</div>
+              <div class="m-complaint-footer">
+                <span class="badge badge-purple" style="font-size:10.5px;">Assigned</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <a href="#" style="display:block;text-align:center;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--primary);">View All Complaints →</a>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">User Dashboard</div>
+      <p class="phone-desc">Stacked cards, full-width<br>layout for mobile screens</p>
+    </div>
+
+    <!-- Phone 3: Submit Complaint (Mobile) -->
+    <div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="m-topbar">
+            <a href="#" style="display:flex;align-items:center;gap:4px;color:var(--primary);font-size:13px;font-weight:600;"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back</a>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">New Complaint</div>
+            <div style="width:40px;"></div>
+          </div>
+          <div class="m-body">
+            <div class="m-form-card">
+              <div class="m-form-title">Complaint Details</div>
+              <div style="margin-bottom:12px;">
+                <label class="m-form-label">Category *</label>
+                <select class="m-form-control"><option>Academic</option><option>Facilities</option><option>IT Services</option><option>Finance</option></select>
+              </div>
+              <div style="margin-bottom:12px;">
+                <label class="m-form-label">Priority *</label>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <span style="padding:5px 10px;background:var(--secondary-light);color:#1e7e34;border-radius:16px;font-size:11.5px;font-weight:600;border:1.5px solid var(--secondary);">Low</span>
+                  <span style="padding:5px 10px;background:var(--warning-light);color:#856404;border-radius:16px;font-size:11.5px;font-weight:600;border:1.5px solid var(--warning);">Medium ✓</span>
+                  <span style="padding:5px 10px;background:var(--bg);color:var(--text-muted);border-radius:16px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border);">High</span>
+                  <span style="padding:5px 10px;background:var(--bg);color:var(--text-muted);border-radius:16px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border);">Critical</span>
+                </div>
+              </div>
+              <div style="margin-bottom:12px;">
+                <label class="m-form-label">Subject *</label>
+                <input type="text" class="m-form-control" value="Missing Exam Results for CSC 301">
+              </div>
+              <div style="margin-bottom:12px;">
+                <label class="m-form-label">Description *</label>
+                <textarea class="m-form-control" rows="4" style="resize:none;">My exam results for CSC 301 have not been uploaded to the portal after 2 months. This is affecting my CGPA calculation and scholarship eligibility...</textarea>
+              </div>
+              <div style="margin-bottom:12px;">
+                <label class="m-form-label">Attachments</label>
+                <div style="border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;background:var(--bg);">
+                  <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--text-muted)" style="margin:0 auto 6px;display:block;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                  <div style="font-size:12.5px;font-weight:600;color:var(--primary);">Tap to upload</div>
+                  <div style="font-size:11px;color:var(--text-muted);">PNG, PDF, DOCX up to 10MB</div>
+                </div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;" checked>
+                <span style="font-size:12.5px;color:var(--text);">Email me status updates</span>
+              </label>
+              <button class="m-submit">
+                Submit Complaint
+              </button>
+              <div style="text-align:center;margin-top:10px;font-size:11.5px;color:var(--text-muted);">Your complaint is encrypted and confidential</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">Submit Complaint</div>
+      <p class="phone-desc">Touch-friendly form with<br>large tap targets</p>
+    </div>
+
+    <!-- Phone 4: My Complaints (Mobile) -->
+    <div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="m-topbar">
+            <div class="m-hamburger"><div></div><div></div><div></div></div>
+            <div class="m-logo" style="font-size:14px;">My Complaints</div>
+            <button style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:11.5px;font-weight:600;cursor:pointer;">+ New</button>
+          </div>
+          <div class="m-body">
+            <!-- Search -->
+            <div style="position:relative;margin-bottom:12px;">
+              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input type="text" style="width:100%;padding:9px 12px 9px 32px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);background:#fff;outline:none;" placeholder="Search complaints...">
+            </div>
+            <!-- Filter chips -->
+            <div class="m-filter-row">
+              <div class="m-chip active">All (12)</div>
+              <div class="m-chip">Pending (3)</div>
+              <div class="m-chip">Resolved (8)</div>
+              <div class="m-chip">Academic</div>
+              <div class="m-chip">Facilities</div>
+              <div class="m-chip">IT</div>
+            </div>
+            <!-- Complaint list -->
+            <div class="m-complaint-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div class="m-complaint-ref">CMP-2024-001</div>
+                <span class="badge badge-green" style="font-size:10px;">Resolved</span>
+              </div>
+              <div class="m-complaint-title">Missing Exam Results for CSC 301</div>
+              <div class="m-complaint-footer">
+                <span style="font-size:11px;color:var(--text-muted);">Academic · Jan 15, 2024</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <div class="m-complaint-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div class="m-complaint-ref">CMP-2024-002</div>
+                <span class="badge badge-yellow" style="font-size:10px;">In Progress</span>
+              </div>
+              <div class="m-complaint-title">Broken AC in Lecture Hall B</div>
+              <div class="m-complaint-footer">
+                <span style="font-size:11px;color:var(--text-muted);">Facilities · Feb 03, 2024</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <div class="m-complaint-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div class="m-complaint-ref">CMP-2024-003</div>
+                <span class="badge badge-blue" style="font-size:10px;">Under Review</span>
+              </div>
+              <div class="m-complaint-title">WiFi Not Working in Library</div>
+              <div class="m-complaint-footer">
+                <span style="font-size:11px;color:var(--text-muted);">IT · Feb 10, 2024</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <div class="m-complaint-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div class="m-complaint-ref">CMP-2024-004</div>
+                <span class="badge badge-purple" style="font-size:10px;">Assigned</span>
+              </div>
+              <div class="m-complaint-title">Tuition Fee Overcharge</div>
+              <div class="m-complaint-footer">
+                <span style="font-size:11px;color:var(--text-muted);">Finance · Feb 15, 2024</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <div class="m-complaint-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div class="m-complaint-ref">CMP-2024-005</div>
+                <span class="badge badge-gray" style="font-size:10px;">Submitted</span>
+              </div>
+              <div class="m-complaint-title">Course Registration Error</div>
+              <div class="m-complaint-footer">
+                <span style="font-size:11px;color:var(--text-muted);">Admin · Mar 01, 2024</span>
+                <span class="m-view-btn">View →</span>
+              </div>
+            </div>
+            <!-- Pagination -->
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:12px;">
+              <button style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--primary);color:#fff;font-size:12px;font-weight:700;">1</button>
+              <button style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:12px;">2</button>
+              <button style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:12px;">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">My Complaints (List)</div>
+      <p class="phone-desc">Filter chips + card-based list<br>optimised for touch</p>
+    </div>
+
+  </div>
+
+  <!-- Bottom note -->
+  <div style="text-align:center;margin-top:56px;padding:24px;background:#fff;border-radius:16px;max-width:700px;margin-left:auto;margin-right:auto;border:1px solid var(--border);">
+    <h3 style="font-size:16px;margin-bottom:8px;">Responsive Breakpoints</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left;margin-top:12px;">
+      <div style="padding:10px;background:var(--bg);border-radius:8px;"><div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:4px;">MOBILE (&lt;600px)</div><div style="font-size:12px;color:var(--text-secondary);">1-column grid · Hamburger menu · Card-list layout · Touch targets ≥44px</div></div>
+      <div style="padding:10px;background:var(--bg);border-radius:8px;"><div style="font-size:11px;font-weight:700;color:var(--warning);margin-bottom:4px;">TABLET (600–900px)</div><div style="font-size:12px;color:var(--text-secondary);">2-column grids · Collapsible sidebar · Responsive tables · Dropdown filters</div></div>
+      <div style="padding:10px;background:var(--bg);border-radius:8px;"><div style="font-size:11px;font-weight:700;color:var(--secondary);margin-bottom:4px;">DESKTOP (&gt;900px)</div><div style="font-size:12px;color:var(--text-secondary);">Full sidebar · 4-column stats · Data tables · Multi-column layouts</div></div>
+    </div>
+  </div>
+</body>
+</html>

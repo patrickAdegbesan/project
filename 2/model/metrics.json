@@ -1,0 +1,11 @@
+{
+  "accuracy": 100.0,
+  "precision": 100.0,
+  "recall": 100.0,
+  "f1": 100.0,
+  "train_size": 24000,
+  "test_size": 6000,
+  "features": 32,
+  "trained_at": "2026-06-28T02:50:43.886393",
+  "model": "GradientBoostingClassifier"
+}

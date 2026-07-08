@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120">
+  <defs>
+    <linearGradient id="iconGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ea4335;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c5221a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Icon mark: rounded square background - no filter -->
+  <rect x="0" y="10" width="100" height="100" rx="22" ry="22" fill="url(#iconGradFull)"/>
+
+  <!-- Document body (white) -->
+  <rect x="22" y="26" width="46" height="58" rx="5" ry="5" fill="white" opacity="0.95"/>
+
+  <!-- Document fold corner -->
+  <polygon points="54,26 68,26 68,40 54,40" fill="#ea4335" opacity="0.35"/>
+  <polygon points="54,26 68,40 54,40" fill="white" opacity="0.5"/>
+
+  <!-- Document lines -->
+  <rect x="29" y="46" width="28" height="3.5" rx="1.75" fill="#ea4335" opacity="0.3"/>
+  <rect x="29" y="54" width="22" height="3.5" rx="1.75" fill="#ea4335" opacity="0.3"/>
+  <rect x="29" y="62" width="26" height="3.5" rx="1.75" fill="#ea4335" opacity="0.3"/>
+
+  <!-- Green checkmark circle -->
+  <circle cx="72" cy="84" r="14" fill="#34a853"/>
+  <polyline points="64,84 70,90 80,78" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="118" y="62"
+        font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+        font-size="38"
+        font-weight="800"
+        letter-spacing="-1"
+        fill="#202124">Complaint<tspan fill="#ea4335">Desk</tspan></text>
+
+  <!-- Subtitle -->
+  <text x="120" y="84"
+        font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+        font-size="13.5"
+        font-weight="500"
+        letter-spacing="0.04em"
+        fill="#5f6368">CALEB UNIVERSITY — ONLINE COMPLAINT MANAGEMENT SYSTEM</text>
+
+  <!-- Accent rule -->
+  <rect x="118" y="90" width="340" height="2" rx="1" fill="#ea4335" opacity="0.18"/>
+</svg>

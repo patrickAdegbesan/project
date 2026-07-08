@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help &amp; Documentation — Admin Panel</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .sidebar { background: #1a1f2e; }
+  .sidebar-logo { border-color: rgba(255,255,255,0.05); }
+  .sidebar-nav a.active { background: rgba(234,67,53,0.2); color: #f87171; }
+
+  .help-hero { background:linear-gradient(135deg,#1a1f2e 0%,#2d3452 100%); border-radius:var(--radius-lg); padding:36px 32px; margin-bottom:28px; position:relative; overflow:hidden; }
+  .help-hero::before { content:'?'; position:absolute; right:24px; top:-10px; font-size:160px; font-weight:900; color:rgba(255,255,255,0.04); line-height:1; }
+  .help-hero h3 { font-size:22px; font-weight:800; color:#fff; margin-bottom:8px; }
+  .help-hero p { font-size:14px; color:rgba(255,255,255,0.6); margin-bottom:20px; }
+  .help-search { display:flex; align-items:center; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:0 14px; gap:10px; max-width:480px; }
+  .help-search input { background:none; border:none; outline:none; color:#fff; font-size:14px; padding:12px 0; flex:1; }
+  .help-search input::placeholder { color:rgba(255,255,255,0.4); }
+
+  .doc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+  .doc-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-sm); cursor:pointer; transition:var(--transition); }
+  .doc-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+  .doc-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+  .doc-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .doc-desc { font-size:12.5px; color:var(--text-muted); line-height:1.6; margin-bottom:12px; }
+  .doc-count { font-size:12px; color:var(--text-muted); font-weight:500; display:flex; align-items:center; gap:4px; }
+
+  .faq-section { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; margin-bottom:20px; box-shadow:var(--shadow-sm); }
+  .faq-item { border-bottom:1px solid var(--border-light); }
+  .faq-item:last-child { border-bottom:none; }
+  .faq-q { display:flex; align-items:center; justify-content:space-between; padding:16px 0; cursor:pointer; font-size:14px; font-weight:600; color:var(--text); gap:12px; }
+  .faq-q svg { flex-shrink:0; transition:transform 0.2s; }
+  .faq-q.open svg { transform:rotate(180deg); }
+  .faq-a { padding:0 0 16px; font-size:13.5px; color:var(--text-secondary); line-height:1.7; display:none; }
+  .faq-a.open { display:block; }
+
+  .quick-links { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .quick-link { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--bg); border:1px solid var(--border); border-radius:10px; text-decoration:none; color:var(--text); font-size:13.5px; font-weight:600; transition:var(--transition); }
+  .quick-link:hover { background:var(--card); box-shadow:var(--shadow-sm); }
+  .quick-link svg { color:var(--primary); flex-shrink:0; }
+
+  @media(max-width:900px){ .doc-grid { grid-template-columns:1fr 1fr; } }
+  @media(max-width:600px){ .doc-grid { grid-template-columns:1fr; } .quick-links { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <div>
+        <span class="logo-text">Complaint<span style="color:#ea4335;">Desk</span></span>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:500;margin-top:-2px;letter-spacing:0.05em;">ADMIN PANEL</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Administration</div>
+      <nav class="sidebar-nav">
+        <a href="07-admin-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="08-admin-all-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>All Complaints<span class="badge-count">23</span></a>
+        <a href="11-admin-users.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Users</a>
+        <a href="12-admin-reports.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Reports &amp; Analytics</a>
+        <a href="admin-announcements.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>Announcements</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">System</div>
+      <nav class="sidebar-nav">
+        <a href="admin-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+        <a href="admin-help.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; Documentation</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div>
+        <div class="sidebar-user-info"><div class="user-name">Super Admin</div><div class="user-role">administrator@caleb.edu.ng</div></div>
+      </div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('active');">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="topnav-search">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Search documentation...">
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></button>
+        <div class="topbar-user"><div class="avatar avatar-sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div><span>Super Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="breadcrumb"><a href="07-admin-dashboard.html">Dashboard</a><span>›</span><span>Help &amp; Documentation</span></div>
+
+      <!-- Hero search -->
+      <div class="help-hero">
+        <h3>Admin Documentation Centre</h3>
+        <p>Guides, FAQs, and references for managing ComplaintDesk at Caleb University</p>
+        <div class="help-search">
+          <svg fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.5)" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Search guides, FAQs, or settings...">
+        </div>
+      </div>
+
+      <!-- Doc category cards -->
+      <h3 style="font-size:15px;font-weight:800;margin-bottom:16px;">Browse by Topic</h3>
+      <div class="doc-grid">
+        <div class="doc-card">
+          <div class="doc-icon" style="background:#e8f0fe;color:#1a73e8;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+          <div class="doc-title">Managing Complaints</div>
+          <div class="doc-desc">Assign, update status, escalate, bulk-action, and close complaints</div>
+          <div class="doc-count"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> 8 articles</div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-icon" style="background:#e6f4ea;color:#34a853;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
+          <div class="doc-title">User Management</div>
+          <div class="doc-desc">Create, suspend, reset passwords, and manage roles for students and staff</div>
+          <div class="doc-count"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> 6 articles</div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-icon" style="background:#fce8e6;color:#ea4335;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+          <div class="doc-title">Reports &amp; Analytics</div>
+          <div class="doc-desc">Export data, read charts, set up scheduled reports and performance KPIs</div>
+          <div class="doc-count"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> 5 articles</div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-icon" style="background:#fff8e1;color:#f9ab00;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg></div>
+          <div class="doc-title">Announcements</div>
+          <div class="doc-desc">Write, schedule, pin, and target announcements to users</div>
+          <div class="doc-count"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> 4 articles</div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-icon" style="background:#f3e8ff;color:#7c3aed;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div class="doc-title">System Settings</div>
+          <div class="doc-desc">Configure SLAs, email, notifications, roles, and maintenance mode</div>
+          <div class="doc-count"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> 7 articles</div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-icon" style="background:#e0f2fe;color:#0284c7;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div>
+          <div class="doc-title">Security &amp; Audit</div>
+          <div class="doc-desc">Audit logs, login history, data retention policy, and GDPR compliance</div>
+          <div class="doc-count"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> 5 articles</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;">
+        <!-- FAQs -->
+        <div>
+          <div class="faq-section">
+            <h3 style="font-size:15px;font-weight:800;margin-bottom:20px;">Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">How do I assign a complaint to a staff handler?<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+              <div class="faq-a">Open the complaint from <strong>All Complaints</strong>, click the <strong>Assign</strong> button on the right, then select a handler from the dropdown. Only users with the "Handler" or "Administrator" role appear in the list. You can also use <strong>Bulk Assign</strong> from the complaints table to assign multiple at once.</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">How do I change a complaint's status?<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+              <div class="faq-a">Open the complaint detail page and click <strong>Update Status</strong> in the top-right action panel. You can move it to <em>In Progress</em>, <em>Under Review</em>, <em>Resolved</em>, or <em>Closed</em>. The complainant receives an email notification on every status change (if notifications are enabled in Settings).</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">A student says they can't log in — how do I help?<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+              <div class="faq-a">Go to <strong>Users</strong>, search for the student by name or matric number, open their profile, and click <strong>Reset Password</strong>. This sends a password-reset link to their registered email. If their account is suspended, click <strong>Activate Account</strong> first.</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">How do I export the complaints report to Excel?<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+              <div class="faq-a">From <strong>Reports &amp; Analytics</strong>, select your date range and filters, then click the <strong>Export</strong> button in the top-right. You can export as CSV or PDF. From <strong>All Complaints</strong>, the <strong>Export</strong> button exports only the currently filtered view.</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">How do I put the portal in maintenance mode?<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+              <div class="faq-a">Go to <strong>Settings → General → Portal Status</strong> and toggle <strong>Portal Active</strong> off. Users will see a maintenance message. Post an Announcement beforehand so users know when to expect downtime. Admins can still log in during maintenance mode.</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">How are complaints auto-assigned to departments?<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+              <div class="faq-a">When <strong>Auto-assign to department</strong> is enabled in <em>Settings → Complaint Rules</em>, the system uses the complaint's <strong>Category</strong> to route it to the default handler for that category. You can set default handlers per category in <em>Users → Role Assignments</em>.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow-sm);margin-bottom:16px;">
+            <h4 style="font-size:14px;font-weight:800;margin-bottom:16px;">Quick Links</h4>
+            <div class="quick-links" style="grid-template-columns:1fr;">
+              <a href="08-admin-all-complaints.html" class="quick-link"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>All Complaints</a>
+              <a href="11-admin-users.html" class="quick-link"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>User Management</a>
+              <a href="12-admin-reports.html" class="quick-link"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Reports &amp; Analytics</a>
+              <a href="admin-settings.html" class="quick-link"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>System Settings</a>
+            </div>
+          </div>
+
+          <div style="background:linear-gradient(135deg,#ea4335,#c5221a);border-radius:var(--radius-lg);padding:22px;color:#fff;">
+            <h4 style="font-size:14px;font-weight:800;margin-bottom:8px;">Need more help?</h4>
+            <p style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6;margin-bottom:16px;">Contact Caleb University IT Support for technical assistance with the portal.</p>
+            <div style="font-size:13px;font-weight:600;margin-bottom:6px;">📧 it-support@caleb.edu.ng</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:16px;">📞 +234 701 234 5678</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);">Mon–Fri, 8:00 AM – 5:00 PM WAT</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleFaq(el) {
+    var a = el.nextElementSibling;
+    var isOpen = a.classList.contains('open');
+    document.querySelectorAll('.faq-q').forEach(function(q){ q.classList.remove('open'); q.nextElementSibling.classList.remove('open'); });
+    if (!isOpen) { el.classList.add('open'); a.classList.add('open'); }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports & Analytics — Admin — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .sidebar { background: #1a1f2e; }
+  .sidebar-nav a.active { background: rgba(234,67,53,0.2); color: #f87171; }
+  .report-preview { background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-top:20px; }
+  .report-header { background:linear-gradient(135deg,#1a1f2e,#2d3748);color:#fff;padding:28px 32px; }
+  .report-logo { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
+  .report-logo .logo-dot { width:10px;height:10px;border-radius:50%;background:var(--danger); }
+  .report-body { padding:24px 32px; }
+  .report-section { margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border-light); }
+  .report-section:last-child { border-bottom:none;margin-bottom:0;padding-bottom:0; }
+  .stat-inline { display:inline-flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px; }
+  .stat-inline .num { font-size:20px;font-weight:800;color:var(--text); }
+  .stat-inline .lbl { font-size:12px;color:var(--text-muted); }
+
+  .trend-row { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light); }
+  .trend-row:last-child{border-bottom:none;}
+  .trend-rank { font-size:13px;font-weight:700;color:var(--text-muted);width:20px;text-align:center; }
+  .trend-label { flex:1;font-size:13.5px;font-weight:500;color:var(--text); }
+  .trend-count { font-size:13px;font-weight:700;color:var(--primary); }
+  .trend-bar { height:6px;border-radius:3px;background:var(--primary);opacity:0.7; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;"><div><span class="logo-text">Complaint<span style="color:#ea4335;">Desk</span></span><div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:500;margin-top:-2px;letter-spacing:0.05em;">ADMIN PANEL</div></div></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Administration</div>
+      <nav class="sidebar-nav">
+        <a href="07-admin-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="08-admin-all-complaints.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>All Complaints<span class="badge-count">23</span></a>
+        <a href="11-admin-users.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Users</a>
+        <a href="12-admin-reports.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Reports &amp; Analytics</a>
+        <a href="admin-announcements.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>Announcements</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">System</div>
+      <nav class="sidebar-nav">
+        <a href="admin-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+        <a href="admin-help.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; Documentation</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div><div class="sidebar-user-info"><div class="user-name">Super Admin</div><div class="user-role">administrator@caleb.edu.ng</div></div></div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search"><svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" placeholder="Search reports..."></div>
+      <div class="topnav-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">7</span></button>
+        <div class="topnav-profile"><div class="avatar sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div><span class="profile-name">Super Admin</span></div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb"><a href="07-admin-dashboard.html">Dashboard</a><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Reports &amp; Analytics</div>
+          <h2>Reports &amp; Analytics</h2>
+        </div>
+      </div>
+
+      <!-- Report Generator -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title" style="margin-bottom:16px;">Generate Custom Report</div>
+        <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+          <div class="form-group" style="margin-bottom:0;flex:1;min-width:160px;">
+            <label class="form-label">Report Type</label>
+            <select class="form-control">
+              <option selected>Comprehensive Summary</option>
+              <option>Complaints by Category</option>
+              <option>Handler Performance</option>
+              <option>Resolution Time Analysis</option>
+              <option>Department Breakdown</option>
+              <option>Recurring Issues</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-control" value="2024-01-01">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-control" value="2024-03-31">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Department</label>
+            <select class="form-control"><option>All Departments</option><option>Computer Science</option><option>Facilities Management</option><option>IT &amp; Systems</option><option>Finance &amp; Bursary</option></select>
+          </div>
+          <button class="btn btn-primary">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Generate Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          Export PDF
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Export Excel
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download CSV
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          Share Link
+        </button>
+      </div>
+
+      <!-- Report Preview -->
+      <div class="report-preview">
+        <!-- Report Header -->
+        <div class="report-header">
+          <div class="report-logo">
+            <div style="width:36px;height:36px;background:#ea4335;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div>
+              <div style="font-size:18px;font-weight:800;">ComplaintDesk</div>
+              <div style="font-size:12px;opacity:0.7;">Caleb University, Lagos</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;">
+              <div style="font-size:13px;opacity:0.7;">Generated: March 31, 2024</div>
+              <div style="font-size:13px;opacity:0.7;">By: Super Administrator</div>
+            </div>
+          </div>
+          <h2 style="font-size:20px;font-weight:800;color:#fff;">Comprehensive Complaint Summary Report</h2>
+          <p style="font-size:13px;opacity:0.7;margin-top:4px;">Period: January 1, 2024 — March 31, 2024 · All Departments</p>
+        </div>
+
+        <!-- Report Body -->
+        <div class="report-body">
+          <!-- Executive Summary -->
+          <div class="report-section">
+            <h3 style="font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              1. Executive Summary
+            </h3>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+              <div class="stat-inline"><span class="num" style="color:var(--primary);">156</span><span class="lbl">Total<br>Complaints</span></div>
+              <div class="stat-inline"><span class="num" style="color:var(--secondary);">47</span><span class="lbl">Resolved<br>(30.1%)</span></div>
+              <div class="stat-inline"><span class="num" style="color:var(--warning);">28</span><span class="lbl">In Progress<br>(17.9%)</span></div>
+              <div class="stat-inline"><span class="num" style="color:var(--danger);">23</span><span class="lbl">Pending<br>Action</span></div>
+              <div class="stat-inline"><span class="num" style="color:var(--purple);">3.2</span><span class="lbl">Avg. Days<br>to Resolve</span></div>
+              <div class="stat-inline"><span class="num" style="color:var(--secondary);">89%</span><span class="lbl">User<br>Satisfaction</span></div>
+            </div>
+          </div>
+
+          <!-- Complaints by Category -->
+          <div class="report-section">
+            <h3 style="font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              2. Complaints by Category
+            </h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <!-- Bar chart -->
+              <div>
+                <div class="bar-chart" style="height:120px;align-items:flex-end;gap:8px;border-bottom:1px solid var(--border);padding-bottom:0;">
+                  <div class="chart-col"><div class="chart-val">45</div><div class="chart-bar" style="height:90px;background:var(--primary);"></div><div class="chart-lbl">Academic</div></div>
+                  <div class="chart-col"><div class="chart-val">38</div><div class="chart-bar" style="height:76px;background:#ff6d00;"></div><div class="chart-lbl">Facilities</div></div>
+                  <div class="chart-col"><div class="chart-val">28</div><div class="chart-bar" style="height:56px;background:var(--secondary);"></div><div class="chart-lbl">IT</div></div>
+                  <div class="chart-col"><div class="chart-val">22</div><div class="chart-bar" style="height:44px;background:var(--warning);"></div><div class="chart-lbl">Finance</div></div>
+                  <div class="chart-col"><div class="chart-val">15</div><div class="chart-bar" style="height:30px;background:var(--purple);"></div><div class="chart-lbl">Admin</div></div>
+                  <div class="chart-col"><div class="chart-val">8</div><div class="chart-bar" style="height:16px;background:#9aa0a6;"></div><div class="chart-lbl">General</div></div>
+                </div>
+              </div>
+              <!-- Category table -->
+              <table>
+                <thead><tr><th>Category</th><th>Count</th><th>Resolved</th><th>Avg Days</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="badge badge-indigo">Academic</span></td><td><strong>45</strong></td><td style="color:var(--secondary);font-weight:700;">38</td><td>2.4d</td></tr>
+                  <tr><td><span class="badge badge-orange">Facilities</span></td><td><strong>38</strong></td><td style="color:var(--secondary);font-weight:700;">28</td><td>4.1d</td></tr>
+                  <tr><td><span class="badge badge-blue">IT</span></td><td><strong>28</strong></td><td style="color:var(--secondary);font-weight:700;">22</td><td>2.8d</td></tr>
+                  <tr><td><span class="badge badge-green">Finance</span></td><td><strong>22</strong></td><td style="color:var(--warning);font-weight:700;">14</td><td>5.2d</td></tr>
+                  <tr><td><span class="badge badge-gray">Administrative</span></td><td><strong>15</strong></td><td style="color:var(--secondary);font-weight:700;">14</td><td>1.9d</td></tr>
+                  <tr><td><span class="badge badge-gray">General</span></td><td><strong>8</strong></td><td style="color:var(--secondary);font-weight:700;">8</td><td>1.2d</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Resolution Time Trend -->
+          <div class="report-section">
+            <h3 style="font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              3. Resolution Time Trend
+            </h3>
+            <div style="display:flex;align-items:flex-end;gap:12px;height:80px;margin-bottom:8px;border-bottom:1px solid var(--border);">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="font-size:11px;font-weight:700;color:var(--text);">5.2d</div><div style="width:100%;height:70px;background:rgba(234,67,53,0.4);border-radius:3px 3px 0 0;"></div><div style="font-size:10.5px;color:var(--text-muted);">Oct</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="font-size:11px;font-weight:700;color:var(--text);">4.8d</div><div style="width:100%;height:62px;background:rgba(251,188,4,0.5);border-radius:3px 3px 0 0;"></div><div style="font-size:10.5px;color:var(--text-muted);">Nov</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="font-size:11px;font-weight:700;color:var(--text);">4.5d</div><div style="width:100%;height:56px;background:rgba(251,188,4,0.4);border-radius:3px 3px 0 0;"></div><div style="font-size:10.5px;color:var(--text-muted);">Dec</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="font-size:11px;font-weight:700;color:var(--text);">3.8d</div><div style="width:100%;height:46px;background:rgba(26,115,232,0.4);border-radius:3px 3px 0 0;"></div><div style="font-size:10.5px;color:var(--text-muted);">Jan</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="font-size:11px;font-weight:700;color:var(--text);">3.2d</div><div style="width:100%;height:38px;background:rgba(52,168,83,0.5);border-radius:3px 3px 0 0;"></div><div style="font-size:10.5px;color:var(--text-muted);">Feb</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="font-size:11px;font-weight:700;color:var(--secondary);">2.9d</div><div style="width:100%;height:34px;background:rgba(52,168,83,0.7);border-radius:3px 3px 0 0;"></div><div style="font-size:10.5px;color:var(--text-muted);">Mar</div></div>
+            </div>
+            <p style="font-size:12.5px;color:var(--secondary);">⬆ Resolution time improved by 44% from October 2023 to March 2024, driven by staff training and improved assignment workflows.</p>
+          </div>
+
+          <!-- Handler Performance -->
+          <div class="report-section">
+            <h3 style="font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--primary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              4. Handler Performance Summary
+            </h3>
+            <table>
+              <thead><tr><th>Handler</th><th>Department</th><th>Assigned</th><th>Resolved</th><th>Resolution Rate</th><th>Avg Days</th><th>User Rating</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Sarah Johnson</strong></td><td>Facilities</td><td>38</td><td style="color:var(--secondary);font-weight:700;">35</td><td><div class="progress" style="width:80px;"><div class="progress-bar green" style="width:92%;"></div></div> 92%</td><td style="color:var(--secondary);">2.1d</td><td>⭐ 4.8 / 5.0</td></tr>
+                <tr><td><strong>Chioma Okafor</strong></td><td>Academic</td><td>45</td><td style="color:var(--secondary);font-weight:700;">40</td><td><div class="progress" style="width:80px;"><div class="progress-bar green" style="width:89%;"></div></div> 89%</td><td style="color:var(--secondary);">2.8d</td><td>⭐ 4.6 / 5.0</td></tr>
+                <tr><td><strong>Blessing Eze</strong></td><td>Admin</td><td>23</td><td style="color:var(--secondary);font-weight:700;">19</td><td><div class="progress" style="width:80px;"><div class="progress-bar blue" style="width:83%;"></div></div> 83%</td><td style="color:var(--warning);">3.2d</td><td>⭐ 4.3 / 5.0</td></tr>
+                <tr><td><strong>Michael Adeyemi</strong></td><td>IT</td><td>28</td><td style="color:var(--secondary);font-weight:700;">22</td><td><div class="progress" style="width:80px;"><div class="progress-bar blue" style="width:79%;"></div></div> 79%</td><td style="color:var(--warning);">3.5d</td><td>⭐ 4.2 / 5.0</td></tr>
+                <tr><td><strong>David Nwosu</strong></td><td>Finance</td><td>22</td><td style="color:var(--warning);font-weight:700;">18</td><td><div class="progress" style="width:80px;"><div class="progress-bar yellow" style="width:82%;"></div></div> 82%</td><td style="color:var(--danger);">4.9d</td><td>⭐ 3.9 / 5.0</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Top Recurring Issues -->
+          <div class="report-section">
+            <h3 style="font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--danger)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              5. Top 5 Recurring Issues
+            </h3>
+            <div class="trend-row"><div class="trend-rank">#1</div><div><div class="trend-label">AC units malfunctioning in lecture halls</div><div class="trend-bar" style="width:90%;margin-top:4px;"></div></div><div class="trend-count">18 reports</div></div>
+            <div class="trend-row"><div class="trend-rank">#2</div><div><div class="trend-label">WiFi connectivity issues in academic buildings</div><div class="trend-bar" style="width:72%;margin-top:4px;background:var(--secondary);"></div></div><div class="trend-count" style="color:var(--secondary);">14 reports</div></div>
+            <div class="trend-row"><div class="trend-rank">#3</div><div><div class="trend-label">Delayed or missing examination results</div><div class="trend-bar" style="width:60%;margin-top:4px;background:var(--warning);"></div></div><div class="trend-count" style="color:#856404;">12 reports</div></div>
+            <div class="trend-row"><div class="trend-rank">#4</div><div><div class="trend-label">Finance portal errors during fee payment</div><div class="trend-bar" style="width:45%;margin-top:4px;background:var(--purple);"></div></div><div class="trend-count" style="color:var(--purple);">9 reports</div></div>
+            <div class="trend-row"><div class="trend-rank">#5</div><div><div class="trend-label">Student portal login and password reset failures</div><div class="trend-bar" style="width:36%;margin-top:4px;background:#9aa0a6;"></div></div><div class="trend-count" style="color:var(--text-muted);">7 reports</div></div>
+            <div class="alert alert-warning" style="margin-top:14px;">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <div class="alert-content">
+                <div class="alert-title">Recommendation</div>
+                <div class="alert-msg">The high volume of AC and WiFi complaints suggests infrastructure-level investment is needed in Blocks A, B, and C. A preventive maintenance schedule is recommended for HVAC and network infrastructure.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Footer -->
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border);">
+            <div style="font-size:12px;color:var(--text-muted);">ComplaintDesk | Caleb University, Lagos | Confidential — Internal Use Only</div>
+            <div style="font-size:12px;color:var(--text-muted);">Report ID: RPT-2024-Q1-001 | Page 1 of 3</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+(async () => {
+  const user = await requireAuth('admin').catch(() => null);
+    if (user) {
+      const ini = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      document.querySelectorAll('.user-name').forEach(el => el.textContent = user.name);
+      document.querySelectorAll('.user-role').forEach(el => el.textContent = user.email);
+      document.querySelectorAll('.avatar:not(.avatar-sm)').forEach(el => el.textContent = ini);
+      document.querySelectorAll('.topbar-user span').forEach(el => { if(el.textContent.trim()) el.textContent = user.name; });
+    }
+
+  try {
+    const [stats, report] = await Promise.all([API.adminStats(), API.adminReports(30)]);
+
+    // Summary stats row
+    const nums = document.querySelectorAll('.stat-inline .num');
+    if (nums[0]) nums[0].textContent = stats.total;
+    if (nums[1]) nums[1].textContent = stats.resolved;
+    if (nums[2]) nums[2].textContent = stats.in_progress;
+    if (nums[3]) nums[3].textContent = stats.open;
+    if (nums[4]) nums[4].textContent = report.avg_resolution_hours
+      ? (report.avg_resolution_hours / 24).toFixed(1) + 'd'
+      : '—';
+
+    // Category table
+    const catTbody = document.querySelectorAll('tbody')[0];
+    if (catTbody && report.by_category.length) {
+      const maxVal = report.by_category[0].value || 1;
+      catTbody.innerHTML = report.by_category.map(c =>
+        `<tr>
+          <td><span class="badge badge-indigo">${c.label}</span></td>
+          <td><strong>${c.value}</strong></td>
+          <td style="color:var(--secondary);font-weight:700;">—</td>
+          <td>—</td>
+        </tr>`
+      ).join('');
+
+      // Also update bar chart
+      const chart = document.querySelector('.bar-chart');
+      if (chart) {
+        const barColors = ['var(--primary)','#ff6d00','var(--secondary)','var(--warning)','var(--purple)','#9aa0a6'];
+        chart.innerHTML = report.by_category.slice(0, 6).map((c, i) => {
+          const h = Math.round((c.value / maxVal) * 90);
+          return `<div class="chart-col">
+            <div class="chart-val">${c.value}</div>
+            <div class="chart-bar" style="height:${h}px;background:${barColors[i]||'#9aa0a6'};"></div>
+            <div class="chart-lbl">${c.label.split(' ')[0]}</div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // Department table
+    const deptTbody = document.querySelectorAll('tbody')[1];
+    if (deptTbody && report.by_department.length) {
+      deptTbody.innerHTML = report.by_department.map(d =>
+        `<tr>
+          <td><strong>${d.label}</strong></td>
+          <td><strong>${d.value}</strong></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>`
+      ).join('');
+    }
+
+    // Status distribution
+    const byStatus = {};
+    (report.by_status || []).forEach(s => byStatus[s.label] = s.value);
+    const lbl = document.querySelector('.lbl');
+    if (lbl && nums[1]) {
+      const pct = stats.total ? Math.round((stats.resolved / stats.total) * 100) : 0;
+      nums[1].closest('.stat-inline').querySelector('.lbl').innerHTML = `Resolved<br>(${pct}%)`;
+    }
+
+  } catch(e) {
+    console.error('Reports error:', e);
+  }
+})();
+</script>
+</body>
+</html>

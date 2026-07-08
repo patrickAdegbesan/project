@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Complaints — Admin — ComplaintDesk</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .sidebar { background: #1a1f2e; }
+  .sidebar-nav a.active { background: rgba(234,67,53,0.2); color: #f87171; }
+  .filter-select { padding:7px 28px 7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:13px;font-family:var(--font);color:var(--text);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239aa0a6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="img/logo-icon.svg" width="44" height="44" alt="ComplaintDesk" style="flex-shrink:0;border-radius:10px;">
+      <div><span class="logo-text">Complaint<span style="color:#ea4335;">Desk</span></span><div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:500;margin-top:-2px;letter-spacing:0.05em;">ADMIN PANEL</div></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Administration</div>
+      <nav class="sidebar-nav">
+        <a href="07-admin-dashboard.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+        <a href="08-admin-all-complaints.html" class="active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>All Complaints<span class="badge-count">23</span></a>
+        <a href="11-admin-users.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Users</a>
+        <a href="12-admin-reports.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Reports &amp; Analytics</a>
+        <a href="admin-announcements.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>Announcements</a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">System</div>
+      <nav class="sidebar-nav">
+        <a href="admin-settings.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+        <a href="admin-help.html"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; Documentation</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div><div class="sidebar-user-info"><div class="user-name">Super Admin</div><div class="user-role">administrator@caleb.edu.ng</div></div></div>
+      <a href="01-login.html" style="display:flex;align-items:center;gap:8px;padding:8px 10px;color:rgba(255,255,255,0.5);font-size:13px;border-radius:var(--radius-sm);margin-top:4px;transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="topnav">
+      <button class="hamburger" onclick="toggleSidebar()"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="topnav-search"><svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" placeholder="Search by ref, name, subject..."></div>
+      <div class="topnav-actions">
+        <button class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-badge">7</span></button>
+        <div class="topnav-profile"><div class="avatar sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">SA</div><span class="profile-name">Super Admin</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb"><a href="07-admin-dashboard.html">Dashboard</a><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>All Complaints</div>
+          <h2>All Complaints</h2>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Export
+          </button>
+          <button class="btn btn-primary btn-sm" data-modal-open="assignModal">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            Bulk Assign
+          </button>
+        </div>
+      </div>
+
+      <!-- Advanced Filter Bar -->
+      <div class="card" style="padding:14px 16px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div class="input-group" style="flex:1;min-width:180px;">
+            <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" class="form-control" placeholder="Search by name, ref, subject..." style="padding-left:36px;">
+          </div>
+          <select class="filter-select"><option>All Statuses</option><option>Submitted</option><option>Under Review</option><option>Assigned</option><option>In Progress</option><option>Resolved</option><option>Closed</option><option>Rejected</option></select>
+          <select class="filter-select"><option>All Categories</option><option>Academic</option><option>Administrative</option><option>IT</option><option>Facilities</option><option>Finance</option><option>General</option></select>
+          <select class="filter-select"><option>All Priorities</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+          <select class="filter-select"><option>All Departments</option><option>Computer Science</option><option>Facilities Management</option><option>IT &amp; Systems</option><option>Bursary</option><option>Academic Planning</option></select>
+          <select class="filter-select"><option>All Handlers</option><option>Sarah Johnson</option><option>Michael Adeyemi</option><option>Chioma Okafor</option><option>David Nwosu</option><option>Blessing Eze</option><option>Unassigned</option></select>
+          <input type="date" class="form-control" value="2024-01-01" style="width:136px;padding:7px 12px;font-size:13px;">
+          <span style="font-size:12px;color:var(--text-muted);">to</span>
+          <input type="date" class="form-control" value="2024-03-31" style="width:136px;padding:7px 12px;font-size:13px;">
+          <button class="btn btn-primary btn-sm">Apply Filter</button>
+          <button class="btn btn-ghost btn-sm">Reset</button>
+        </div>
+      </div>
+
+      <!-- Bulk Actions + Info Row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;">
+            Select All
+          </label>
+          <select class="filter-select" style="font-size:12.5px;padding:5px 26px 5px 10px;opacity:0.7;">
+            <option>Bulk Actions...</option>
+            <option>Assign Selected</option>
+            <option>Mark Resolved</option>
+            <option>Export Selected</option>
+            <option>Delete Selected</option>
+          </select>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);">
+          Showing <strong>1–15</strong> of <strong>156</strong> complaints &nbsp;·&nbsp;
+          <select class="filter-select" style="font-size:12px;padding:4px 24px 4px 8px;">
+            <option>15 per page</option>
+            <option>25 per page</option>
+            <option>50 per page</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Table -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px;"><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></th>
+                <th>Ref #</th>
+                <th>Complainant</th>
+                <th>Department</th>
+                <th>Category</th>
+                <th>Subject</th>
+                <th>Priority</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="complaints-tbody">
+              <!-- Row 1 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-010</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm">JS</div><div><div style="font-size:13px;font-weight:600;">John Smith</div><div style="font-size:11px;color:var(--text-muted);">CSC/2021/045</div></div></div></td>
+                <td style="font-size:12.5px;">Computer Science</td>
+                <td><span class="badge badge-green">Finance</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">TETFUND Scholarship Payment Delayed</td>
+                <td><span class="badge priority-critical" style="font-size:10.5px;">Critical</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 20, 2024</td>
+                <td><span class="badge badge-gray">Submitted</span></td>
+                <td><span style="color:var(--danger);font-size:12.5px;font-weight:500;">⚠ Unassigned</span></td>
+                <td class="table-actions">
+                  <button class="btn btn-primary btn-sm" data-modal-open="assignModal">Assign</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-009</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#9334e6,#7c3aed);">AU</div><div><div style="font-size:13px;font-weight:600;">Amara Uchenna</div><div style="font-size:11px;color:var(--text-muted);">LAW/2022/012</div></div></div></td>
+                <td style="font-size:12.5px;">Law</td>
+                <td><span class="badge badge-blue">IT</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Student Portal Login Issues</td>
+                <td><span class="badge priority-medium" style="font-size:10.5px;">Medium</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 15, 2024</td>
+                <td><span class="badge badge-purple">Assigned</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#1558b0);">MA</div><span style="font-size:12.5px;">M. Adeyemi</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);">Del</button>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-008</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">OE</div><div><div style="font-size:13px;font-weight:600;">Oluwafemi Eze</div><div style="font-size:11px;color:var(--text-muted);">EEE/2020/078</div></div></div></td>
+                <td style="font-size:12.5px;">Electrical Eng.</td>
+                <td><span class="badge badge-orange">Facilities</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Leaking Roof in Hostel Block C, Room 214</td>
+                <td><span class="badge priority-high" style="font-size:10.5px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 12, 2024</td>
+                <td><span class="badge badge-blue">Under Review</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#34a853,#1e7e34);">SJ</div><span style="font-size:12.5px;">S. Johnson</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="assignModal">Assign</button>
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-007</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#34a853,#1e7e34);">NK</div><div><div style="font-size:13px;font-weight:600;">Ngozi Kalu</div><div style="font-size:11px;color:var(--text-muted);">MLS/2022/034</div></div></div></td>
+                <td style="font-size:12.5px;">Medical Lab Sci.</td>
+                <td><span class="badge badge-indigo">Academic</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Wrong Grade in Transcript — CSC 205</td>
+                <td><span class="badge priority-high" style="font-size:10.5px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 10, 2024</td>
+                <td><span class="badge badge-yellow">In Progress</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#9334e6,#7c3aed);">CO</div><span style="font-size:12.5px;">C. Okafor</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 5 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-006</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#fbbc04,#e37400);">TA</div><div><div style="font-size:13px;font-weight:600;">Tunde Adesanya</div><div style="font-size:11px;color:var(--text-muted);">BUS/2021/156</div></div></div></td>
+                <td style="font-size:12.5px;">Business Admin</td>
+                <td><span class="badge badge-gray">General</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Lost Student ID Card — Request Replacement</td>
+                <td><span class="badge priority-low" style="font-size:10.5px;">Low</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 05, 2024</td>
+                <td><span class="badge badge-green">Resolved</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">BE</div><span style="font-size:12.5px;">B. Eze</span></div></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 6 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-005</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);">AO</div><div><div style="font-size:13px;font-weight:600;">Adaeze Okonkwo</div><div style="font-size:11px;color:var(--text-muted);">ACC/2023/007</div></div></div></td>
+                <td style="font-size:12.5px;">Accounting</td>
+                <td><span class="badge badge-gray">Administrative</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Course Registration Error — 2nd Semester</td>
+                <td><span class="badge priority-low" style="font-size:10.5px;">Low</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 01, 2024</td>
+                <td><span class="badge badge-gray">Submitted</span></td>
+                <td><span style="color:var(--danger);font-size:12.5px;font-weight:500;">⚠ Unassigned</span></td>
+                <td class="table-actions">
+                  <button class="btn btn-primary btn-sm" data-modal-open="assignModal">Assign</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 7 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-004</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm">JS</div><div><div style="font-size:13px;font-weight:600;">John Smith</div><div style="font-size:11px;color:var(--text-muted);">CSC/2021/045</div></div></div></td>
+                <td style="font-size:12.5px;">Computer Science</td>
+                <td><span class="badge badge-green">Finance</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Tuition Fee Overcharge 2023/24 Session</td>
+                <td><span class="badge priority-critical" style="font-size:10.5px;">Critical</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Feb 15, 2024</td>
+                <td><span class="badge badge-purple">Assigned</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#fbbc04,#e37400);">DN</div><span style="font-size:12.5px;">D. Nwosu</span></div></td>
+                <td class="table-actions" style="color:var(--danger);">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 8 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-003</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm">JS</div><div><div style="font-size:13px;font-weight:600;">John Smith</div><div style="font-size:11px;color:var(--text-muted);">CSC/2021/045</div></div></div></td>
+                <td style="font-size:12.5px;">Computer Science</td>
+                <td><span class="badge badge-blue">IT</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">WiFi Not Working in Main Library</td>
+                <td><span class="badge priority-high" style="font-size:10.5px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Feb 10, 2024</td>
+                <td><span class="badge badge-blue">Under Review</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#1558b0);">MA</div><span style="font-size:12.5px;">M. Adeyemi</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 9 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-002</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm">JS</div><div><div style="font-size:13px;font-weight:600;">John Smith</div><div style="font-size:11px;color:var(--text-muted);">CSC/2021/045</div></div></div></td>
+                <td style="font-size:12.5px;">Computer Science</td>
+                <td><span class="badge badge-orange">Facilities</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Broken AC Unit in Lecture Hall B</td>
+                <td><span class="badge priority-high" style="font-size:10.5px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Feb 03, 2024</td>
+                <td><span class="badge badge-yellow">In Progress</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#34a853,#1e7e34);">SJ</div><span style="font-size:12.5px;">S. Johnson</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Row 10 -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-001</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm">JS</div><div><div style="font-size:13px;font-weight:600;">John Smith</div><div style="font-size:11px;color:var(--text-muted);">CSC/2021/045</div></div></div></td>
+                <td style="font-size:12.5px;">Computer Science</td>
+                <td><span class="badge badge-indigo">Academic</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Missing Exam Results for CSC 301</td>
+                <td><span class="badge priority-medium" style="font-size:10.5px;">Medium</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Jan 15, 2024</td>
+                <td><span class="badge badge-green">Resolved</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#9334e6,#7c3aed);">CO</div><span style="font-size:12.5px;">C. Okafor</span></div></td>
+                <td class="table-actions">
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <!-- Rows 11-15 (additional) -->
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-011</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#ff6d00,#e65100);">EB</div><div><div style="font-size:13px;font-weight:600;">Emeka Bassey</div><div style="font-size:11px;color:var(--text-muted);">MCM/2022/091</div></div></div></td>
+                <td style="font-size:12.5px;">Mass Communication</td>
+                <td><span class="badge badge-indigo">Academic</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Lecturer Consistently Late to MCM 301 Classes</td>
+                <td><span class="badge priority-medium" style="font-size:10.5px;">Medium</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 21, 2024</td>
+                <td><span class="badge badge-gray">Submitted</span></td>
+                <td><span style="color:var(--danger);font-size:12.5px;font-weight:500;">⚠ Unassigned</span></td>
+                <td class="table-actions">
+                  <button class="btn btn-primary btn-sm" data-modal-open="assignModal">Assign</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-012</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#0d47a1,#1565c0);">IO</div><div><div style="font-size:13px;font-weight:600;">Ifeoma Osei</div><div style="font-size:11px;color:var(--text-muted);">PHR/2021/055</div></div></div></td>
+                <td style="font-size:12.5px;">Pharmacy</td>
+                <td><span class="badge badge-orange">Facilities</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Lab Equipment Broken — Pharmacy Lab 3</td>
+                <td><span class="badge priority-critical" style="font-size:10.5px;">Critical</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 22, 2024</td>
+                <td><span class="badge badge-gray">Submitted</span></td>
+                <td><span style="color:var(--danger);font-size:12.5px;font-weight:500;">⚠ Unassigned</span></td>
+                <td class="table-actions">
+                  <button class="btn btn-primary btn-sm" data-modal-open="assignModal">Assign</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-013</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#00897b,#004d40);">KN</div><div><div style="font-size:13px;font-weight:600;">Kehinde Nwosu</div><div style="font-size:11px;color:var(--text-muted);">ARC/2020/033</div></div></div></td>
+                <td style="font-size:12.5px;">Architecture</td>
+                <td><span class="badge badge-blue">IT</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">AutoCAD License Expired in Design Studio</td>
+                <td><span class="badge priority-high" style="font-size:10.5px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 22, 2024</td>
+                <td><span class="badge badge-blue">Under Review</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#1a73e8,#1558b0);">MA</div><span style="font-size:12.5px;">M. Adeyemi</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-014</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);">FO</div><div><div style="font-size:13px;font-weight:600;">Fatimah Oladele</div><div style="font-size:11px;color:var(--text-muted);">PUB/2023/019</div></div></div></td>
+                <td style="font-size:12.5px;">Public Admin</td>
+                <td><span class="badge badge-gray">Administrative</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Incorrect Personal Data on Student Records</td>
+                <td><span class="badge priority-medium" style="font-size:10.5px;">Medium</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 23, 2024</td>
+                <td><span class="badge badge-purple">Assigned</span></td>
+                <td><div style="display:flex;align-items:center;gap:5px;"><div class="avatar sm" style="background:linear-gradient(135deg,#ea4335,#c5221a);">BE</div><span style="font-size:12.5px;">B. Eze</span></div></td>
+                <td class="table-actions">
+                  <button class="btn btn-ghost btn-sm" data-modal-open="statusModal">Status</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--primary);width:15px;height:15px;"></td>
+                <td><a href="06-complaint-detail.html" class="ref-id">CMP-2024-015</a></td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="avatar sm" style="background:linear-gradient(135deg,#2e7d32,#1b5e20);">CB</div><div><div style="font-size:13px;font-weight:600;">Chukwuemeka Balogun</div><div style="font-size:11px;color:var(--text-muted);">EEE/2021/088</div></div></div></td>
+                <td style="font-size:12.5px;">Electrical Eng.</td>
+                <td><span class="badge badge-green">Finance</span></td>
+                <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;">Bursary Receipt Not Issued After Payment</td>
+                <td><span class="badge priority-high" style="font-size:10.5px;">High</span></td>
+                <td style="white-space:nowrap;font-size:12.5px;color:var(--text-muted);">Mar 23, 2024</td>
+                <td><span class="badge badge-gray">Submitted</span></td>
+                <td><span style="color:var(--danger);font-size:12.5px;font-weight:500;">⚠ Unassigned</span></td>
+                <td class="table-actions">
+                  <button class="btn btn-primary btn-sm" data-modal-open="assignModal">Assign</button>
+                  <a href="06-complaint-detail.html" class="btn btn-ghost btn-sm">View</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+        <div style="font-size:12.5px;color:var(--text-muted);">Showing 1–15 of <strong>156</strong> results</div>
+        <div class="pagination">
+          <button class="page-btn disabled"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <span style="color:var(--text-muted);font-size:13px;">...</span>
+          <button class="page-btn">8</button>
+          <button class="page-btn"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div style="font-size:12.5px;color:var(--text-muted);">Page 1 of 8</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal-backdrop" id="assignModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Assign Complaint</div><button class="modal-close" data-modal-close><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+    <div class="modal-body">
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="ref-id">CMP-2024-010</span><span class="badge badge-green">Finance</span><span class="badge priority-critical" style="font-size:10.5px;">Critical</span></div>
+        <div style="font-size:13.5px;font-weight:600;">TETFUND Scholarship Payment Delayed</div>
+        <div style="font-size:12px;color:var(--text-muted);">John Smith · Mar 20, 2024</div>
+      </div>
+      <div class="form-group"><label class="form-label">Assign To <span class="required">*</span></label>
+        <select class="form-control">
+          <option value="">Select staff member...</option>
+          <option>Sarah Johnson — Facilities Manager</option>
+          <option>Michael Adeyemi — IT Support Lead</option>
+          <option>Chioma Okafor — Academic Affairs</option>
+          <option selected>David Nwosu — Finance Officer</option>
+          <option>Blessing Eze — Administrative Coordinator</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Priority Override</label><select class="form-control"><option>Keep Current (Critical)</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+      <div class="form-group"><label class="form-label">Due Date <span class="required">*</span></label><input type="date" class="form-control" value="2024-03-27"></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Internal Notes</label><textarea class="form-control" rows="3">Liaise with Bursary and Student Affairs. Send confirmation within 24 hours.</textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" data-modal-close>Cancel</button><button class="btn btn-primary">Assign Complaint</button></div>
+  </div>
+</div>
+
+<!-- Status Modal -->
+<div class="modal-backdrop" id="statusModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Update Status</div><button class="modal-close" data-modal-close><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">New Status <span class="required">*</span></label>
+        <select class="form-control"><option>Submitted</option><option>Under Review</option><option>Assigned</option><option selected>In Progress</option><option>Resolved</option><option>Closed</option><option>Rejected</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Reason / Notes <span class="required">*</span></label><textarea class="form-control" rows="4" placeholder="Provide context for this status change..."></textarea></div>
+      <label class="form-check" style="margin-bottom:8px;"><input type="checkbox" class="form-check-input" checked><span class="form-check-label">Notify complainant via email</span></label>
+      <label class="form-check"><input type="checkbox" class="form-check-input"><span class="form-check-label">Send SMS notification</span></label>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" data-modal-close>Cancel</button><button class="btn btn-primary">Update Status</button></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+(async () => {
+  const user = await requireAuth('admin').catch(() => null);
+    if (user) {
+      const ini = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      document.querySelectorAll('.user-name').forEach(el => el.textContent = user.name);
+      document.querySelectorAll('.user-role').forEach(el => el.textContent = user.email);
+      document.querySelectorAll('.avatar:not(.avatar-sm)').forEach(el => el.textContent = ini);
+      document.querySelectorAll('.topbar-user span').forEach(el => { if(el.textContent.trim()) el.textContent = user.name; });
+    }
+  let currentStatus = '', currentPriority = '', searchTimer;
+
+  async function loadComplaints() {
+    const tbody = document.getElementById('complaints-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);">Loading…</td></tr>';
+    try {
+      const params = {};
+      if (currentStatus)   params.status   = currentStatus;
+      if (currentPriority) params.priority  = currentPriority;
+      const q = document.querySelector('.topnav-search input');
+      if (q && q.value.trim()) params.q = q.value.trim();
+
+      const { complaints, total } = await API.adminComplaints(params);
+      if (!complaints.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);">No complaints found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = complaints.map(c => `
+        <tr>
+          <td><input type="checkbox" class="table-check"></td>
+          <td><a href="06-complaint-detail.html?id=${c.id}" class="ref-id">${c.ref_no}</a></td>
+          <td><div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.title}">${c.title}</div></td>
+          <td>${c.submitter_name || 'Anonymous'}</td>
+          <td><span class="badge badge-indigo" style="font-size:10.5px;">${c.category_name || '—'}</span></td>
+          <td>${priorityBadge(c.priority)}</td>
+          <td>${statusBadge(c.status)}</td>
+          <td>${fmtDate(c.created_at)}</td>
+          <td class="table-actions">
+            <a href="06-complaint-detail.html?id=${c.id}" class="btn btn-ghost btn-sm">View</a>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:28px;color:#c5221a;">${e.message}</td></tr>`;
+    }
+  }
+
+  // Search
+  const searchInput = document.querySelector('.topnav-search input');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(loadComplaints, 400);
+    });
+  }
+
+  // Status filter tabs (if any)
+  document.querySelectorAll('[data-status]').forEach(el => {
+    el.addEventListener('click', () => { currentStatus = el.dataset.status || ''; loadComplaints(); });
+  });
+
+  // Filter selects
+  document.querySelectorAll('select.filter-select, select.form-control').forEach((sel, i) => {
+    sel.addEventListener('change', () => {
+      if (i === 0) currentStatus   = sel.value;
+      if (i === 1) currentPriority = sel.value;
+      loadComplaints();
+    });
+  });
+
+  loadComplaints();
+})();
+</script>
+</body>
+</html>
