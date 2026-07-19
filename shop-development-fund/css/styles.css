@@ -198,6 +198,41 @@ a:hover { text-decoration: underline; }
 .summary-panel dd a { word-break: break-word; }
 .summary-panel dd.highlight { color: var(--bronze); font-weight: 700; }
 
+/* ---------- Illustrations ---------- */
+.hero-art {
+  border-top: 1px solid var(--rule);
+  background: #f2f1ec;
+  padding-top: 2.2rem;
+}
+.art-fig { margin: 0; }
+.art-fig svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.elevation { border: 1px solid var(--rule); }
+.art-caption {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--muted);
+  text-align: right;
+  padding: 0.55rem 0 1.2rem;
+}
+.plan-fig { margin-top: 2rem; }
+.plan-fig svg { border: 1px solid var(--rule); }
+.plan-fig .art-caption { padding-bottom: 0; }
+
+.reason-icon { display: block; color: var(--bronze); margin-bottom: 0.5rem; }
+.reason-icon svg { width: 26px; height: 26px; }
+
+.idea-group h3 svg {
+  width: 17px;
+  height: 17px;
+  margin-right: 0.5rem;
+  vertical-align: -3px;
+  color: var(--bronze);
+}
+
 /* ---------- Sections ---------- */
 .section { padding: 4.2rem 0; }
 .section-rule { border-top: 1px solid var(--rule); }
