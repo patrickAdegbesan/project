@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Project Admin — Rehoboth-Winners Shopping Mall</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="admin-page">
+
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>Project administration — not for public distribution</span>
+      <a href="index.html">&larr; Back to site</a>
+    </div>
+  </div>
+
+  <header class="masthead">
+    <div class="container masthead-inner">
+      <span class="wordmark">Rehoboth-Winners<span>Mall</span> <small class="admin-tag">Admin</small></span>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+
+    <p class="admin-intro">
+      Record payments, mark slots, and update stage progress here. Data is
+      stored in this browser only. When you are ready to publish, use
+      <strong>Download site-data.js</strong> and upload the file to the
+      website's <code>data/</code> folder — the public site contains no
+      personal information, only slot statuses and stage progress.
+    </p>
+
+    <!-- ============ Slots ============ -->
+    <section class="admin-section">
+      <h2><span>1</span> Slot status</h2>
+      <p class="admin-help">Click a slot to cycle its status:
+        <em>Available &rarr; Reserved &rarr; Sold &rarr; Available</em>.
+        Slots are also marked sold automatically when you record a payment
+        against them below.</p>
+      <div class="slot-grid admin-slot-grid" id="adminSlotGrid"></div>
+    </section>
+
+    <!-- ============ Payments ============ -->
+    <section class="admin-section">
+      <h2><span>2</span> Payment register</h2>
+      <p class="admin-help">Record each contribution as it is confirmed on
+        your Paystack dashboard. These records stay in this browser and in
+        your CSV exports — they are never published to the public site.</p>
+
+      <form class="payment-form" id="paymentForm">
+        <div class="pf-grid">
+          <label>Date
+            <input type="date" name="date" required>
+          </label>
+          <label>Full name
+            <input type="text" name="name" required>
+          </label>
+          <label>Email
+            <input type="email" name="email">
+          </label>
+          <label>Phone
+            <input type="tel" name="phone">
+          </label>
+          <label>Amount (&#8358;)
+            <input type="number" name="amount" min="0" step="any" required>
+          </label>
+          <label>Paystack reference
+            <input type="text" name="ref">
+          </label>
+          <label>Slot
+            <select name="slot" id="slotSelect"></select>
+          </label>
+          <label>Note
+            <input type="text" name="note" placeholder="e.g. paired purchase — upper shop">
+          </label>
+        </div>
+        <label class="pf-check">
+          <input type="checkbox" name="markSold" checked>
+          Mark the selected slot as sold
+        </label>
+        <button type="submit" class="btn">Add Payment Record</button>
+      </form>
+
+      <div class="table-scroll">
+        <table class="detail-table admin-table" id="paymentsTable">
+          <thead>
+            <tr>
+              <th>Date</th><th>Name</th><th>Email</th><th>Phone</th>
+              <th>Amount</th><th>Reference</th><th>Slot</th><th>Note</th><th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr><th colspan="4">Total recorded</th><th id="paymentsTotal" colspan="5">&#8358;0</th></tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ Stages ============ -->
+    <section class="admin-section">
+      <h2><span>3</span> Stage progress</h2>
+      <p class="admin-help">Set each stage's status and how far it has gone.
+        This drives the roadmap on the public site.</p>
+      <div id="stageEditors"></div>
+    </section>
+
+    <!-- ============ Publish ============ -->
+    <section class="admin-section">
+      <h2><span>4</span> Save &amp; publish</h2>
+      <div class="admin-actions">
+        <button class="btn" id="btnSave">Save &amp; Preview in This Browser</button>
+        <button class="btn" id="btnDownload">Download site-data.js</button>
+        <button class="btn btn-secondary" id="btnCsv">Export Payments CSV</button>
+        <button class="btn btn-secondary" id="btnReset">Discard Local Changes</button>
+      </div>
+      <p class="admin-help" id="saveStatus"></p>
+      <p class="admin-help">
+        <strong>To publish:</strong> Save, then Download
+        <code>site-data.js</code> and upload it to the website's
+        <code>data/</code> folder, replacing the existing file. The public
+        site updates immediately. Keep this admin page off any public menu
+        and back up your CSV exports regularly.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-legal">
+      <p>Rehoboth-Winners Shopping Mall — project administration</p>
+      <p><a href="index.html">Public site</a></p>
+    </div>
+  </footer>
+
+  <script src="data/site-data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

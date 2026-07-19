@@ -45,7 +45,7 @@
   <section class="hero">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <p class="notice">Only 4 slots remaining</p>
+        <p class="notice" id="slotsNotice">Slots now selling</p>
         <h1>Be a proud shop owner at Rehoboth&#8209;Winners Shopping&nbsp;Mall</h1>
         <p>
           A proposed development of sixteen massive shops — eight up, eight
@@ -66,7 +66,8 @@
           <div><dt>Location</dt><dd>Bluestone Garden City, facing the estate road</dd></div>
           <div><dt>Shops</dt><dd>16 — eight upper, eight lower</dd></div>
           <div><dt>Full slot</dt><dd>2 shops (one up, one down) &middot; &#8358;7.5m</dd></div>
-          <div><dt>Slots remaining</dt><dd class="highlight">4 of 8</dd></div>
+          <div><dt>Slots remaining</dt><dd class="highlight" id="slotsSummary">8 of 8</dd></div>
+          <div><dt>Current stage</dt><dd id="stageSummary">Stage 1 — Securing the land</dd></div>
           <div><dt>Payment channel</dt><dd><a href="https://paystack.shop/pay/shop-development-fund" target="_blank" rel="noopener">paystack.shop/pay/<wbr>shop-development-fund</a></dd></div>
         </dl>
       </aside>
@@ -161,6 +162,14 @@
           on the ground floor and one above, with toilet space inclusive.
         </p>
 
+        <h3 class="sub-heading">Slot availability</h3>
+        <div class="slot-grid" id="slotGrid"></div>
+        <div class="slot-legend">
+          <span class="lg lg-available">Available — click to pay</span>
+          <span class="lg lg-reserved">Reserved</span>
+          <span class="lg lg-sold">Sold</span>
+        </div>
+
         <table class="detail-table">
           <tbody>
             <tr>
@@ -177,7 +186,7 @@
             </tr>
             <tr>
               <th scope="row">Slots remaining</th>
-              <td><strong>4 of 8</strong></td>
+              <td><strong id="slotsTableCell">8 of 8</strong></td>
             </tr>
           </tbody>
         </table>
@@ -227,41 +236,31 @@
     </div>
   </section>
 
-  <!-- ============ Project stages ============ -->
+  <!-- ============ Project roadmap ============ -->
   <section class="section section-rule" id="stages">
     <div class="container split">
       <div class="split-label">
         <span class="section-no">04</span>
-        <h2>The Four Project Stages</h2>
+        <h2>Project Roadmap</h2>
       </div>
-      <div class="split-body">
-        <ol class="numbered">
-          <li>
-            <h3>Securing the land</h3>
-            <p>Acquisition of the 500&nbsp;sqm commercial plot with every legal
-            documentation — survey, deeds and global C of O.</p>
-          </li>
-          <li>
-            <h3>Documentation &amp; design</h3>
-            <p>Individual legal documentation per slot; architectural design;
-            electrical design and budget cost; mechanical building cost;
-            cost of materials; professional, legal and consultant fees.</p>
-          </li>
-          <li>
-            <h3>Construction to roof level</h3>
-            <p>Building from scratch to roof level with all plumbing and
-            electrical piping/wiring in place; plastering of the entire
-            building; windows, burglary bars and roll-shutter doors fitted;
-            borehole, tank scaffold, soakaway and all drainage systems;
-            external painting and parking lot.</p>
-          </li>
-          <li>
-            <h3>Individual finishing</h3>
-            <p>Tiling, internal painting, electrical and plumbing fittings,
-            ceiling works, meter and overhead tank — completed by each owner
-            to their own taste and standard.</p>
-          </li>
-        </ol>
+      <div class="split-body roadmap-body">
+        <p>
+          The development runs in four stages, from securing the land to the
+          finished mall. Follow the map below — each stop is a stage. Select
+          a stop to see what it covers and how far it has gone.
+        </p>
+
+        <div class="roadmap-wrap">
+          <div class="roadmap-stagearea">
+            <svg class="roadmap-svg" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path class="map-path" d="M50,161 C130,161 210,65 290,65 S450,161 530,161 S690,65 770,65 S900,151 945,151"/>
+            </svg>
+            <ul class="map-nodes" id="mapNodes"></ul>
+          </div>
+          <p class="map-updated" id="mapUpdated"></p>
+        </div>
+
+        <div class="stage-detail" id="stageDetail"></div>
       </div>
     </div>
   </section>
@@ -424,6 +423,7 @@
     </div>
   </footer>
 
+  <script src="data/site-data.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
