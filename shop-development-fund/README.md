@@ -82,6 +82,23 @@ When the site gets its final domain, set the `og:image` meta tag in
 `index.html` to the absolute URL of `assets/og-image.png` so WhatsApp
 and Facebook show the preview card when the link is shared.
 
+### Renders and the fly-through video
+
+The hero showcase holds a cinematic fly-through video
+(`assets/mall-flythrough.mp4`) and a four-image render gallery. To add
+the renders, drop these files into `assets/` (square images, ~1024px):
+
+| File | Shows |
+|------|-------|
+| `assets/mall-front.jpg` | Front view (also used as the video poster) |
+| `assets/mall-aerial.jpg` | Aerial view |
+| `assets/mall-dusk.jpg` | Evening / dusk view |
+| `assets/mall-frontage.jpg` | Shopfront frontage |
+
+The gallery fills in automatically for whichever files are present; if
+none are added yet, it hides itself so nothing looks broken. Replace
+the video by overwriting `assets/mall-flythrough.mp4`.
+
 ## Running locally
 
 Open `index.html` directly in a browser, or serve the folder:

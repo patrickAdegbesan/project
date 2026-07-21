@@ -85,10 +85,30 @@
       </aside>
     </div>
 
-    <!-- Artist's impression: front elevation -->
+    <!-- Showcase: fly-through video + render gallery -->
     <div class="hero-art">
       <div class="container">
-        <figure class="art-fig">
+
+        <figure class="art-fig video-fig">
+          <div class="video-frame">
+            <video id="mallVideo" src="assets/mall-flythrough.mp4" poster="assets/mall-front.jpg" controls preload="metadata" playsinline></video>
+            <button class="video-play" id="videoPlay" aria-label="Play the fly-through video">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+              <span>Watch the fly-through</span>
+            </button>
+          </div>
+          <figcaption class="art-caption">Cinematic fly-through of the proposed mall — illustrative only</figcaption>
+        </figure>
+
+        <ul class="render-gallery" id="renderGallery">
+          <li><a href="assets/mall-front.jpg" target="_blank" rel="noopener"><img src="assets/mall-front.jpg" alt="Proposed mall — front view" loading="lazy"></a><span>Front view</span></li>
+          <li><a href="assets/mall-aerial.jpg" target="_blank" rel="noopener"><img src="assets/mall-aerial.jpg" alt="Proposed mall — aerial view" loading="lazy"></a><span>Aerial view</span></li>
+          <li><a href="assets/mall-dusk.jpg" target="_blank" rel="noopener"><img src="assets/mall-dusk.jpg" alt="Proposed mall — evening view" loading="lazy"></a><span>Evening view</span></li>
+          <li><a href="assets/mall-frontage.jpg" target="_blank" rel="noopener"><img src="assets/mall-frontage.jpg" alt="Proposed mall — shopfront frontage" loading="lazy"></a><span>Shopfront frontage</span></li>
+        </ul>
+
+        <figure class="art-fig line-elevation">
+          <svg class="elevation" viewBox="0 0 1200 430" role="img" aria-label="Line illustration of the proposed mall: two floors of eight shops each, facing the estate road">
           <svg class="elevation" viewBox="0 0 1200 430" role="img" aria-label="Artist's impression of the proposed mall: two floors of eight shops each, facing the estate road">
             <defs>
               <g id="bay-down">
@@ -149,7 +169,7 @@
             <use href="#lamp" x="66" y="310"/>
             <use href="#lamp" x="1134" y="310"/>
           </svg>
-          <figcaption class="art-caption">Artist's impression — proposed front elevation, facing the estate road (illustrative only)</figcaption>
+          <figcaption class="art-caption">Front elevation — schematic (illustrative only)</figcaption>
         </figure>
       </div>
     </div>

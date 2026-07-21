@@ -54,6 +54,45 @@
   var yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* ---------------- Fly-through video overlay ---------------- */
+  var vid = document.getElementById('mallVideo');
+  var playBtn = document.getElementById('videoPlay');
+  if (vid && playBtn) {
+    playBtn.addEventListener('click', function () { vid.play(); });
+    vid.addEventListener('play', function () { playBtn.classList.add('hidden'); });
+    vid.addEventListener('pause', function () {
+      if (!vid.ended) playBtn.classList.remove('hidden');
+    });
+  }
+
+  /* ---------------- Render gallery: show only images that exist ----------------
+     Each image whose file is missing removes its tile; if none of the render
+     photos have been added yet, the whole gallery hides itself so nothing
+     appears broken. Add the photos to /assets to make it appear. */
+  var gallery = document.getElementById('renderGallery');
+  if (gallery) {
+    var imgs = Array.prototype.slice.call(gallery.querySelectorAll('img'));
+    var pending = imgs.length;
+    var settle = function () {
+      if (--pending === 0 && gallery.querySelectorAll('li').length === 0) {
+        gallery.remove();
+      }
+    };
+    imgs.forEach(function (img) {
+      var done = false;
+      var ok = function () { if (!done) { done = true; settle(); } };
+      var fail = function () {
+        if (done) return;
+        done = true;
+        var li = img.closest('li');
+        if (li) li.remove();
+        settle();
+      };
+      if (img.complete) { img.naturalWidth > 0 ? ok() : fail(); }
+      else { img.addEventListener('load', ok); img.addEventListener('error', fail); }
+    });
+  }
+
   if (!DATA) return; // static fallback content stays as written in the HTML
 
   /* ---------------- Slot availability ---------------- */
