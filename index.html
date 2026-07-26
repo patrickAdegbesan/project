@@ -310,8 +310,8 @@
 
   <header class="hero" id="home">
     <div class="hero-media" id="videoCard" role="button" tabindex="0" aria-label="Play mall development video">
-      <video autoplay muted loop playsinline preload="metadata">
-        <source src="./hailuo-2_3_A_timeline_video_of_the_development_of_REHOBOTH-WINNERS_SHOPPING_MALL_showing_pr-0.mp4" type="video/mp4">
+      <video muted loop playsinline preload="none" poster="./hero-poster.webp">
+        <source data-src="./hailuo-2_3_A_timeline_video_of_the_development_of_REHOBOTH-WINNERS_SHOPPING_MALL_showing_pr-0.mp4" type="video/mp4">
       </video>
       <div class="play"><div class="ring"></div></div>
       <span class="video-tag">▶ Watch the vision</span>
@@ -339,7 +339,7 @@
   <section class="phase" id="land">
     <div class="frame">
       <div class="phase-img reveal zoom">
-        <img src="./gemini-2.5-flash-image_A_cinematic_story-timelapse_of_the_making_of_REHOBOTH-WINNERS_SHOPPING_MALL_a_mo-0.jpg" alt="The land at Bluestone Garden City — cleared plot with survey pegs">
+        <img src="./gemini-2.5-flash-image_A_cinematic_story-timelapse_of_the_making_of_REHOBOTH-WINNERS_SHOPPING_MALL_a_mo-0.jpg" alt="The land at Bluestone Garden City — cleared plot with survey pegs" width="1024" height="1024" loading="lazy" decoding="async">
       </div>
       <div class="phase-copy reveal d1">
         <p class="step">Phase 1 of 4 · The foundation</p>
@@ -362,7 +362,7 @@
   <section class="phase white rev" id="build">
     <div class="frame">
       <div class="phase-img reveal zoom">
-        <img src="./gemini-2.5-flash-image_A_detailed_blueprint_of_REHOBOTH-WINNERS_SHOPPING_MALL_showcasing_its_modern_two-0.jpg" alt="Architectural blueprint of Rehoboth-Winners Shopping Mall — ground and first floor elevations">
+        <img src="./gemini-2.5-flash-image_A_detailed_blueprint_of_REHOBOTH-WINNERS_SHOPPING_MALL_showcasing_its_modern_two-0.jpg" alt="Architectural blueprint of Rehoboth-Winners Shopping Mall — ground and first floor elevations" width="1024" height="1024" loading="lazy" decoding="async">
       </div>
       <div class="phase-copy reveal d1">
         <p class="step">Phase 2 of 4 · Design &amp; documentation</p>
@@ -388,7 +388,7 @@
   <section class="phase">
     <div class="frame">
       <div class="phase-img reveal zoom">
-        <img src="./lucid-origin_A_cinematic_photo_of_a_two-storey_commercial_shopping_mall_under_construction_in-0.jpg" alt="Mall under construction, built to roof level with scaffolding and water tank">
+        <img src="./lucid-origin_A_cinematic_photo_of_a_two-storey_commercial_shopping_mall_under_construction_in-0.jpg" alt="Mall under construction, built to roof level with scaffolding and water tank" width="1024" height="1024" loading="lazy" decoding="async">
       </div>
       <div class="phase-copy reveal d1">
         <p class="step">Phase 3 of 4 · Construction</p>
@@ -414,7 +414,7 @@
   <section class="phase white rev">
     <div class="frame">
       <div class="phase-img reveal zoom">
-        <img src="./lucid-origin_A_cinematic_interior_of_a_newly_finished_modern_retail_shop_freshly_tiled_floor_-0.jpg" alt="Finished shop interior — tiled floor, painted walls, roll-shutter shopfront">
+        <img src="./lucid-origin_A_cinematic_interior_of_a_newly_finished_modern_retail_shop_freshly_tiled_floor_-0.jpg" alt="Finished shop interior — tiled floor, painted walls, roll-shutter shopfront" width="1024" height="1024" loading="lazy" decoding="async">
       </div>
       <div class="phase-copy reveal d1">
         <p class="step">Phase 4 of 4 · Interior finishing</p>
@@ -469,7 +469,7 @@
   <!-- Fullscreen player -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <button class="close" id="closeBox" aria-label="Close">✕</button>
-    <video id="bigVideo" controls playsinline>
+    <video id="bigVideo" controls playsinline preload="none">
       <source src="./hailuo-2_3_A_timeline_video_of_the_development_of_REHOBOTH-WINNERS_SHOPPING_MALL_showing_pr-0.mp4" type="video/mp4">
     </video>
   </div>
@@ -499,6 +499,19 @@
   document.getElementById('closeBox').addEventListener('click',closeBox);
   lb.addEventListener('click',function(e){if(e.target===lb)closeBox();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeBox();});
+
+  // Hero background video: the poster carries first paint, the 1.7MB file only
+  // downloads once the rest of the page is in. Skipped entirely on Data Saver
+  // or reduced-motion, where the poster is the whole experience.
+  window.addEventListener('load',function(){
+    var v=card.querySelector('video'),src=v&&v.querySelector('source[data-src]');
+    if(!src)return;
+    var conn=navigator.connection||{};
+    if(conn.saveData||window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    src.src=src.getAttribute('data-src');src.removeAttribute('data-src');
+    v.load();
+    var p=v.play();if(p&&p.catch)p.catch(function(){});
+  });
 
   // Business ideas
   (function(){
