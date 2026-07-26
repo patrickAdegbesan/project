@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rehoboth-Winners Shopping Mall</title>
+<style>
+  :root{
+    --accent:#c0762b;
+    --accent-bright:#d8873a;
+    --ink:#20242a;
+    --ink-soft:#5f6b6f;
+    --line:#e9e4dc;
+    --paper:#ffffff;
+    --cream:#faf7f2;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{margin:0;overflow-x:hidden;max-width:100%}
+  [id]{scroll-margin-top:80px}   /* offset for sticky nav */
+  /* Money / investment watermark baked into the page background */
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);
+    background-color:var(--paper);-webkit-font-smoothing:antialiased;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='rgba(192,118,43,0.32)' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg%3E%3Cpath d='M40 40v40M64 40v40M34 52h36M34 68h36'/%3E%3Cpath d='M40 40l24 40'/%3E%3C/g%3E%3Cg%3E%3Cpolyline points='190,90 214,66 232,80 262,50'/%3E%3Cpolyline points='262,50 262,66'/%3E%3Cpolyline points='262,50 246,50'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='70' cy='210' r='24'/%3E%3Cpath d='M70 194v32M62 202h12a4 4 0 010 8h-12M62 210h14a4 4 0 010 8h-14'/%3E%3C/g%3E%3Cg%3E%3Cpath d='M212 236v-34l24-14 24 14v34'/%3E%3Cpath d='M212 214h48'/%3E%3Cpath d='M228 236v-14h16v14'/%3E%3C/g%3E%3Cg%3E%3Cline x1='150' y1='150' x2='150' y2='128'/%3E%3Cline x1='162' y1='150' x2='162' y2='114'/%3E%3Cline x1='174' y1='150' x2='174' y2='100'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-size:260px 260px}
+
+  .frame{max-width:1200px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+
+  /* ---------- Scroll progress ---------- */
+  .scroll-prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;background:var(--accent)}
+
+  /* ---------- Nav: floating glass pill ---------- */
+  .nav{position:sticky;top:0;z-index:50;padding:14px clamp(12px,3vw,22px);transition:padding .3s ease}
+  .nav .frame{max-width:1160px;margin:0 auto;height:64px;
+    padding:0 14px 0 clamp(16px,2.4vw,24px);
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    background:rgba(255,255,255,.66);backdrop-filter:blur(18px) saturate(1.5);
+    -webkit-backdrop-filter:blur(18px) saturate(1.5);
+    border:1px solid rgba(255,255,255,.7);border-radius:18px;
+    box-shadow:0 12px 40px rgba(32,36,42,.12),inset 0 1px 0 rgba(255,255,255,.6);
+    transition:height .3s ease,background .3s ease,box-shadow .3s ease,border-radius .3s ease}
+  .nav.scrolled{padding-top:8px;padding-bottom:8px}
+  .nav.scrolled .frame{height:56px;background:rgba(255,255,255,.9);
+    box-shadow:0 8px 26px rgba(32,36,42,.16)}
+  .logo{display:flex;align-items:center;gap:11px}
+  .logo-txt{display:flex;flex-direction:column;justify-content:center}
+  .logo-txt b{font-size:.86rem;letter-spacing:.16em;color:var(--ink);line-height:1}
+  .logo-txt>span{font-size:.56rem;letter-spacing:.26em;color:var(--accent);margin-top:4px;font-weight:700}
+  .menu{display:flex;align-items:center;gap:clamp(16px,2.4vw,30px);list-style:none;margin:0;padding:0}
+  .menu a{position:relative;text-decoration:none;color:var(--ink);font-weight:600;font-size:.8rem;
+    letter-spacing:.06em;padding:6px 0;transition:color .2s}
+  .menu a:not(.book):after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;
+    border-radius:2px;background:linear-gradient(90deg,var(--accent),#e7b562);
+    transition:right .3s cubic-bezier(.4,.8,.3,1)}
+  .menu a:not(.book):hover,.menu a.active{color:var(--accent)}
+  .menu a:not(.book):hover:after,.menu a.active:after{right:0}
+  .nav .book{background:var(--accent);color:#fff;
+    padding:11px 20px;border-radius:10px;font-size:.78rem;font-weight:700;text-decoration:none;
+    letter-spacing:.04em;transition:transform .18s,filter .18s}
+  .nav .book:hover{transform:translateY(-1px);filter:brightness(1.06)}
+  .burger{display:none;background:none;border:0;cursor:pointer;padding:6px}
+  .burger span{display:block;width:24px;height:2px;background:var(--ink);margin:5px 0;border-radius:2px;
+    transition:transform .3s,opacity .3s}
+
+  /* ---------- Hero (desktop: video as background) ---------- */
+  .hero{position:relative;overflow:hidden;min-height:min(82vh,660px);display:flex;align-items:center}
+  .hero-media{position:absolute;inset:0;z-index:0;cursor:pointer}
+  .hero-media video{width:100%;height:100%;object-fit:cover;display:block}
+  .hero-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,rgba(245,242,237,.5) 0%,rgba(245,242,237,.12) 42%,
+      rgba(15,13,11,0) 66%,rgba(15,13,11,.22) 100%)}
+  .hero .frame{position:relative;z-index:2;display:flex;
+    padding-top:clamp(40px,6vw,70px);padding-bottom:clamp(40px,6vw,70px)}
+  .copy{max-width:540px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);
+    border-radius:20px;padding:clamp(28px,3vw,44px);
+    box-shadow:0 30px 70px rgba(32,36,42,.22)}
+  .play{position:absolute;inset:0;z-index:3;display:none;place-items:center;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.14))}
+  .play .ring{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.94);
+    display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .play .ring:after{content:"";width:0;height:0;margin-left:5px;
+    border-left:19px solid var(--accent);border-top:11px solid transparent;border-bottom:11px solid transparent}
+  .video-tag{position:absolute;right:18px;bottom:18px;z-index:4;color:#fff;font-size:.72rem;
+    letter-spacing:.08em;text-transform:uppercase;font-weight:600;background:rgba(0,0,0,.42);
+    padding:8px 14px;border-radius:999px;backdrop-filter:blur(4px);pointer-events:none}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.72rem;letter-spacing:.24em;
+    text-transform:uppercase;font-weight:700;color:var(--accent);margin:0 0 20px}
+  .eyebrow:before{content:"";width:26px;height:1px;background:var(--accent)}
+  h1{font-weight:800;font-size:clamp(2.5rem,5.6vw,4.2rem);line-height:1.02;letter-spacing:-.02em;
+    margin:0 0 22px;text-transform:uppercase}
+  h1 .l2{color:var(--accent)}
+  .hero p.sub{max-width:46ch;color:var(--ink-soft);font-size:1.05rem;line-height:1.7;margin:0 0 32px}
+  .actions{display:flex;flex-wrap:wrap;gap:14px}
+  .btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+    font-size:.88rem;letter-spacing:.03em;padding:15px 28px;border-radius:8px;cursor:pointer;
+    border:1.5px solid transparent;transition:transform .16s,filter .16s,background .16s,color .16s}
+  .btn-solid{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(192,118,43,.28)}
+  .btn-solid:hover{transform:translateY(-2px);filter:brightness(1.07)}
+  .btn-outline{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn-outline:hover{transform:translateY(-2px);border-color:var(--accent);color:var(--accent)}
+  .facts{display:flex;gap:clamp(20px,4vw,40px);margin-top:38px;flex-wrap:wrap}
+  .facts .f b{display:block;font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .facts .f span{display:block;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:6px}
+
+  /* ---------- Business ideas (bold editorial) ---------- */
+  .ideas{background:var(--ink);color:#fff;padding:clamp(60px,9vw,120px) 0;
+    position:relative;overflow:hidden}
+  .ideas .head{max-width:820px;margin-bottom:clamp(36px,5vw,56px)}
+  .ideas .eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--accent-bright);
+    font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;font-weight:700;margin:0 0 20px}
+  .ideas .eyebrow:before{content:"";width:32px;height:1px;background:var(--accent-bright)}
+  .ideas h2{font-weight:800;font-size:clamp(2.4rem,6.5vw,4.6rem);line-height:.98;letter-spacing:-.02em;
+    margin:0 0 18px;text-wrap:balance}
+  .ideas h2 em{font-style:normal;color:var(--accent-bright)}
+  .ideas .head p{color:rgba(255,255,255,.62);font-size:1.06rem;line-height:1.7;max-width:56ch;margin:0}
+  .idea-list{columns:3;column-gap:clamp(28px,4vw,56px)}
+  .idea{display:flex;gap:16px;align-items:baseline;padding:15px 0;break-inside:avoid;
+    border-top:1px solid rgba(255,255,255,.12);transition:padding-left .25s ease}
+  .idea .num{flex:none;color:var(--accent-bright);font-size:.8rem;font-weight:700;
+    font-variant-numeric:tabular-nums;width:26px;letter-spacing:.02em}
+  .idea .name{font-size:1.06rem;font-weight:600;color:#fff;transition:color .2s}
+  .idea:hover{padding-left:8px}
+  .idea:hover .name{color:var(--accent-bright)}
+  @media (max-width:820px){.idea-list{columns:2;column-gap:32px}}
+  @media (max-width:520px){.idea-list{columns:1}.idea{padding:13px 0}}
+
+  /* ---------- Contact footer ---------- */
+  .contact{background:var(--ink);color:#fff;padding:clamp(48px,7vw,80px) 0}
+  .contact .frame{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(30px,5vw,60px);
+    align-items:center}
+  .contact .step{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:700;
+    color:var(--accent-bright);margin:0 0 14px}
+  .contact h2{font-weight:800;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.06;margin:0 0 14px}
+  .contact p{color:rgba(255,255,255,.72);font-size:1.02rem;line-height:1.7;margin:0 0 26px;max-width:46ch}
+  .contact .btn-solid{box-shadow:0 12px 28px rgba(192,118,43,.4)}
+  .call-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+    border-radius:16px;padding:clamp(22px,3vw,30px)}
+  .call-card .lbl{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(255,255,255,.55);margin:0 0 16px}
+  .call-card a{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;
+    padding:14px 0;border-top:1px solid rgba(255,255,255,.12);font-size:1.15rem;font-weight:700;
+    font-variant-numeric:tabular-nums;transition:color .15s}
+  .call-card a:first-of-type{border-top:0}
+  .call-card a:hover{color:var(--accent-bright)}
+  .call-card a .ic{width:38px;height:38px;border-radius:50%;background:var(--accent);flex:none;
+    display:grid;place-items:center}
+  .call-card a .ic svg{width:18px;height:18px;fill:#fff}
+  .footnote{border-top:1px solid rgba(255,255,255,.1);margin-top:clamp(36px,5vw,54px);
+    padding-top:22px;color:rgba(255,255,255,.5);font-size:.82rem;line-height:1.6}
+  @media (max-width:760px){.contact .frame{grid-template-columns:1fr;gap:28px}}
+
+  /* ---------- Lightbox ---------- */
+  .lightbox{position:fixed;inset:0;z-index:100;background:rgba(15,13,11,.9);
+    display:none;align-items:center;justify-content:center;padding:24px}
+  .lightbox.open{display:flex}
+  .lightbox video{max-width:min(1100px,94vw);max-height:88vh;width:auto;border-radius:12px;
+    box-shadow:0 30px 80px rgba(0,0,0,.6);background:#000}
+  .lightbox .close{position:absolute;top:20px;right:24px;width:44px;height:44px;border-radius:50%;
+    border:0;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;font-size:1.5rem;line-height:1}
+  .lightbox .close:hover{background:rgba(255,255,255,.26)}
+
+  /* ---------- Phase 1 section ---------- */
+  .phase{background:rgba(250,247,242,.6);border-top:1px solid var(--line);
+    padding:clamp(50px,7vw,90px) 0}
+  .phase .frame{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(32px,5vw,60px);align-items:center}
+  .phase-img{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/3;
+    background:linear-gradient(135deg,#d9cbb6,#b7a184);
+    box-shadow:0 24px 50px rgba(32,36,42,.14)}
+  .phase-img img{width:100%;height:100%;object-fit:cover;display:block}
+  .phase-img .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+    color:#6a5b44;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;padding:20px}
+  .phase-img .badge{position:absolute;left:16px;top:16px;background:var(--accent);color:#fff;
+    font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    padding:8px 14px;border-radius:999px;z-index:2}
+  .phase-copy .step{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);margin:0 0 14px}
+  .phase-copy h2{font-weight:800;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.06;
+    letter-spacing:-.01em;margin:0 0 16px}
+  .phase-copy p{color:var(--ink-soft);font-size:1.02rem;line-height:1.7;margin:0 0 22px;max-width:52ch}
+  .price-box{display:flex;gap:11px;flex-wrap:wrap;margin:20px 0 22px}
+  .price-box .pb{flex:1 1 120px;background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:12px 15px}
+  .price-box .pb .k{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .price-box .pb .v{font-size:1.35rem;font-weight:800;font-variant-numeric:tabular-nums;margin-top:4px;
+    color:var(--ink)}
+  .price-box .pb.accent{background:var(--accent);border-color:var(--accent)}
+  .price-box .pb.accent .k{color:#f7e6d3}
+  .price-box .pb.accent .v{color:#fff}
+  .phase-note{display:flex;gap:10px;align-items:flex-start;color:var(--ink-soft);font-size:.86rem;
+    line-height:1.55;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 14px;margin-bottom:22px}
+
+  /* ---------- Phase variants (alternating side / background) ---------- */
+  .phase.white{background:rgba(255,255,255,.55)}
+  .phase.rev .phase-copy{order:1}
+  .phase.rev .phase-img{order:2}
+  /* compact "what's included" tags */
+  .phase-tags{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
+  .phase-tags span{font-size:.78rem;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:7px 13px;color:var(--ink-soft)}
+  .phase-tags span b{color:var(--ink);font-weight:600}
+  /* checklist card (used inside a phase copy) */
+  .checklist{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 24px 50px rgba(32,36,42,.1);margin:8px 0 24px}
+  .checklist .cl-head{background:var(--ink);color:#fff;padding:16px 22px;font-weight:700;
+    font-size:.9rem;letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+  .checklist .cl-head .n{background:var(--accent);color:#fff;font-size:.68rem;font-weight:700;
+    padding:4px 10px;border-radius:999px;letter-spacing:.08em}
+  .checklist ul{list-style:none;margin:0;padding:6px 0}
+  .checklist li{display:flex;gap:13px;align-items:flex-start;padding:14px 22px;
+    border-top:1px solid var(--line);font-size:.96rem}
+  .checklist li:first-child{border-top:0}
+  .checklist li .ck{flex:none;width:22px;height:22px;border-radius:50%;background:rgba(192,118,43,.12);
+    color:var(--accent);display:grid;place-items:center;font-size:.7rem;font-weight:800;margin-top:1px}
+  .checklist li b{font-weight:600;color:var(--ink)}
+  .checklist li span.d{display:block;color:var(--ink-soft);font-size:.84rem;margin-top:2px}
+
+  /* ---------- Scroll reveal (only hides once JS confirms it can reveal) ---------- */
+  .js .reveal{opacity:0;transform:translateY(30px);
+    transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .js .reveal.zoom{transform:translateY(30px) scale(.97)}
+  .js .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}
+  .reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}
+
+  .phase-img img{transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+  .phase-img:hover img{transform:scale(1.04)}
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .phase-img img{transition:none}
+    .scroll-prog{display:none}
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .phase .frame{grid-template-columns:1fr;gap:32px}
+    .phase-img,.phase.rev .phase-img{order:-1}   /* image always on top on mobile */
+    .phase.rev .phase-copy{order:0}
+  }
+  /* Mobile: video becomes a clear block on top, content below & smaller */
+  @media (max-width:900px){
+    .hero{display:block;min-height:0;overflow:visible}
+    .hero-media{position:relative;inset:auto;width:100%;aspect-ratio:16/9;
+      box-shadow:0 16px 34px rgba(32,36,42,.16)}
+    .hero-scrim{display:none}
+    .play{display:grid}                    /* show the play ring on the clear video */
+    .video-tag{right:auto;left:14px;bottom:14px}
+    .hero .frame{display:block;padding:clamp(22px,6vw,34px) clamp(18px,4vw,40px) clamp(30px,7vw,44px)}
+    .copy{max-width:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+      border:0;border-radius:0;padding:0;box-shadow:none}
+    h1{font-size:clamp(2rem,8.5vw,3rem)}
+    .hero p.sub{font-size:.98rem;margin-bottom:24px}
+  }
+  @media (max-width:760px){
+    .menu{position:absolute;top:64px;right:12px;left:12px;flex-direction:column;align-items:stretch;
+      gap:4px;background:#fff;border-radius:14px;padding:10px;border:1px solid var(--line);
+      box-shadow:0 24px 50px rgba(0,0,0,.18);display:none;z-index:40}
+    .menu.open{display:flex}
+    .menu li{width:100%}
+    .menu a{display:block;width:100%;padding:14px 14px;border-radius:9px;font-size:.9rem}
+    .menu a:hover,.menu a.active{background:rgba(192,118,43,.1)}
+    .menu .book{width:100%;margin-top:6px;padding:15px 14px;text-align:center;
+      border-radius:9px;font-size:.9rem}
+    .menu .book:hover{background:var(--accent);color:#fff}
+    .burger{display:block}
+  }
+  @media (max-width:760px){
+    .facts{display:none}                  /* declutter: hide stats on mobile */
+    .hero p.sub{font-size:1rem}
+  }
+  /* Small phones: shrink everything so nothing overflows */
+  @media (max-width:560px){
+    .phase-copy h2{font-size:clamp(1.6rem,7vw,2rem)}
+    .phase-copy p{font-size:.96rem}
+    .price-box{gap:9px;flex-wrap:nowrap}
+    .price-box .pb{flex:1 1 0;min-width:0;padding:12px 13px}
+    .price-box .pb .v{font-size:1.25rem}
+    .price-box .pb .k{font-size:.56rem}
+    .phase-note{font-size:.88rem;padding:12px 14px}
+    .btn{padding:14px 22px;font-size:.84rem}
+  }
+  @media (max-width:440px){
+    .actions{width:100%}
+    .btn{flex:1 1 auto;justify-content:center}
+    h1{font-size:clamp(1.9rem,9vw,2.5rem)}
+    .hero p.sub{font-size:.94rem}
+  }
+  @media (prefers-reduced-motion:reduce){.btn,.play .ring{transition:none}}
+</style>
+</head>
+<body>
+  <script>document.documentElement.classList.add('js');</script>
+  <div class="scroll-prog" id="scrollProg"></div>
+  <nav class="nav" id="nav">
+    <div class="frame">
+      <div class="logo"><span class="logo-txt"><b>REHOBOTH-WINNERS</b><span>Shopping Mall</span></span></div>
+      <button class="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="menu">
+        <li><a href="#home" class="active">HOME</a></li>
+        <li><a href="#land">THE LAND</a></li>
+        <li><a href="#build">THE BUILD</a></li>
+        <li><a href="#contact">CONTACT</a></li>
+        <li><a class="book" href="#pay" data-pay>Reserve a shop</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero" id="home">
+    <div class="hero-media" id="videoCard" role="button" tabindex="0" aria-label="Play mall development video">
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="./hailuo-2_3_A_timeline_video_of_the_development_of_REHOBOTH-WINNERS_SHOPPING_MALL_showing_pr-0.mp4" type="video/mp4">
+      </video>
+      <div class="play"><div class="ring"></div></div>
+      <span class="video-tag">▶ Watch the vision</span>
+    </div>
+    <div class="hero-scrim"></div>
+    <div class="frame">
+      <div class="copy">
+        <p class="eyebrow">Bluestone Garden City · Ire Estate</p>
+        <h1>Be a proud<br><span class="l2">shop owner.</span></h1>
+        <p class="sub">Own a shop at Rehoboth-Winners Shopping Mall — 16 modern shops with convenience built in, 8 up and 8 down, facing the Bluestone Garden City estate road. A lifetime investment that pays you back, year after year.</p>
+        <div class="actions">
+          <a class="btn btn-solid" href="#pay" data-pay>GET STARTED</a>
+          <a class="btn btn-outline" href="#about">LEARN MORE</a>
+        </div>
+        <div class="facts">
+          <div class="f"><b>16</b><span>Shops · 8 up, 8 down</span></div>
+          <div class="f"><b>62 sqm</b><span>Per full slot</span></div>
+          <div class="f"><b>₦7.5m</b><span>Per slot · Stage 1</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Phase 1 -->
+  <section class="phase" id="land">
+    <div class="frame">
+      <div class="phase-img reveal zoom">
+        <img src="./gemini-2.5-flash-image_A_cinematic_story-timelapse_of_the_making_of_REHOBOTH-WINNERS_SHOPPING_MALL_a_mo-0.jpg" alt="The land at Bluestone Garden City — cleared plot with survey pegs">
+      </div>
+      <div class="phase-copy reveal d1">
+        <p class="step">Phase 1 of 4 · The foundation</p>
+        <h2>It all starts with the land.</h2>
+        <p>The first phase is securing the land and completing every legal documentation — survey, deeds and global C-of-O. This is the foundation everything else is built on, and every naira here goes strictly into land payment procedures.</p>
+        <div class="price-box">
+          <div class="pb accent"><div class="k">Per full slot</div><div class="v">₦7.5m</div></div>
+          <div class="pb"><div class="k">Phase 1 total · 8 slots</div><div class="v">₦60m</div></div>
+        </div>
+        <div class="phase-note">
+          <span>📌</span>
+          <span>One slot ≈ 62 sqm (24 × 13 ft) = two shops, one up and one down, with toilet space included. Want just one shop? Pair with someone and split the payment.</span>
+        </div>
+        <a class="btn btn-solid" href="#pay" data-pay>Secure your slot</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phase 2 -->
+  <section class="phase white rev" id="build">
+    <div class="frame">
+      <div class="phase-img reveal zoom">
+        <img src="./gemini-2.5-flash-image_A_detailed_blueprint_of_REHOBOTH-WINNERS_SHOPPING_MALL_showcasing_its_modern_two-0.jpg" alt="Architectural blueprint of Rehoboth-Winners Shopping Mall — ground and first floor elevations">
+      </div>
+      <div class="phase-copy reveal d1">
+        <p class="step">Phase 2 of 4 · Design &amp; documentation</p>
+        <h2>From land to blueprint.</h2>
+        <p>With the land secured, Phase 2 turns it into a buildable plan. Each slot gets its own legal documentation, and seasoned professionals design the mall end to end — so every shop is built to standard, and every cost is known before a block is laid.</p>
+        <div class="checklist">
+          <div class="cl-head"><span class="n">Phase 2</span> What this phase covers</div>
+          <ul>
+            <li><span class="ck">✓</span><span><b>Individual legal documentation</b><span class="d">Title papers issued per slot, in your name.</span></span></li>
+            <li><span class="ck">✓</span><span><b>Architectural design</b><span class="d">Full plans for the 16-shop, two-storey mall.</span></span></li>
+            <li><span class="ck">✓</span><span><b>Electrical design &amp; budget</b><span class="d">Wiring layout and costed power plan.</span></span></li>
+            <li><span class="ck">✓</span><span><b>Mechanical building cost</b><span class="d">Structural and mechanical works costed.</span></span></li>
+            <li><span class="ck">✓</span><span><b>Cost of materials</b><span class="d">Transparent bill of quantities.</span></span></li>
+            <li><span class="ck">✓</span><span><b>Professional &amp; consultant fees</b><span class="d">Legal, engineering and consultancy covered.</span></span></li>
+          </ul>
+        </div>
+        <a class="btn btn-solid" href="#pay" data-pay>Reserve your slot</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phase 3 -->
+  <section class="phase">
+    <div class="frame">
+      <div class="phase-img reveal zoom">
+        <img src="./lucid-origin_A_cinematic_photo_of_a_two-storey_commercial_shopping_mall_under_construction_in-0.jpg" alt="Mall under construction, built to roof level with scaffolding and water tank">
+      </div>
+      <div class="phase-copy reveal d1">
+        <p class="step">Phase 3 of 4 · Construction</p>
+        <h2>From ground to roof.</h2>
+        <p>This is where the mall rises. The full structure is built from scratch to roof level — with all plumbing and electrical pipe and wiring in place, plastered throughout, and every window, burglary-proof and roll-shutter door fitted.</p>
+        <div class="phase-tags">
+          <span><b>Roof-level build</b></span>
+          <span>Plumbing &amp; electrical routing</span>
+          <span>Full plastering</span>
+          <span>Windows &amp; burglary proofing</span>
+          <span>Roll-shutter doors</span>
+          <span>Borehole &amp; tank scaffold</span>
+          <span>Soakaway &amp; drainage</span>
+          <span>External painting</span>
+          <span>Parking lot</span>
+        </div>
+        <a class="btn btn-solid" href="#pay" data-pay>Reserve your slot</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phase 4 -->
+  <section class="phase white rev">
+    <div class="frame">
+      <div class="phase-img reveal zoom">
+        <img src="./lucid-origin_A_cinematic_interior_of_a_newly_finished_modern_retail_shop_freshly_tiled_floor_-0.jpg" alt="Finished shop interior — tiled floor, painted walls, roll-shutter shopfront">
+      </div>
+      <div class="phase-copy reveal d1">
+        <p class="step">Phase 4 of 4 · Interior finishing</p>
+        <h2>Make it yours.</h2>
+        <p>The final phase is the finishing — done by each owner to their own taste and standard, because everyone's business and style is different. Tiling, internal painting, electrical and plumbing fittings, ceiling works, your meter and overhead tank. Your shop, your way.</p>
+        <div class="phase-tags">
+          <span><b>Tiling</b></span>
+          <span>Internal painting</span>
+          <span>Electrical fittings</span>
+          <span>Plumbing fittings</span>
+          <span>Ceiling works</span>
+          <span>Meter</span>
+          <span>Overhead tank</span>
+        </div>
+        <a class="btn btn-solid" href="#pay" data-pay>Become an owner</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Business ideas -->
+  <section class="ideas" id="ideas">
+    <div class="frame">
+      <div class="head reveal">
+        <p class="eyebrow">What you could run</p>
+        <h2><em id="ideaCount">33</em> ways to earn<br>from your shop.</h2>
+        <p>A mall this functional makes room for almost any business the community needs. Pick what fits you — or bring an idea of your own.</p>
+      </div>
+      <div class="idea-list reveal d1" id="ideaList"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact" id="contact">
+    <div class="frame">
+      <div class="reveal">
+        <p class="step">Own a shop today</p>
+        <h2>Ready to become an owner?</h2>
+        <p>Tap Get Started to make your payment — you'll fill in your name and details on the secure payment page. Prefer to talk first? Give us a call.</p>
+        <a class="btn btn-solid" href="#pay" data-pay>Get started <span class="arrow">→</span></a>
+      </div>
+      <div class="call-card reveal d1">
+        <p class="lbl">Call for enquiries</p>
+        <a href="tel:08033346916"><span class="ic"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.5 15.5 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.6 3.6 1 1 0 01-.25 1z"/></svg></span>0803 334 6916</a>
+        <a href="tel:09077195867"><span class="ic"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.5 15.5 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.6 3.6 1 1 0 01-.25 1z"/></svg></span>0907 719 5867</a>
+      </div>
+    </div>
+    <div class="frame">
+      <p class="footnote">Rehoboth-Winners Shopping Mall · Bluestone Garden City, Ire Estate. Phase 1 funds go strictly into land payment procedures. Figures shown reflect Phase 1 slot pricing.</p>
+    </div>
+  </section>
+
+  <!-- Fullscreen player -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="close" id="closeBox" aria-label="Close">✕</button>
+    <video id="bigVideo" controls playsinline>
+      <source src="./hailuo-2_3_A_timeline_video_of_the_development_of_REHOBOTH-WINNERS_SHOPPING_MALL_showing_pr-0.mp4" type="video/mp4">
+    </video>
+  </div>
+
+<script>
+  var PAYMENT_URL = "https://paystack.shop/pay/shop-development-fund";
+  document.querySelectorAll('[data-pay]').forEach(function(el){
+    el.addEventListener('click',function(e){
+      if(!PAYMENT_URL){e.preventDefault();
+        alert("Payment link coming shortly. To reserve now, call 0803 334 6916 or 0907 719 5867.");return;}
+      window.location.href=PAYMENT_URL;
+    });
+  });
+
+  var burger=document.querySelector('.burger'),menu=document.querySelector('.menu');
+  burger.addEventListener('click',function(){
+    var open=menu.classList.toggle('open');burger.setAttribute('aria-expanded',open);
+  });
+
+  var lb=document.getElementById('lightbox'),big=document.getElementById('bigVideo');
+  function openBox(){lb.classList.add('open');lb.setAttribute('aria-hidden','false');
+    big.currentTime=0;big.play();}
+  function closeBox(){lb.classList.remove('open');lb.setAttribute('aria-hidden','true');big.pause();}
+  var card=document.getElementById('videoCard');
+  card.addEventListener('click',openBox);
+  card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openBox();}});
+  document.getElementById('closeBox').addEventListener('click',closeBox);
+  lb.addEventListener('click',function(e){if(e.target===lb)closeBox();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeBox();});
+
+  // Business ideas
+  (function(){
+    var ideas=["Cold room","Supermarket","Wholesale provisions","Bookshop","Vegetables & fruits",
+      "Foodstuff shop","Cyber café & business centre","Computer accessories & printing","Eatery",
+      "Bakery","Event centre","Cinema","Cosmetic shop","Perfumery","Hair salon & makeup glam",
+      "Pharmacy","Photo studio","Tailoring & accessories","Wine & spirits","Soft drinks",
+      "Hair accessories","Children's & teens wear","Lace, Ankara & fabric","Bags & shoes",
+      "Boutique","Sports accessories","Gym","Recording studio","Ice-cream parlour",
+      "Condiments & spice","Plastics & nylon","Building materials","Cement"];
+    var list=document.getElementById('ideaList'),html="";
+    ideas.forEach(function(name,i){
+      var n=(i+1)<10?'0'+(i+1):(i+1);
+      html+='<div class="idea"><span class="num">'+n+'</span><span class="name">'+name+'</span></div>';
+    });
+    list.innerHTML=html;
+    document.getElementById('ideaCount').textContent=ideas.length;
+  })();
+
+  // Scroll progress bar + nav shrink on scroll
+  var prog=document.getElementById('scrollProg'),nav=document.getElementById('nav');
+  function onScroll(){
+    var h=document.documentElement,st=h.scrollTop||document.body.scrollTop;
+    var max=h.scrollHeight-h.clientHeight;
+    prog.style.width=(max>0?(st/max*100):0)+'%';
+    nav.classList.toggle('scrolled',st>12);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  // Reveal on scroll — with failsafes so content can never stay hidden
+  var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var items=Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  function showAll(){items.forEach(function(el){el.classList.add('in');});}
+  function showInView(){
+    var vh=window.innerHeight||document.documentElement.clientHeight;
+    items.forEach(function(el){
+      var r=el.getBoundingClientRect();
+      if(r.top<vh*0.92&&r.bottom>0)el.classList.add('in');
+    });
+  }
+  if(reduce||!('IntersectionObserver' in window)){
+    showAll();
+  }else{
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+      });
+    },{threshold:0.05,rootMargin:'0px 0px -5% 0px'});
+    items.forEach(function(el){io.observe(el);});
+    showInView();                                   // reveal whatever's already visible
+    window.addEventListener('load',showInView);     // and again after full load
+    setTimeout(showAll,3000);                        // hard failsafe: never leave anything blank
+  }
+</script>
+</body>
+</html>
