@@ -218,6 +218,43 @@
   .checklist li b{font-weight:600;color:var(--ink)}
   .checklist li span.d{display:block;color:var(--ink-soft);font-size:.84rem;margin-top:2px}
 
+  /* ---------- FAQ accordion ---------- */
+  .faq{background:rgba(255,255,255,.55);border-top:1px solid var(--line);
+    padding:clamp(50px,7vw,90px) 0}
+  .faq .head{max-width:640px;margin:0 0 clamp(28px,4vw,44px)}
+  .faq .step{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);margin:0 0 14px}
+  .faq h2{font-weight:800;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.06;
+    letter-spacing:-.01em;margin:0 0 16px}
+  .faq .head p{color:var(--ink-soft);font-size:1.02rem;line-height:1.7;margin:0;max-width:52ch}
+  .faq-groups{max-width:880px}
+  .faq-group+.faq-group{margin-top:clamp(24px,3.5vw,38px)}
+  .faq-cat{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);margin:0 0 12px}
+  .faq-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 24px 50px rgba(32,36,42,.1)}
+  .qa{border-top:1px solid var(--line)}
+  .qa:first-child{border-top:0}
+  .qa>summary{list-style:none;cursor:pointer;display:flex;gap:14px;align-items:flex-start;
+    padding:17px 22px;font-weight:600;font-size:1rem;line-height:1.45;color:var(--ink);
+    transition:color .2s}
+  .qa>summary::-webkit-details-marker{display:none}
+  .qa>summary::marker{content:""}
+  .qa>summary:hover,.qa[open]>summary{color:var(--accent)}
+  .qa>summary:after{content:"";flex:none;margin-left:auto;width:9px;height:9px;margin-top:5px;
+    border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);
+    transform:rotate(45deg);transition:transform .25s ease}
+  .qa[open]>summary:after{transform:rotate(-135deg);margin-top:9px}
+  .qa .a{padding:0 22px 20px}
+  .qa .a p{color:var(--ink-soft);font-size:.96rem;line-height:1.7;margin:0;max-width:68ch}
+  .qa .a p+p{margin-top:10px}
+  .qa .a a{color:var(--accent);font-weight:600}
+  @media (max-width:520px){
+    .qa>summary{padding:15px 16px;font-size:.94rem}
+    .qa .a{padding:0 16px 17px}
+    .qa .a p{font-size:.91rem}
+  }
+
   /* ---------- Scroll reveal (only hides once JS confirms it can reveal) ---------- */
   .js .reveal{opacity:0;transform:translateY(30px);
     transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
@@ -303,6 +340,7 @@
         <li><a href="#home" class="active">HOME</a></li>
         <li><a href="#land">THE LAND</a></li>
         <li><a href="#build">THE BUILD</a></li>
+        <li><a href="#faq">FAQ</a></li>
         <li><a href="#contact">CONTACT</a></li>
         <li><a class="book" href="#pay" data-pay>Reserve a shop</a></li>
       </ul>
@@ -456,6 +494,105 @@
         <p>A mall this functional makes room for almost any business the community needs. Pick what fits you — or bring an idea of your own.</p>
       </div>
       <div class="idea-list reveal d1" id="ideaList"></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="frame">
+      <div class="head reveal">
+        <p class="step">Frequently asked questions</p>
+        <h2>Everything buyers ask us.</h2>
+        <p>Land size, title, payments and how the mall is run once it's built — the answers we give most often.</p>
+      </div>
+
+      <div class="faq-groups">
+        <div class="faq-group reveal d1">
+          <h3 class="faq-cat">Land &amp; building</h3>
+          <div class="faq-card">
+            <details class="qa" open>
+              <summary>How big is the total land and each shop?</summary>
+              <div class="a"><p>The entire Rehoboth-Winners Shopping Mall sits on 500 SQM of land, divided into 8 equal commercial slots of 62.5 SQM each. The mall is two-storey, so every slot gives you two shops — one upstairs and one downstairs — 16 shops in total.</p></div>
+            </details>
+            <details class="qa">
+              <summary>Is it up and down or bungalow?</summary>
+              <div class="a"><p>It's up and down — a two-storey building. Each 62.5 SQM slot covers two shops, one on the ground floor and one on the first floor, with toilet space included. Want just one shop? Pair with someone and split the payment.</p></div>
+            </details>
+            <details class="qa">
+              <summary>Is there parking and other facilities?</summary>
+              <div class="a"><p>Yes. The layout includes customer parking, 24/7 security, common area lighting, waste disposal, and drainage.</p></div>
+            </details>
+          </div>
+        </div>
+
+        <div class="faq-group reveal d1">
+          <h3 class="faq-cat">Purchase &amp; developer</h3>
+          <div class="faq-card">
+            <details class="qa">
+              <summary>Who is selling the shop slots?</summary>
+              <div class="a"><p>Rehoboth-Winners Shopping Mall slots are being sold by Ire Estate. Ire Estate is the developer and allocation authority.</p></div>
+            </details>
+            <details class="qa">
+              <summary>Do I have to deal directly with Ogun State Government?</summary>
+              <div class="a"><p>No. As a buyer, you have no direct dealings with Ogun State Government. Ire Estate will handle all payments, levies, and C of O processing on behalf of all 8 owners.</p></div>
+            </details>
+          </div>
+        </div>
+
+        <div class="faq-group reveal d1">
+          <h3 class="faq-cat">Title &amp; documentation</h3>
+          <div class="faq-card">
+            <details class="qa">
+              <summary>What documents will I receive?</summary>
+              <div class="a"><p>You will receive an Allocation Letter, Purchase Receipt, Contract Agreement, and Deed of Assignment from Ire Estate. Ire Estate will also process and deliver the C of O for the property.</p></div>
+            </details>
+            <details class="qa">
+              <summary>What is the title on the land?</summary>
+              <div class="a"><p>Ire Estate holds the master title for the 500 SQM from Ogun State. Each buyer gets a Deed of Assignment for their 62.5 SQM portion, backed by the master C of O.</p></div>
+            </details>
+          </div>
+        </div>
+
+        <div class="faq-group reveal d1">
+          <h3 class="faq-cat">Payment &amp; fees</h3>
+          <div class="faq-card">
+            <details class="qa">
+              <summary>What payment plans are available?</summary>
+              <div class="a"><p>Contact the Rehoboth Mall Management team for further details — <a href="tel:08033346916">0803 334 6916</a> or <a href="tel:09077195867">0907 719 5867</a>.</p></div>
+            </details>
+            <details class="qa">
+              <summary>What fees am I responsible for?</summary>
+              <div class="a"><p>Only the Monthly Mall Service Charge for security, cleaning, and common maintenance, paid to Ire Estate / Mall Management. Ire Estate will also collect and remit the Annual Tenement Rate to Obafemi Owode LGA on behalf of owners.</p></div>
+            </details>
+          </div>
+        </div>
+
+        <div class="faq-group reveal d1">
+          <h3 class="faq-cat">Use &amp; management</h3>
+          <div class="faq-card">
+            <details class="qa">
+              <summary>Can I merge 2 shops together?</summary>
+              <div class="a"><p>Yes. You can merge 2 shops together if both slots are beside each other. No approval is required.</p></div>
+            </details>
+            <details class="qa">
+              <summary>What kind of business can I operate?</summary>
+              <div class="a"><p>Any approved commercial business: retail, boutique, pharmacy, office, restaurant, bank, etc. Subject to Rehoboth Mall rules.</p></div>
+            </details>
+            <details class="qa">
+              <summary>Can I sell or rent my shop later?</summary>
+              <div class="a"><p>Yes. But the Manager must be aware. No payment charges or transfer fees are required.</p></div>
+            </details>
+            <details class="qa">
+              <summary>When can I start building / fitting out my shop?</summary>
+              <div class="a"><p>Immediately after allocation. The building budget cost will be gotten and the bill will be split among the 8 slot owners to proceed with the building stage.</p></div>
+            </details>
+            <details class="qa">
+              <summary>Who manages the mall after sales?</summary>
+              <div class="a"><p>Ire Estate / Rehoboth Mall Management Team will manage security, cleaning, maintenance, and run the "Rehoboth Mall Owners Association" with all 8 owners.</p></div>
+            </details>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
