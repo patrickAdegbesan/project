@@ -16,7 +16,10 @@
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  html,body{margin:0;overflow-x:hidden;max-width:100%}
+  /* overflow-x lives on <html> only — putting it on <body> makes body a scroll
+     container, which silently kills position:sticky on the nav */
+  html{overflow-x:hidden}
+  html,body{margin:0;max-width:100%}
   [id]{scroll-margin-top:80px}   /* offset for sticky nav */
   /* Money / investment watermark baked into the page background */
   body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);
@@ -61,6 +64,9 @@
   .burger{display:none;background:none;border:0;cursor:pointer;padding:6px}
   .burger span{display:block;width:24px;height:2px;background:var(--ink);margin:5px 0;border-radius:2px;
     transition:transform .3s,opacity .3s}
+  .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .burger.open span:nth-child(2){opacity:0}
+  .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
   /* ---------- Hero (desktop: video as background) ---------- */
   .hero{position:relative;overflow:hidden;min-height:min(82vh,660px);display:flex;align-items:center}
@@ -575,7 +581,7 @@
             </details>
             <details class="qa">
               <summary>How much passing traffic will my shop see?</summary>
-              <div class="a"><p>Ire Estate is the gateway to the estates behind it — residents of all of them pass through Ire Estate to get home. That daily flow of people past your shopfront is what makes this location work for retail.</p></div>
+              <div class="a"><p>Ire Estate sits in Bluestone Garden City, an estate community with 8 other estates beyond Ire Estate. Residents of all of them pass through to get home, and that daily flow past your shopfront is what makes this location work for retail.</p></div>
             </details>
             <details class="qa">
               <summary>How will customers know the mall is there?</summary>
@@ -699,9 +705,13 @@
   });
 
   var burger=document.querySelector('.burger'),menu=document.querySelector('.menu');
-  burger.addEventListener('click',function(){
-    var open=menu.classList.toggle('open');burger.setAttribute('aria-expanded',open);
-  });
+  function setMenu(open){
+    menu.classList.toggle('open',open);burger.classList.toggle('open',open);
+    burger.setAttribute('aria-expanded',open);
+  }
+  burger.addEventListener('click',function(){setMenu(!menu.classList.contains('open'));});
+  // tapping a link should dismiss the sheet, not leave it covering the section
+  menu.addEventListener('click',function(e){if(e.target.tagName==='A')setMenu(false);});
 
   var lb=document.getElementById('lightbox'),big=document.getElementById('bigVideo');
   function openBox(){lb.classList.add('open');lb.setAttribute('aria-hidden','false');
@@ -783,15 +793,30 @@
     render();
   })();
 
-  // Scroll progress bar + nav shrink on scroll
+  // Scroll progress bar + nav shrink + active-link spy
   var prog=document.getElementById('scrollProg'),nav=document.getElementById('nav');
+  var navLinks=Array.prototype.slice.call(document.querySelectorAll('.menu a:not(.book)'));
+  var spy=navLinks.map(function(a){
+    var t=a.getAttribute('href')||'';
+    return {link:a,sec:t.charAt(0)==='#'?document.querySelector(t):null};
+  }).filter(function(o){return o.sec;});
+
   function onScroll(){
     var h=document.documentElement,st=h.scrollTop||document.body.scrollTop;
     var max=h.scrollHeight-h.clientHeight;
     prog.style.width=(max>0?(st/max*100):0)+'%';
     nav.classList.toggle('scrolled',st>12);
+
+    // last section whose top has crossed the upper third of the viewport wins
+    if(spy.length){
+      var probe=window.innerHeight*0.3,cur=spy[0];
+      spy.forEach(function(o){if(o.sec.getBoundingClientRect().top<=probe)cur=o;});
+      navLinks.forEach(function(a){a.classList.toggle('active',a===cur.link);});
+    }
   }
-  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
 
   // Reveal on scroll — with failsafes so content can never stay hidden
   var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
