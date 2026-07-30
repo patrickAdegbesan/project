@@ -254,6 +254,44 @@
   .checklist li b{font-weight:600;color:var(--ink)}
   .checklist li span.d{display:block;color:var(--ink-soft);font-size:.84rem;margin-top:2px}
 
+  /* ---------- Payment ---------- */
+  .pay{background:rgba(250,247,242,.6);border-top:1px solid var(--line);
+    padding:clamp(50px,7vw,90px) 0}
+  .pay .head{max-width:620px;margin:0 0 clamp(26px,4vw,40px)}
+  .pay .step{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);margin:0 0 14px}
+  .pay h2{font-weight:800;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.06;
+    letter-spacing:-.01em;margin:0 0 16px}
+  .pay .head p{color:var(--ink-soft);font-size:1.02rem;line-height:1.7;margin:0;max-width:52ch}
+  .pay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));
+    gap:clamp(14px,2vw,20px);max-width:880px}
+  .pay-card{display:flex;flex-direction:column;gap:8px;text-decoration:none;background:#fff;
+    border:1px solid var(--line);border-radius:16px;padding:clamp(22px,2.6vw,28px);
+    box-shadow:0 24px 50px rgba(32,36,42,.1);
+    transition:transform .18s,box-shadow .18s,border-color .18s}
+  .pay-card:hover{transform:translateY(-3px);border-color:var(--accent);
+    box-shadow:0 30px 60px rgba(32,36,42,.16)}
+  .pay-card .pc-k{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:700;color:var(--accent)}
+  .pay-card .pc-v{font-size:clamp(1.7rem,3.4vw,2.2rem);font-weight:800;color:var(--ink);
+    font-variant-numeric:tabular-nums;line-height:1}
+  .pay-card .pc-d{color:var(--ink-soft);font-size:.9rem;line-height:1.6}
+  .pay-card .pc-go{margin-top:6px;font-size:.8rem;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink)}
+  .pay-card:hover .pc-go{color:var(--accent)}
+  .pay-card.full{background:var(--ink);border-color:var(--ink)}
+  .pay-card.full .pc-v,.pay-card.full .pc-go{color:#fff}
+  .pay-card.full .pc-k{color:var(--accent-bright)}
+  .pay-card.full .pc-d{color:rgba(255,255,255,.66)}
+  .pay-card.full:hover .pc-go{color:var(--accent-bright)}
+  .pay-note{margin-top:clamp(22px,3vw,32px);max-width:880px;background:#fff;
+    border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;
+    padding:clamp(18px,2.4vw,24px)}
+  .pay-note p{color:var(--ink-soft);font-size:.94rem;line-height:1.7;margin:0}
+  .pay-note p+p{margin-top:12px}
+  .pay-note b{color:var(--ink)}
+  .pay-note a{color:var(--accent);font-weight:600}
+
   /* ---------- FAQ accordion ---------- */
   .faq{background:rgba(255,255,255,.55);border-top:1px solid var(--line);
     padding:clamp(50px,7vw,90px) 0}
@@ -378,7 +416,7 @@
         <li><a href="#build">THE BUILD</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#contact">CONTACT</a></li>
-        <li><a class="book" href="#pay" data-pay>Reserve a shop</a></li>
+        <li><a class="book" href="#pay">Reserve a shop</a></li>
       </ul>
     </div>
   </nav>
@@ -398,7 +436,7 @@
         <h1>Be a proud<br><span class="l2">shop owner.</span></h1>
         <p class="sub">Own a shop at Rehoboth-Winners Shopping Mall — 16 modern shops with convenience built in, 8 up and 8 down, facing the Bluestone Garden City estate road. A lifetime investment that pays you back, year after year.</p>
         <div class="actions">
-          <a class="btn btn-solid" href="#pay" data-pay>GET STARTED</a>
+          <a class="btn btn-solid" href="#pay">GET STARTED</a>
           <a class="btn btn-outline" href="#about">LEARN MORE</a>
         </div>
         <div class="facts">
@@ -431,7 +469,7 @@
           <span>📌</span>
           <span>One slot ≈ 62 sqm (24 × 13 ft) = two shops, one up and one down, with toilet space included. Want just one shop? Pair with someone and split the payment.</span>
         </div>
-        <a class="btn btn-solid" href="#pay" data-pay>Secure your slot</a>
+        <a class="btn btn-solid" href="#pay">Secure your slot</a>
       </div>
     </div>
   </section>
@@ -460,7 +498,7 @@
             <li><span class="ck">✓</span><span><b>Professional &amp; consultant fees</b><span class="d">Legal, engineering and consultancy covered.</span></span></li>
           </ul>
         </div>
-        <a class="btn btn-solid" href="#pay" data-pay>Reserve your slot</a>
+        <a class="btn btn-solid" href="#pay">Reserve your slot</a>
       </div>
     </div>
   </section>
@@ -489,7 +527,7 @@
           <span>External painting</span>
           <span>Parking lot</span>
         </div>
-        <a class="btn btn-solid" href="#pay" data-pay>Reserve your slot</a>
+        <a class="btn btn-solid" href="#pay">Reserve your slot</a>
       </div>
     </div>
   </section>
@@ -516,7 +554,7 @@
           <span>Meter</span>
           <span>Overhead tank</span>
         </div>
-        <a class="btn btn-solid" href="#pay" data-pay>Become an owner</a>
+        <a class="btn btn-solid" href="#pay">Become an owner</a>
       </div>
     </div>
   </section>
@@ -623,8 +661,13 @@
           <div class="faq-card">
             <details class="qa">
               <summary>What payment plans are available?</summary>
-              <div class="a"><p>Payment per slot is <b>₦7.5m</b>. A minimum of <b>₦5m</b> secures your slot, and the balance is completed within 2 months.</p>
+              <div class="a"><p>Payment per slot is <b>₦7.5m</b>. A minimum of <b>₦5m</b> secures your slot, and the balance is completed within 2 months. Both amounts can be paid from the <a href="#pay">payment section</a>.</p>
               <p>To talk through your own schedule, call the Rehoboth Mall Management team — <a href="tel:08033346916">0803 334 6916</a> or <a href="tel:09077195867">0907 719 5867</a>.</p></div>
+            </details>
+            <details class="qa">
+              <summary>Who exactly am I paying, and how do I get a receipt?</summary>
+              <div class="a"><p>Contributions are collected by <b>3O1A Tech Ltd</b> into the Commercial Shop Development Project account, processed through Paystack. Once the contributions for the phase are complete, the funds are moved to <b>Ire Estate</b>, who handle the land payment, documentation and C of O.</p>
+              <p>Paystack issues you an instant receipt for your payment. Ire Estate then issues your Allocation Letter, Purchase Receipt, Contract Agreement and Deed of Assignment. Call <a href="tel:08033346916">0803 334 6916</a> after paying so your slot is recorded in your name.</p></div>
             </details>
             <details class="qa">
               <summary>How much does it cost to build?</summary>
@@ -666,6 +709,41 @@
     </div>
   </section>
 
+  <!-- Payment -->
+  <section class="pay" id="pay">
+    <div class="frame">
+      <div class="head reveal">
+        <p class="step">Make your payment</p>
+        <h2>Choose your payment.</h2>
+        <p>A full slot is ₦7.5m. You can secure a slot with ₦5m and complete the balance within 2 months.</p>
+      </div>
+      <div class="pay-grid">
+        <a class="pay-card reveal d1" href="https://paystack.shop/pay/shop-development-fund?amount=5000000">
+          <span class="pc-k">Secure a slot</span>
+          <span class="pc-v">₦5,000,000</span>
+          <span class="pc-d">The minimum that holds a slot in your name. Balance completed within 2 months.</span>
+          <span class="pc-go">Pay this →</span>
+        </a>
+        <a class="pay-card full reveal d2" href="https://paystack.shop/pay/shop-development-fund?amount=7500000">
+          <span class="pc-k">Pay in full</span>
+          <span class="pc-v">₦7,500,000</span>
+          <span class="pc-d">One complete slot — 62.5 sqm, two shops, one up and one down.</span>
+          <span class="pc-go">Pay this →</span>
+        </a>
+      </div>
+      <div class="pay-note reveal d2">
+        <p><b>Who you are paying.</b> Contributions are collected by <b>3O1A Tech Ltd</b> into the
+          Commercial Shop Development Project account. Once the contributions for the phase are
+          complete, the funds are moved to <b>Ire Estate</b>, who handle the land payment,
+          documentation and C&nbsp;of&nbsp;O, and who issue your allocation letter and receipt.</p>
+        <p>Payment is processed by <b>Paystack</b> — card, bank transfer or USSD. The amount is filled
+          in for you but stays editable, so check it before you confirm. Keep your Paystack receipt,
+          then call <a href="tel:08033346916">0803 334 6916</a> or
+          <a href="tel:09077195867">0907 719 5867</a> so your slot is recorded in your name.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- Contact -->
   <section class="contact" id="contact">
     <div class="frame">
@@ -673,7 +751,7 @@
         <p class="step">Own a shop today</p>
         <h2>Ready to become an owner?</h2>
         <p>Tap Get Started to make your payment — you'll fill in your name and details on the secure payment page. Prefer to talk first? Give us a call.</p>
-        <a class="btn btn-solid" href="#pay" data-pay>Get started <span class="arrow">→</span></a>
+        <a class="btn btn-solid" href="#pay">Get started <span class="arrow">→</span></a>
       </div>
       <div class="call-card reveal d1">
         <p class="lbl">Call for enquiries</p>
@@ -695,14 +773,9 @@
   </div>
 
 <script>
-  var PAYMENT_URL = "https://paystack.shop/pay/shop-development-fund";
-  document.querySelectorAll('[data-pay]').forEach(function(el){
-    el.addEventListener('click',function(e){
-      if(!PAYMENT_URL){e.preventDefault();
-        alert("Payment link coming shortly. To reserve now, call 0803 334 6916 or 0907 719 5867.");return;}
-      window.location.href=PAYMENT_URL;
-    });
-  });
+  // Payment is plain anchors to the #pay section, which carries the two fixed
+  // amounts and the payee disclosure. No JS in the path, so the buttons still
+  // work if scripts fail — they used to be dead links without them.
 
   var burger=document.querySelector('.burger'),menu=document.querySelector('.menu');
   function setMenu(open){
