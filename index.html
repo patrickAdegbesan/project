@@ -291,6 +291,26 @@
   .pay-note p+p{margin-top:12px}
   .pay-note b{color:var(--ink)}
   .pay-note a{color:var(--accent);font-weight:600}
+  .pay-steps{margin-top:clamp(22px,3vw,32px);max-width:880px;background:#fff;
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 24px 50px rgba(32,36,42,.1)}
+  .pay-steps h3{margin:0;background:var(--ink);color:#fff;padding:16px 22px;
+    font-size:.9rem;font-weight:700;letter-spacing:.04em}
+  .pay-steps ol{list-style:none;margin:0;padding:6px 0;counter-reset:s}
+  .pay-steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;
+    padding:14px 22px;border-top:1px solid var(--line);color:var(--ink-soft);
+    font-size:.95rem;line-height:1.6}
+  .pay-steps li:first-child{border-top:0}
+  .pay-steps li:before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;
+    background:rgba(192,118,43,.12);color:var(--accent);display:grid;place-items:center;
+    font-size:.72rem;font-weight:800;margin-top:1px}
+  .pay-steps li>span{min-width:0}
+  .pay-steps li b{color:var(--ink);font-weight:600}
+  .pay-steps a{color:var(--accent);font-weight:600}
+  @media (max-width:520px){
+    .pay-steps li{padding:13px 16px;font-size:.9rem;gap:11px}
+    .pay-steps h3{padding:14px 16px}
+  }
 
   /* ---------- FAQ accordion ---------- */
   .faq{background:rgba(255,255,255,.55);border-top:1px solid var(--line);
@@ -437,7 +457,7 @@
         <p class="sub">Own a shop at Rehoboth-Winners Shopping Mall — 16 modern shops with convenience built in, 8 up and 8 down, facing the Bluestone Garden City estate road. A lifetime investment that pays you back, year after year.</p>
         <div class="actions">
           <a class="btn btn-solid" href="#pay">GET STARTED</a>
-          <a class="btn btn-outline" href="#about">LEARN MORE</a>
+          <a class="btn btn-outline" href="#land">LEARN MORE</a>
         </div>
         <div class="facts">
           <div class="f"><b>16</b><span>Shops · 8 up, 8 down</span></div>
@@ -736,10 +756,18 @@
           Commercial Shop Development Project account. Once the contributions for the phase are
           complete, the funds are moved to <b>Ire Estate</b>, who handle the land payment,
           documentation and C&nbsp;of&nbsp;O, and who issue your allocation letter and receipt.</p>
-        <p>Payment is processed by <b>Paystack</b> — card, bank transfer or USSD. The amount is filled
-          in for you but stays editable, so check it before you confirm. Keep your Paystack receipt,
-          then call <a href="tel:08033346916">0803 334 6916</a> or
-          <a href="tel:09077195867">0907 719 5867</a> so your slot is recorded in your name.</p>
+      </div>
+      <div class="pay-steps reveal d2">
+        <h3>How to pay, step by step</h3>
+        <ol>
+          <li><span><b>Pick your amount</b> above — ₦5m to secure a slot, or ₦7.5m to pay in full.</span></li>
+          <li><span>You land on the secure <b>Paystack</b> page. Fill in your name, email and phone number.</span></li>
+          <li><span><b>Check the amount</b> before you confirm. It is filled in for you, but it can still be edited.</span></li>
+          <li><span>Pay by <b>card, bank transfer or USSD</b> — whichever you prefer.</span></li>
+          <li><span><b>Keep the receipt</b> Paystack sends to your email. That is your proof of payment.</span></li>
+          <li><span>Call <a href="tel:08033346916">0803 334 6916</a> or <a href="tel:09077195867">0907 719 5867</a>
+            with your receipt so the slot is <b>recorded in your name</b>.</span></li>
+        </ol>
       </div>
     </div>
   </section>
