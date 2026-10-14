@@ -24,7 +24,7 @@ be copied out and used on its own.
 | [7](7/) | **Student Study Planner** | Study planning and time management: tasks, schedule, progress logs, goals, analytics, adaptive recommendations | Flask + SQLite, vanilla JS frontend | backend :5000 + `python -m http.server 5500` in `frontend/` | `python backend/cli.py` |
 | [8](8/) | **Network Congestion Simulation** | Discrete-event simulator for urban telecom networks (Poisson traffic, FIFO queues, M/M/1 validation) with a web control panel | Python (simpy/numpy/matplotlib), Flask | `python app.py` → :5000 | `python main.py` |
 | [9](9/) | **SRMS** | Student Record Management System: students, courses, grades/GPA, attendance, fees, reports, audit log — plus a script pipeline that generates the project report | PHP 8 + MySQL, Bootstrap | Apache/`php -S` + MySQL | `php srms/cli.php` |
-| [10](10/) | **Telegram Keyword Alerts** | Watches every Telegram group you're in (via your own account, no admin or group bot needed) and DMs you through your private bot when a message matches keywords you set | Python, Telethon + SQLite | — (managed by chatting with your bot) | `python -m kwalert` |
+| [10](10/) | **Telegram Keyword Alerts & Auto-Replies** | Watches every Telegram chat you're in (via your own account, no admin or group bot needed): DMs you through your private bot when a message matches keywords you set, and auto-answers repeated questions with replies you write | Python, Telethon + SQLite | — (managed by chatting with your bot) | `python -m kwalert` |
 
 Each project folder's own README covers installation, configuration,
 usage, API reference and the terminal client in detail.

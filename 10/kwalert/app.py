@@ -1,7 +1,7 @@
 """Runs two Telegram connections side by side.
 
 * ``user`` - logged in as YOU. Reads every chat you're in (no admin, no bot in
-  the group). It never sends anything into your groups.
+  the group). The only thing it ever sends is the auto-replies you wrote.
 * ``bot``  - your own private bot from @BotFather. It sends you the alerts (so
   your phone actually rings) and takes your commands (/add, /list, ...).
 """
@@ -9,21 +9,21 @@
 from __future__ import annotations
 
 import asyncio
+import datetime as dt
 import logging
 import os
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from telethon import TelegramClient, events, errors, utils
+from telethon import Button, TelegramClient, events, errors, utils
 from telethon.sessions import StringSession
 from telethon.tl import functions, types
 
+from .autoreply import AutoReplier, Incoming, RuleMatcher, SendBlocked, SlowDown, load_rules
 from .core import (
     BOT_COMMANDS,
-    CHANNEL,
-    DM,
-    GROUP,
     AlertDeduper,
     ChatInfo,
     Commands,
@@ -31,10 +31,15 @@ from .core import (
     should_watch,
     split_message,
 )
+from .kinds import CHANNEL, DM, GROUP
 from .matcher import Matcher
 from .storage import Store
 
 log = logging.getLogger("kwalert")
+
+# After a restart, missed messages are caught up for alerts, but questions
+# older than this are not auto-answered (someone has probably replied already).
+AUTOREPLY_MAX_AGE = dt.timedelta(minutes=15)
 
 
 @dataclass
@@ -105,6 +110,7 @@ async def run(cfg: Config) -> None:
 
     user = make_user_client(cfg)
     bot = TelegramClient(str(cfg.data_dir / "bot"), cfg.api_id, cfg.api_hash)
+    bot.parse_mode = "html"  # so message.text round-trips when editing Send/Skip prompts
 
     print("Logging in to your Telegram account (first time: enter phone + code)...")
     await user.start()
@@ -133,17 +139,71 @@ async def run(cfg: Config) -> None:
             chats.append(ChatInfo(d.id, d.name or "Untitled", kind))
         return chats
 
-    commands = Commands(store, matcher, list_chats)
-
-    async def notify(text: str) -> None:
+    async def notify(text: str, buttons=None) -> None:
         try:
-            for part in split_message(text):
-                await bot.send_message(owner_id, part, parse_mode="html", link_preview=False)
+            parts = split_message(text)
+            for i, part in enumerate(parts):
+                await bot.send_message(
+                    owner_id, part, parse_mode="html", link_preview=False,
+                    buttons=buttons if i == len(parts) - 1 else None,
+                )
         except (ValueError, errors.PeerIdInvalidError, errors.UserIsBlockedError):
             log.warning(
                 "Can't message you yet. Open @%s in Telegram and press START.",
                 bot_me.username,
             )
+
+    async def send_as_you(target, text: str, reply_to: int | None) -> None:
+        """Send an auto-reply from your account, translating Telegram's refusals."""
+        try:
+            await user.send_message(target, text, reply_to=reply_to, link_preview=False)
+        except (errors.FloodWaitError, errors.PeerFloodError) as exc:
+            raise SlowDown(str(exc)) from exc
+        except (
+            errors.ChatWriteForbiddenError,
+            errors.ChatAdminRequiredError,
+            errors.ChatRestrictedError,
+            errors.UserBannedInChannelError,
+            errors.SlowModeWaitError,
+            errors.ChatSendPlainForbiddenError,
+            errors.UserIsBlockedError,
+            errors.ForbiddenError,  # any other "you may not post here"
+        ) as exc:
+            raise SendBlocked(str(exc)) from exc
+
+    async def ask_approval(pid: int, text: str) -> None:
+        await notify(
+            text,
+            buttons=[[Button.inline("✅ Send", f"ar:s:{pid}"), Button.inline("Skip", f"ar:k:{pid}")]],
+        )
+
+    replier = AutoReplier(store, RuleMatcher(load_rules(store)), send_as_you, notify, ask_approval)
+    commands = Commands(store, matcher, list_chats, replier)
+
+    async def maybe_autoreply(event) -> None:
+        if event.chat_id == bot_me.id or not event.raw_text:
+            return
+        if dt.datetime.now(dt.timezone.utc) - event.date > AUTOREPLY_MAX_AGE:
+            return
+        sender = await event.get_sender()
+        # Only answer real people: not bots, not anonymous admins or channels.
+        if not isinstance(sender, types.User) or sender.bot or sender.is_self:
+            return
+        chat = await event.get_chat()
+        await replier.on_message(
+            Incoming(
+                chat_id=event.chat_id,
+                chat_kind=chat_kind(event),
+                chat_title=utils.get_display_name(chat) or "Unknown chat",
+                msg_id=event.id,
+                text=event.raw_text,
+                sender_id=sender.id,
+                sender_name=utils.get_display_name(sender) or "Someone",
+                sender_is_contact=bool(sender.contact),
+                chat_ref=await event.get_input_chat(),
+                sender_ref=await event.get_input_sender(),
+            )
+        )
 
     async def on_message(event, edited: bool = False) -> None:
         if event.chat_id == bot_me.id:
@@ -176,6 +236,10 @@ async def run(cfg: Config) -> None:
             await on_message(event)
         except Exception:
             log.exception("Failed to process a message")
+        try:
+            await maybe_autoreply(event)
+        except Exception:
+            log.exception("Failed to auto-reply")
 
     @user.on(events.MessageEdited(incoming=True))
     async def _edited(event):
@@ -197,6 +261,28 @@ async def run(cfg: Config) -> None:
             for part in split_message(reply):
                 await event.respond(part, parse_mode="html", link_preview=False)
 
+    @bot.on(events.CallbackQuery(pattern=rb"^ar:"))
+    async def _approval(event):
+        if event.sender_id != owner_id:
+            await event.answer()
+            return
+        m = re.match(rb"^ar:([sk]):(\d+)$", event.data)
+        if not m:
+            await event.answer()
+            return
+        pid = int(m.group(2))
+        original = (await event.get_message()).text or ""
+        gone = "⌛ Already handled, or expired because the program restarted."
+        if m.group(1) == b"s":
+            await event.answer("Sending…")
+            sent = await replier.approve(pid)
+            outcome = gone if sent is None else ("✅ Sent" if sent else "❌ Not sent (see the message above)")
+        else:
+            done = replier.skip(pid)
+            await event.answer("Skipped")
+            outcome = "⏭ Skipped" if done else gone
+        await event.edit(f"{original}\n\n<b>{outcome}</b>", parse_mode="html", buttons=None)
+
     try:
         await bot(
             functions.bots.SetBotCommandsRequest(
@@ -208,11 +294,14 @@ async def run(cfg: Config) -> None:
     except Exception:
         log.warning("Could not set the bot's command menu (not critical).")
 
-    n = len(store.keywords())
+    n, r = len(store.keywords()), len(store.rules())
     await notify(
         "✅ <b>Keyword alerts are running.</b>\n"
         + (f"Watching for {n} keyword(s). /list to see them."
            if n else "You have no keywords yet. Add some, e.g. <code>/add school fees, result</code>")
+        + "\n"
+        + (f"{r} auto-reply rule(s), auto-replies {'on' if store.get_flag('autoreply') else 'OFF'}. /replies to see them."
+           if r else "No auto-replies yet. Example: <code>/reply class + time => Class is 10am</code>")
     )
     print(f"Running. Open @{bot_me.username} in Telegram and send /help. Ctrl+C to stop.")
 

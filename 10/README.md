@@ -1,16 +1,23 @@
-# Telegram Keyword Alerts
+# Telegram Keyword Alerts & Auto-Replies
 
-Get a private Telegram notification whenever a message in **any group you're in**
-mentions a keyword **you** choose: "school fees", "result", "account", anything.
+1. **Alerts:** get a private Telegram notification whenever a message in **any
+   chat you're in** mentions a keyword **you** choose: "school fees",
+   "result", "account", anything.
+2. **Auto-replies:** when people keep asking the same question ("what time is
+   class?", "when are we submitting the assignment?"), your account answers
+   each of them for you, with the reply **you** wrote.
 
-- **No admin needed and nothing is added to the group.** It reads your groups
-  through your own account, the same way Telegram Desktop or Web would.
-- **Nobody in the group can tell.** It never posts in your groups.
-- **No built-in keywords.** You add, remove and test them yourself from Telegram.
+- **No admin needed and nothing is added to the group.** It works through your
+  own account, the same way Telegram Desktop or Web would.
+- **Works in every kind of chat:** public and private groups, supergroups and
+  topics, channel comment sections, and private chats.
+- **Nothing built in.** You write every keyword and every reply from Telegram.
 - Alerts arrive from your own private bot, so your phone actually notifies you.
+- It never posts anything except the auto-replies you wrote.
 
 ```
-Groups you're in ──► this program (logged in as you) ──► keyword? ──► your bot DMs you 📱
+Chats you're in ──► this program (logged in as you) ─┬─ keyword?  ──► your bot DMs you 📱
+                                                      └─ question? ──► you reply to them (automatically)
 ```
 
 ## What an alert looks like
@@ -91,6 +98,57 @@ Everything is done by chatting with your bot:
 - Your own messages never trigger alerts.
 - Text *inside* images or PDFs isn't read, only the message text and caption.
 
+## Auto-replies
+
+Auto-replies are sent **from your account**, as a reply to the person's
+message, so to them it looks like you answered. (A bot can't do this: Telegram
+won't let a bot message people who never opened it.)
+
+### Writing a rule
+```
+/reply class + time => Class is 10am in LT2 every Monday.
+```
+- Before `=>`: the words that must appear in the question. `+` means **all**
+  of them, in any order. So `class + time` answers "What time is class?" and
+  "abeg class starts what time".
+- Commas give **alternatives**, so one rule can catch different wordings:
+  ```
+  /reply assignment + submit, assignment + due, assignment + deadline => Submit on the portal by Friday 11:59pm.
+  ```
+- After `=>`: your answer, exactly as it will be sent. It can be several lines.
+- The same matching as keywords applies: capital letters don't matter, whole
+  words only, and `*` means "any letters" (`submi*` matches submit and submission).
+- If a message matches more than one rule, the lowest-numbered rule answers.
+
+| Command | What it does |
+|---|---|
+| `/reply words => answer` | Add a rule |
+| `/replies` | List rules with their numbers |
+| `/editreply 2 => new answer` | Change rule 2's answer |
+| `/delreply 2` | Delete rule 2 |
+| `/testreply what time is class?` | See which rule would answer |
+| `/autoreply on` / `off` | Switch auto-replies on or off (on by default) |
+| `/approve on` / `off` | **Ask me first:** each reply comes to you with **Send / Skip** buttons. Off = fully automatic (default) |
+| `/replyin chat` / `dm` | `chat` (default): reply in the chat where they asked. `dm`: reply privately to people in your contacts; everyone else still gets it in the chat |
+| `/cooldown 24` | Hours before the same person can get the same answer again (default 12) |
+
+You get a short note from your bot every time it answers someone
+("↩️ Auto-replied to Ada in Class of 2026"), so you always know what was said.
+
+### Built-in safety limits
+Telegram restricts accounts that look like spam bots, so auto-replies:
+- answer **each person once** per rule per cooldown, even if they ask again;
+- wait a **random 5–20 seconds** before replying;
+- send at most **10 per chat and 30 in total per hour**;
+- **switch themselves off** and tell you if Telegram says "slow down";
+- don't reply to bots, anonymous admins, or your own messages;
+- don't answer questions more than 15 minutes old (e.g. after a restart);
+- **never post in broadcast channels.** That would go to every subscriber.
+  Questions in a channel's *comments* are answered normally.
+
+`/mute` and `/only` apply to auto-replies too, and `/pause` stops everything.
+Private chats are always eligible for auto-replies; `/dms` only controls keyword alerts.
+
 ## Hosting (keeping it running 24/7)
 
 It must stay connected to catch messages, so run it somewhere that's always on:
@@ -117,18 +175,23 @@ If it restarts, it fetches messages it missed while offline.
 - `TG_SESSION` and the files in `data/` **are a login to your Telegram
   account**. Keep them private and never commit them (they're git-ignored).
 - To revoke access at any time: Telegram → Settings → Devices → end the session.
-- The program only **reads** your chats and sends alerts to you. Keep it that
-  way: using a personal account to mass-message people can get it restricted.
+- Apart from the auto-replies you write, the program only **reads** your
+  chats. Keep the safety limits on: a personal account that mass-messages
+  people can get restricted by Telegram. Private replies are limited to your
+  contacts for the same reason.
 - The bot ignores messages from anyone but you.
 
 ## Project layout
 
 ```
 kwalert/
-  app.py       Telegram connections: your account (reader) + your bot (alerts, commands)
+  app.py       Telegram connections: your account (reads, sends auto-replies)
+               + your bot (alerts, commands, Send/Skip buttons)
+  autoreply.py reply rules, who was already answered, safety limits
   core.py      which chats to watch, alert formatting, bot commands
   matcher.py   keyword matching rules
-  storage.py   SQLite: keywords, muted/only chats, settings
+  kinds.py     chat types (group / channel / private)
+  storage.py   SQLite: keywords, reply rules, muted/only chats, settings
 tests/         pytest suite (no Telegram login needed)
 ```
 

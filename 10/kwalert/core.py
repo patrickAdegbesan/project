@@ -11,12 +11,10 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Awaitable, Callable
 
+from .autoreply import AutoReplier, RuleError, parse_rule
+from .kinds import CHANNEL, DM, GROUP
 from .matcher import REGEX, TEXT, Keyword, KeywordError, Match, Matcher, snippet
 from .storage import Store
-
-GROUP = "group"
-CHANNEL = "channel"
-DM = "dm"
 
 
 @dataclass(frozen=True)
@@ -113,8 +111,8 @@ def split_message(text: str, limit: int = 4000) -> list[str]:
     return parts or [""]
 
 
-HELP = """<b>Keyword alerts</b>
-You choose every keyword. There are none until you add some.
+HELP = """<b>Keyword alerts &amp; auto-replies</b>
+You choose every keyword and every reply. There are none until you add some.
 
 <b>Keywords</b>
 /add <i>word or phrase</i> — add one, or several separated by commas
@@ -126,9 +124,25 @@ You choose every keyword. There are none until you add some.
 /clear yes — delete all keywords
 /test <i>some text</i> — see which keywords would fire
 
+<b>Auto-replies</b> (sent from your account, as you)
+/reply <i>words</i> => <i>your answer</i> — add a reply rule
+   e.g. <code>/reply class + time, lecture + time => Class is 10am in LT2</code>
+   <code>+</code> means the message must contain ALL those words (any order);
+   commas give alternatives.
+/replies — list your reply rules
+/delreply <i>number</i> — delete a rule
+/editreply <i>number</i> => <i>new answer</i> — change a rule's answer
+/testreply <i>some text</i> — see which rule would answer
+/autoreply on|off — switch auto-replies on or off
+/approve on|off — ask me before each reply (off = fully automatic)
+/replyin chat|dm — reply in the chat where asked (default), or privately
+   to people saved in your contacts (others still get it in the chat)
+/cooldown <i>hours</i> — don't answer the same person the same rule again
+   within this time (default 12)
+
 <b>Chats</b>
 /groups — numbered list of chats being watched
-/mute <i>numbers</i> — stop alerts from those chats (e.g. <code>/mute 2 5</code>)
+/mute <i>numbers</i> — ignore those chats (no alerts, no auto-replies) (e.g. <code>/mute 2 5</code>)
 /unmute <i>numbers</i>
 /only <i>numbers</i> — watch ONLY those chats
 /only off — go back to watching all chats
@@ -136,22 +150,31 @@ You choose every keyword. There are none until you add some.
 /dms on|off — also watch private chats (off by default)
 
 <b>General</b>
-/pause, /resume — stop or restart all alerts
+/pause, /resume — stop or restart all alerts and auto-replies
 /status — current settings
 
 Matching ignores capital letters and only matches whole words, so
-<code>account</code> won't fire on "accountability". Your own messages are ignored."""
+<code>account</code> won't fire on "accountability". Your own messages are ignored.
+Auto-replies never post in broadcast channels and each person gets a given
+answer only once per cooldown."""
 
 BOT_COMMANDS = [
     ("add", "Add keywords (comma-separated)"),
     ("remove", "Remove keywords"),
     ("list", "Show your keywords"),
     ("test", "Test text against your keywords"),
+    ("reply", "Add an auto-reply: words => answer"),
+    ("replies", "List auto-reply rules"),
+    ("delreply", "Delete an auto-reply rule"),
+    ("editreply", "Change an auto-reply's answer"),
+    ("testreply", "Test text against reply rules"),
+    ("autoreply", "Turn auto-replies on/off"),
+    ("approve", "Ask me before each auto-reply"),
     ("groups", "List watched chats"),
     ("mute", "Mute chats by number"),
     ("unmute", "Unmute chats by number"),
     ("only", "Watch only these chats"),
-    ("pause", "Pause all alerts"),
+    ("pause", "Pause alerts and auto-replies"),
     ("resume", "Resume alerts"),
     ("status", "Show settings"),
     ("help", "How to use this bot"),
@@ -180,10 +203,17 @@ def _on_off(arg: str) -> bool | None:
 class Commands:
     """Turns a bot message from the owner into a reply (HTML)."""
 
-    def __init__(self, store: Store, matcher: Matcher, list_chats: ListChats):
+    def __init__(
+        self,
+        store: Store,
+        matcher: Matcher,
+        list_chats: ListChats,
+        replier: AutoReplier | None = None,
+    ):
         self.store = store
         self.matcher = matcher
         self.list_chats = list_chats
+        self.replier = replier
 
     def _reload(self) -> None:
         self.matcher.set_keywords(self.store.keywords())
@@ -269,6 +299,119 @@ class Commands:
         if not hits:
             return "No keyword matched."
         return "Would alert for: " + ", ".join(f"<b>{_e(h.keyword.label())}</b>" for h in hits)
+
+    # --- auto-replies -----------------------------------------------------
+
+    def _reload_rules(self) -> None:
+        if self.replier:
+            self.replier.reload()
+
+    async def cmd_reply(self, arg: str) -> str:
+        if not arg:
+            return (
+                "Usage: <code>/reply class + time => Class is 10am in LT2</code>\n"
+                "Several triggers: <code>/reply class + time, lecture + start => ...</code>"
+            )
+        try:
+            triggers, reply = parse_rule(arg)
+        except RuleError as exc:
+            return f"❌ {_e(str(exc))}"
+        rule_id = self.store.add_rule(triggers, reply)
+        self._reload_rules()
+        lines = [f"✅ Added reply #{rule_id}", "When a message contains:"]
+        lines += [f"  • {_e(t)}" for t in triggers]
+        lines += ["I'll reply:", _e(reply)]
+        if not self.store.get_flag("autoreply"):
+            lines.append("\n⚠️ Auto-replies are off. Send <code>/autoreply on</code>.")
+        return "\n".join(lines)
+
+    async def cmd_replies(self, arg: str) -> str:
+        rules = self.store.rules()
+        if not rules:
+            return "No auto-reply rules yet. Add one with /reply."
+        blocks = []
+        for rid, triggers, reply in rules:
+            trig = "  |  ".join(_e(t) for t in triggers)
+            blocks.append(f"<b>#{rid}</b>  {trig}\n→ {_e(reply)}")
+        state = "on" if self.store.get_flag("autoreply") else "OFF"
+        mode = "ask me first" if self.store.get_flag("approve") else "automatic"
+        return f"<b>Auto-replies ({state}, {mode})</b>\n\n" + "\n\n".join(blocks)
+
+    async def cmd_delreply(self, arg: str) -> str:
+        nums = _numbers(arg)
+        if not nums:
+            return "Usage: <code>/delreply 2</code> (numbers from /replies)"
+        lines = [
+            f"🗑 Deleted reply #{n}" if self.store.delete_rule(n) else f"No reply #{n}"
+            for n in nums
+        ]
+        self._reload_rules()
+        return "\n".join(lines)
+
+    async def cmd_editreply(self, arg: str) -> str:
+        m = re.match(r"^#?(\d+)\s*=>\s*(.+)$", arg, re.DOTALL)
+        if not m:
+            return "Usage: <code>/editreply 2 => Class has moved to 11am</code>"
+        rid, reply = int(m.group(1)), m.group(2).strip()
+        if not self.store.update_rule_reply(rid, reply):
+            return f"No reply #{rid}. See /replies."
+        self._reload_rules()
+        return f"✏️ Reply #{rid} now says:\n{_e(reply)}"
+
+    async def cmd_testreply(self, arg: str) -> str:
+        if not arg:
+            return "Usage: <code>/testreply what time is class?</code>"
+        if not self.replier or not self.replier.rules.rules:
+            return "No auto-reply rules yet. Add one with /reply."
+        rule = self.replier.rules.find(arg)
+        if rule is None:
+            return "No reply rule matched."
+        return f"Reply #{rule.id} would answer:\n{_e(rule.reply)}"
+
+    async def cmd_autoreply(self, arg: str) -> str:
+        return await self._flag("autoreply", arg, "Auto-reply")
+
+    async def cmd_approve(self, arg: str) -> str:
+        on = _on_off(arg)
+        if on is None:
+            state = "on (I ask you first)" if self.store.get_flag("approve") else "off (fully automatic)"
+            return f"Approval is {state}. Use <code>/approve on</code> or <code>/approve off</code>."
+        self.store.set_flag("approve", on)
+        if on:
+            return "I'll ask you before sending each auto-reply, with Send / Skip buttons."
+        return "Auto-replies are now sent automatically."
+
+    async def cmd_replyin(self, arg: str) -> str:
+        where = arg.strip().lower()
+        if where not in ("chat", "dm"):
+            current = self.store.get("reply_in")
+            return (
+                f"Replies currently go to: <b>{current}</b>.\n"
+                "<code>/replyin chat</code> — reply to their message in the chat where they asked\n"
+                "<code>/replyin dm</code> — message them privately if they're in your contacts "
+                "(others still get the answer in the chat)"
+            )
+        self.store.set("reply_in", where)
+        if where == "dm":
+            return (
+                "Replies will go privately to people in your contacts; everyone else gets "
+                "the answer in the chat. (Private messages are limited to contacts so "
+                "Telegram doesn't flag your account for messaging strangers.)"
+            )
+        return "Replies will go to the chat where the question was asked."
+
+    async def cmd_cooldown(self, arg: str) -> str:
+        try:
+            hours = float(arg)
+        except ValueError:
+            return (
+                f"Cooldown is {self.store.get('cooldown_hours')} hours. "
+                "Usage: <code>/cooldown 24</code>"
+            )
+        if not 0 <= hours <= 24 * 30:
+            return "Pick between 0 and 720 hours."
+        self.store.set("cooldown_hours", f"{hours:g}")
+        return f"The same person won't get the same answer again within {hours:g} hours."
 
     # --- chats ------------------------------------------------------------
 
@@ -367,11 +510,11 @@ class Commands:
 
     async def cmd_pause(self, arg: str) -> str:
         self.store.set_flag("paused", True)
-        return "⏸ Alerts paused. Send /resume to restart."
+        return "⏸ Alerts and auto-replies paused. Send /resume to restart."
 
     async def cmd_resume(self, arg: str) -> str:
         self.store.set_flag("paused", False)
-        return "▶️ Alerts resumed."
+        return "▶️ Alerts and auto-replies resumed."
 
     async def cmd_status(self, arg: str) -> str:
         focused = self.store.chats("focused")
@@ -381,6 +524,9 @@ class Commands:
             "<b>Status</b>",
             f"Alerts: {'⏸ paused' if self.store.get_flag('paused') else '▶️ running'}",
             f"Keywords: {len(self.store.keywords())}",
+            f"Auto-replies: {onoff('autoreply')} · {len(self.store.rules())} rule(s) · "
+            f"{'ask me first' if self.store.get_flag('approve') else 'automatic'} · "
+            f"to {self.store.get('reply_in')} · cooldown {self.store.get('cooldown_hours')}h",
             f"Channels: {onoff('channels')} · Private chats: {onoff('dms')}",
         ]
         if focused:
