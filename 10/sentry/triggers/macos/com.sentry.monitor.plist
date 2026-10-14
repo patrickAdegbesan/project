@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sentry LaunchAgent for macOS.
+
+  This fires capture.py when the GUI session loads (login / fast-user-switch)
+  because a LaunchAgent is (re)loaded for the session at that moment. For
+  wake-from-sleep, pair this with `sleepwatcher` (see this folder's README).
+
+  Edit the two __PLACEHOLDER__ paths below, then install per the README.
+  The agent is listed openly in `launchctl list` — it is not hidden.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.sentry.monitor</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__PYTHON__</string>
+        <string>__SENTRY_DIR__/capture.py</string>
+        <string>--once</string>
+    </array>
+
+    <!-- Run once each time the agent is loaded (i.e. at session start). -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Keep logs so you can confirm it ran; openly, in your home Library. -->
+    <key>StandardOutPath</key>
+    <string>__SENTRY_DIR__/evidence/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>__SENTRY_DIR__/evidence/launchd.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Interactive</string>
+</dict>
+</plist>

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# systemd system-sleep hook. Installed to /usr/lib/systemd/system-sleep/.
+# systemd calls it with "pre"/"suspend" before sleep and "post"/"suspend"
+# after resume; we fire Sentry on resume.
+#
+# The two placeholders are filled in by install.sh.
+SENTRY_DIR="__SENTRY_DIR__"
+PYTHON="__PYTHON__"
+RUN_AS="__RUN_AS__"
+
+case "$1/$2" in
+    post/*)
+        # Run as the desktop user so the camera and X/Wayland session are
+        # reachable; su drops from root (system-sleep hooks run as root).
+        su - "$RUN_AS" -c "$PYTHON '$SENTRY_DIR/capture.py' --once" || true
+        ;;
+esac

@@ -1,0 +1,4 @@
+# Never commit your filled-in credentials or captured evidence.
+config.ini
+evidence/
+*.log

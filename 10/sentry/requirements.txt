@@ -1,0 +1,5 @@
+# Sentry capture core.
+# Screenshot: mss is small and works on macOS/Windows/Linux(X11).
+# Webcam: opencv grabs a frame from the default camera on all three OSes.
+mss>=9.0.1
+opencv-python>=4.8.0

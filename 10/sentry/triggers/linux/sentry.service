@@ -1,0 +1,17 @@
+# systemd *user* service: fires Sentry once each time your graphical
+# session starts (login / unlock-after-login via graphical-session.target).
+# Installed to ~/.config/systemd/user/ by install.sh.
+#
+# Listed openly: `systemctl --user status sentry.service`.
+[Unit]
+Description=Sentry intruder monitor (one capture at session start)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+# __PYTHON__ and __SENTRY_DIR__ are filled in by install.sh.
+ExecStart=__PYTHON__ __SENTRY_DIR__/capture.py --once
+
+[Install]
+WantedBy=graphical-session.target
